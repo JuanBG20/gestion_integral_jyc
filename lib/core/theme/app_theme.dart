@@ -27,11 +27,13 @@ class AppTheme {
           color: AppColors.primary,
         ),
 
-        /*  // Section Title
+        // Section Title
         titleMedium: GoogleFonts.cabin(
-          fontSize: 18,
+          fontSize: 20,
           fontWeight: FontWeight.w600,
+          color: AppColors.primary,
         ),
+        /*
 
         // Card Title
         titleSmall: GoogleFonts.cabin(
@@ -46,12 +48,12 @@ class AppTheme {
           color: AppColors.onBackground,
         ),
 
-        /* // Paragraph
+        // Paragraph
         bodyMedium: GoogleFonts.cabin(
-          fontSize: 13,
-          fontWeight: FontWeight.w500,
-          color: Color(0xFF42474F),
-        ),*/
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          color: AppColors.onBackground,
+        ),
 
         // Extra info
         bodySmall: GoogleFonts.cabin(
