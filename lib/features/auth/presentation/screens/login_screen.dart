@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_text_field.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 
@@ -77,36 +78,32 @@ class _LoginScreenState extends State<LoginScreen> {
                       key: _formKey,
                       child: Column(
                         children: [
-                          TextFormField(
+                          LabeledTextField(
                             controller: _emailController,
-                            keyboardType: TextInputType.emailAddress,
-                            decoration: InputDecoration(
-                              labelText: "Email",
-                              hintText: "operario@gmail.com",
-                              prefixIcon: const Icon(Icons.person_outline),
-                            ),
+                            inputType: TextInputType.emailAddress,
+                            label: 'Email',
+                            hint: 'operario@gmail.com',
+                            prefixIcon: const Icon(Icons.person_outline),
                           ),
 
                           const SizedBox(height: 20),
 
-                          TextFormField(
+                          LabeledTextField(
                             controller: _passwordController,
                             obscureText: _obscurePassword,
-                            decoration: InputDecoration(
-                              labelText: "Contraseña",
-                              hintText: "*******",
-                              prefixIcon: const Icon(Icons.lock_outline),
-                              suffixIcon: IconButton(
-                                onPressed: () {
-                                  setState(() {
-                                    _obscurePassword = !_obscurePassword;
-                                  });
-                                },
-                                icon: Icon(
-                                  _obscurePassword
-                                      ? Icons.visibility_off
-                                      : Icons.visibility,
-                                ),
+                            label: 'Contraseña',
+                            hint: '*******',
+                            prefixIcon: const Icon(Icons.lock_outline),
+                            suffixIcon: IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  _obscurePassword = !_obscurePassword;
+                                });
+                              },
+                              icon: Icon(
+                                _obscurePassword
+                                    ? Icons.visibility_off
+                                    : Icons.visibility,
                               ),
                             ),
                           ),
