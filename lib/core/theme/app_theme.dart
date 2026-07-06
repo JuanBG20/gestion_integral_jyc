@@ -93,10 +93,10 @@ class AppTheme {
         style: OutlinedButton.styleFrom(
           backgroundColor: Colors.white,
           elevation: 0,
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(24),
           side: const BorderSide(color: AppColors.outline),
-          foregroundColor: Colors.black,
-          textStyle: const TextStyle(fontWeight: FontWeight.w700),
+          foregroundColor: AppColors.primary,
+          textStyle: const TextStyle(fontWeight: FontWeight.w600),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
         ),
       ),
