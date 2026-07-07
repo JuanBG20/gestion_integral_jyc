@@ -31,7 +31,7 @@ class DashboardScreen extends StatelessWidget {
 
             LayoutBuilder(
               builder: (context, constraints) {
-                final bool isDesktop = constraints.maxWidth > 900;
+                final bool isDesktop = constraints.maxWidth > 840;
 
                 if (isDesktop) {
                   return Row(

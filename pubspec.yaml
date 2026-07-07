@@ -1,6 +1,6 @@
 name: gestion_integral_jyc
 description: "A new Flutter project."
-publish_to: 'none'
+publish_to: "none"
 version: 0.1.0+1
 
 environment:
@@ -10,6 +10,7 @@ dependencies:
   flutter:
     sdk: flutter
   google_fonts: ^8.1.0
+  flutter_expandable_table: ^2.2.0
 
 dev_dependencies:
   flutter_test:
