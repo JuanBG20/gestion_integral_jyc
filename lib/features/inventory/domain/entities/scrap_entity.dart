@@ -4,10 +4,12 @@ class ScrapEntity {
   final double height;
   final double width;
   final RawMaterialEntity rawMaterial;
+  final int stock;
 
   ScrapEntity({
     required this.height,
     required this.width,
     required this.rawMaterial,
+    required this.stock,
   });
 }
