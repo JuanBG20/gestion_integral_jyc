@@ -38,6 +38,7 @@ class _NewRawMaterialScreenState extends State<NewScrapScreen> {
       subtitle: "Ingrese los detalles del nuevo retazo para el inventario.",
       returnLabel: "Volver al Inventario",
       saveLabel: "Guardar Retazo",
+      maxWidth: 1200,
       formKey: _formKey,
       formContent: LayoutBuilder(
         builder: (context, constraints) {

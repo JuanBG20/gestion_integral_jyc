@@ -13,6 +13,7 @@ class FormScreenLayout extends StatelessWidget {
   final VoidCallback onReturn;
   final VoidCallback onSave;
   final VoidCallback onCancel;
+  final double maxWidth;
 
   const FormScreenLayout({
     super.key,
@@ -26,6 +27,7 @@ class FormScreenLayout extends StatelessWidget {
     required this.onReturn,
     required this.onSave,
     required this.onCancel,
+    this.maxWidth = 900,
   });
 
   @override
@@ -37,7 +39,7 @@ class FormScreenLayout extends StatelessWidget {
         alignment: Alignment.topCenter,
 
         child: ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: sidePanel != null ? 1200 : 900),
+          constraints: BoxConstraints(maxWidth: maxWidth),
 
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(24),

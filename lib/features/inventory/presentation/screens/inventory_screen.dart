@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_cell.dart';
+import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_column.dart';
+import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_header.dart';
+import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_row.dart';
+import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_shell.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/features/inventory/domain/entities/base_product_entity.dart';
@@ -9,6 +14,30 @@ import 'package:gestion_integral_jyc/features/inventory/presentation/models/prod
 
 class InventoryScreen extends StatelessWidget {
   const InventoryScreen({super.key});
+
+  static const _rawMaterialColumns = [
+    AppTableColumn(label: "SKU", flex: 2),
+    AppTableColumn(label: "Descripción", flex: 3),
+    AppTableColumn(label: "Stock", flex: 1),
+    AppTableColumn(label: "Stock Mínimo", flex: 2),
+    AppTableColumn(label: "Categoría > Subcategoría", flex: 3),
+  ];
+
+  static const _productColumns = [
+    AppTableColumn(label: "SKU", flex: 2),
+    AppTableColumn(label: "Descripción", flex: 3),
+    AppTableColumn(label: "Stock", flex: 1),
+    AppTableColumn(label: "Categoría > Subcategoría", flex: 3),
+    AppTableColumn(label: "Precio Costo", flex: 2),
+    AppTableColumn(label: "Precio Venta", flex: 2),
+  ];
+
+  static const _scrapColumns = [
+    AppTableColumn(label: "Materia Prima", flex: 4),
+    AppTableColumn(label: "Ancho", flex: 2),
+    AppTableColumn(label: "Alto", flex: 2),
+    AppTableColumn(label: "Stock", flex: 1),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -82,38 +111,6 @@ class InventoryScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTableShell(
-    BuildContext context, {
-    required Widget header,
-    required List<Widget> rows,
-  }) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final double tableWidth = constraints.maxWidth > 1000
-            ? constraints.maxWidth
-            : 1000.0;
-
-        return SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-
-          child: SizedBox(
-            width: tableWidth,
-
-            child: Container(
-              decoration: BoxDecoration(
-                color: AppColors.background,
-                border: Border.all(color: AppColors.outline),
-                borderRadius: BorderRadius.circular(4),
-              ),
-
-              child: ListView(children: [header, ...rows]),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
   Widget _buildRawMaterialsTab(BuildContext context) {
     final materiasPrimas = [
       RawMaterialEntity(
@@ -126,14 +123,24 @@ class InventoryScreen extends StatelessWidget {
       ),
     ];
 
-    return _buildTableShell(
-      context,
-      header: _buildRawMaterialsHeader(context),
-      rows: [
-        ...materiasPrimas.map(
-          (mp) => _buildRawMaterialRow(context, material: mp),
-        ),
-      ],
+    return AppTableShell(
+      header: const AppTableHeader(columns: _rawMaterialColumns),
+      rows: materiasPrimas
+          .map(
+            (mp) => AppTableRow(
+              cells: [
+                AppTableCell.text(mp.sku, flex: 2),
+                AppTableCell.text(mp.description, flex: 3),
+                AppTableCell.text(mp.stock.toString(), flex: 1),
+                AppTableCell.text(mp.minStock.toString(), flex: 2),
+                AppTableCell.text(
+                  '${mp.category} > ${mp.subcategory}',
+                  flex: 3,
+                ),
+              ],
+            ),
+          )
+          .toList(),
     );
   }
 
@@ -193,9 +200,11 @@ class InventoryScreen extends StatelessWidget {
       ),
     ];
 
-    return _buildTableShell(
-      context,
-      header: _buildProductsHeader(context),
+    return AppTableShell(
+      header: const AppTableHeader(
+        columns: _productColumns,
+        leadingPadding: 60,
+      ),
       rows: mockInventory
           .map((product) => _buildExpandableTableRow(context, product: product))
           .toList(),
@@ -215,115 +224,26 @@ class InventoryScreen extends StatelessWidget {
       ScrapEntity(height: 10, width: 20, rawMaterial: materiaPrima, stock: 1),
     ];
 
-    return _buildTableShell(
-      context,
-      header: _buildScrapsHeader(context),
-      rows: [...retazos.map((scrap) => _buildScrapRow(context, scrap: scrap))],
-    );
-  }
-
-  Widget _buildRawMaterialsHeader(BuildContext context) {
-    final headerTheme = context.textTheme.bodyMedium?.copyWith(
-      color: Colors.black,
-      fontWeight: FontWeight.w700,
-    );
-    return Container(
-      padding: const EdgeInsets.only(top: 24, right: 24, bottom: 24, left: 24),
-      decoration: BoxDecoration(color: AppColors.surface),
-
-      child: Row(
-        children: [
-          Expanded(flex: 2, child: Text("SKU", style: headerTheme)),
-          Expanded(flex: 3, child: Text("Descripción", style: headerTheme)),
-          Expanded(flex: 1, child: Text("Stock", style: headerTheme)),
-          Expanded(flex: 2, child: Text("Stock Mínimo", style: headerTheme)),
-          Expanded(
-            flex: 3,
-            child: Text("Categoría > Subcategoría", style: headerTheme),
-          ),
-
-          const SizedBox(width: 40),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildProductsHeader(BuildContext context) {
-    final headerTheme = context.textTheme.bodyMedium?.copyWith(
-      color: Colors.black,
-      fontWeight: FontWeight.w700,
-    );
-
-    return Container(
-      padding: const EdgeInsets.only(top: 24, right: 24, bottom: 24, left: 60),
-      decoration: BoxDecoration(color: AppColors.surface),
-
-      child: Row(
-        children: [
-          Expanded(flex: 2, child: Text("SKU", style: headerTheme)),
-          Expanded(flex: 3, child: Text("Descripción", style: headerTheme)),
-          Expanded(flex: 1, child: Text("Stock", style: headerTheme)),
-          Expanded(
-            flex: 3,
-            child: Text("Categoría > Subcategoría", style: headerTheme),
-          ),
-          Expanded(flex: 2, child: Text("Precio Costo", style: headerTheme)),
-          Expanded(flex: 2, child: Text("Precio Venta", style: headerTheme)),
-
-          const SizedBox(width: 40),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildScrapsHeader(BuildContext context) {
-    final headerTheme = context.textTheme.bodyMedium?.copyWith(
-      color: Colors.black,
-      fontWeight: FontWeight.w700,
-    );
-
-    return Container(
-      padding: const EdgeInsets.only(top: 24, right: 24, bottom: 24, left: 24),
-      decoration: BoxDecoration(color: AppColors.surface),
-
-      child: Row(
-        children: [
-          Expanded(flex: 4, child: Text("Materia Prima", style: headerTheme)),
-          Expanded(flex: 2, child: Text("Ancho", style: headerTheme)),
-          Expanded(flex: 2, child: Text("Alto", style: headerTheme)),
-          Expanded(flex: 1, child: Text("Stock", style: headerTheme)),
-
-          const SizedBox(width: 40),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildRawMaterialRow(
-    BuildContext context, {
-    required RawMaterialEntity material,
-  }) {
-    return Container(
-      padding: const EdgeInsets.only(top: 12, bottom: 12, left: 24, right: 24),
-      decoration: BoxDecoration(
-        color: AppColors.background,
-        border: Border(bottom: BorderSide(color: AppColors.outline)),
-      ),
-
-      child: Row(
-        children: [
-          Expanded(flex: 2, child: Text(material.sku)),
-          Expanded(flex: 3, child: Text(material.description)),
-          Expanded(flex: 1, child: Text(material.stock.toString())),
-          Expanded(flex: 2, child: Text(material.minStock.toString())),
-          Expanded(
-            flex: 3,
-            child: Text('${material.category} > ${material.subcategory}'),
-          ),
-
-          const SizedBox(width: 40),
-        ],
-      ),
+    return AppTableShell(
+      header: const AppTableHeader(columns: _scrapColumns),
+      rows: retazos
+          .map(
+            (scrap) => AppTableRow(
+              cells: [
+                AppTableCell.text(scrap.rawMaterial.description, flex: 4),
+                AppTableCell.text(
+                  '${scrap.width.toStringAsFixed(1)} cm',
+                  flex: 2,
+                ),
+                AppTableCell.text(
+                  '${scrap.height.toStringAsFixed(1)} cm',
+                  flex: 2,
+                ),
+                AppTableCell.text(scrap.stock.toString(), flex: 1),
+              ],
+            ),
+          )
+          .toList(),
     );
   }
 
@@ -353,78 +273,38 @@ class InventoryScreen extends StatelessWidget {
       ),
 
       children: product.variants
-          .map((variant) => _buildProductRow(context, variant: variant))
-          .toList(),
-    );
-  }
-
-  Widget _buildProductRow(
-    BuildContext context, {
-    required VariantProductEntity variant,
-  }) {
-    final variantSpecs = [
-      variant.color,
-      variant.size,
-    ].where((element) => element != null && element.isNotEmpty).join(' - ');
-
-    return Container(
-      padding: const EdgeInsets.only(top: 12, bottom: 12, left: 60, right: 24),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        border: Border(bottom: BorderSide(color: AppColors.outline)),
-      ),
-
-      child: Row(
-        children: [
-          Expanded(
-            flex: 2,
-            child: Padding(
-              padding: const EdgeInsets.only(left: 16),
-              child: Text(variant.sku),
+          .map(
+            (variant) => AppTableRow(
+              padding: const EdgeInsets.only(
+                top: 12,
+                bottom: 12,
+                left: 60,
+                right: 24,
+              ),
+              background: AppColors.surface,
+              cells: [
+                AppTableCell.text(variant.sku, flex: 2),
+                AppTableCell.text(
+                  [
+                    variant.color,
+                    variant.size,
+                  ].where((e) => e != null && e.isNotEmpty).join(' - '),
+                  flex: 3,
+                ),
+                AppTableCell.text(variant.stock.toString(), flex: 1),
+                AppTableCell.text("", flex: 3),
+                AppTableCell.text(
+                  '\$${variant.costPrice.toStringAsFixed(2)}',
+                  flex: 2,
+                ),
+                AppTableCell.text(
+                  '\$${variant.salePrice.toStringAsFixed(2)}',
+                  flex: 2,
+                ),
+              ],
             ),
-          ),
-          Expanded(flex: 3, child: Text(variantSpecs)),
-          Expanded(flex: 1, child: Text(variant.stock.toString())),
-          Expanded(flex: 3, child: Text("")),
-          Expanded(
-            flex: 2,
-            child: Text('\$${variant.costPrice.toStringAsFixed(2)}'),
-          ),
-          Expanded(
-            flex: 2,
-            child: Text('\$${variant.salePrice.toStringAsFixed(2)}'),
-          ),
-
-          const SizedBox(width: 40),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildScrapRow(BuildContext context, {required ScrapEntity scrap}) {
-    return Container(
-      padding: const EdgeInsets.only(top: 12, bottom: 12, left: 24, right: 24),
-      decoration: BoxDecoration(
-        color: AppColors.background,
-        border: Border(bottom: BorderSide(color: AppColors.outline)),
-      ),
-
-      child: Row(
-        children: [
-          Expanded(flex: 4, child: Text(scrap.rawMaterial.description)),
-          Expanded(
-            flex: 2,
-            child: Text('${scrap.width.toStringAsFixed(1)} cm'),
-          ),
-          Expanded(
-            flex: 2,
-            child: Text('${scrap.height.toStringAsFixed(1)} cm'),
-          ),
-          Expanded(flex: 1, child: Text(scrap.stock.toString())),
-
-          const SizedBox(width: 40),
-        ],
-      ),
+          )
+          .toList(),
     );
   }
 
