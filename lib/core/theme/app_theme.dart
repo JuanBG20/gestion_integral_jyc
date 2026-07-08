@@ -80,7 +80,7 @@ class AppTheme {
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
           elevation: 0,
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
           side: const BorderSide(color: AppColors.primary),
           foregroundColor: Colors.white,
           textStyle: const TextStyle(fontWeight: FontWeight.w700),
@@ -93,7 +93,7 @@ class AppTheme {
         style: OutlinedButton.styleFrom(
           backgroundColor: Colors.white,
           elevation: 0,
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
           side: const BorderSide(color: AppColors.outline),
           foregroundColor: AppColors.primary,
           textStyle: const TextStyle(fontWeight: FontWeight.w600),
