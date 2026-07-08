@@ -23,4 +23,6 @@ class ClientEntity {
     this.address,
     this.id,
   });
+
+  String get fullName => '$name $lastName';
 }

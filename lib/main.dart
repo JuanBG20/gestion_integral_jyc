@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/layout.dart';
 import 'package:gestion_integral_jyc/core/theme/app_theme.dart';
-import 'package:gestion_integral_jyc/features/inventory/presentation/screens/new_product_screen.dart';
+import 'package:gestion_integral_jyc/features/production/presentation/screens/work_screen.dart';
 
 void main() {
   runApp(const MainApp());
@@ -13,7 +13,7 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(body: Layout(child: NewProductScreen())),
+      home: Scaffold(body: Layout(child: WorkScreen())),
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
     );
