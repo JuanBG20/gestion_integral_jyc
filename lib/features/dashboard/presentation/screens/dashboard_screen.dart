@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gestion_integral_jyc/core/presentation/widgets/quick_action_button.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 
@@ -177,28 +178,28 @@ class DashboardScreen extends StatelessWidget {
 
               const SizedBox(height: 16),
 
-              _buildQuickActionButton(
+              QuickActionButton(
                 label: 'Nueva Venta',
                 icon: Icons.point_of_sale_outlined,
               ),
 
               const SizedBox(height: 16),
 
-              _buildQuickActionButton(
+              QuickActionButton(
                 label: 'Nueva Órden de Trabajo',
                 icon: Icons.add_box_outlined,
               ),
 
               const SizedBox(height: 16),
 
-              _buildQuickActionButton(
+              QuickActionButton(
                 label: 'Registrar Material',
                 icon: Icons.draw_outlined,
               ),
 
               const SizedBox(height: 16),
 
-              _buildQuickActionButton(
+              QuickActionButton(
                 label: 'Registar Retazo',
                 icon: Icons.content_cut_outlined,
               ),
@@ -324,26 +325,6 @@ class DashboardScreen extends StatelessWidget {
           Text(subtitle, style: context.textTheme.bodySmall),
         ],
       ),
-    );
-  }
-
-  Widget _buildQuickActionButton({
-    required String label,
-    required IconData icon,
-  }) {
-    return OutlinedButton.icon(
-      onPressed: () {},
-      label: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-
-        children: [Icon(icon, size: 20), const SizedBox(width: 8), Text(label)],
-      ),
-      icon: Icon(
-        Icons.arrow_forward_ios,
-        color: AppColors.onBackground,
-        size: 16,
-      ),
-      iconAlignment: IconAlignment.end,
     );
   }
 
