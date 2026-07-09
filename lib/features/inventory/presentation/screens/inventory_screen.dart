@@ -11,6 +11,7 @@ import 'package:gestion_integral_jyc/features/inventory/domain/entities/raw_mate
 import 'package:gestion_integral_jyc/features/inventory/domain/entities/scrap_entity.dart';
 import 'package:gestion_integral_jyc/features/inventory/domain/entities/variant_product_entity.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/models/product_group_ui.dart';
+import 'package:go_router/go_router.dart';
 
 class InventoryScreen extends StatelessWidget {
   const InventoryScreen({super.key});
@@ -44,69 +45,92 @@ class InventoryScreen extends StatelessWidget {
     return DefaultTabController(
       length: 3,
 
-      child: Scaffold(
-        backgroundColor: AppColors.surface,
+      child: Builder(
+        builder: (BuildContext tabContext) {
+          return Scaffold(
+            backgroundColor: AppColors.surface,
 
-        body: Padding(
-          padding: const EdgeInsets.all(24),
+            body: Padding(
+              padding: const EdgeInsets.all(24),
 
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
 
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
                     children: [
-                      Text("Inventario", style: context.textTheme.titleLarge),
-                      Text(
-                        "Gestión de productos terminados, materia prima y retazos.",
-                        style: context.textTheme.bodyLarge,
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+
+                        children: [
+                          Text(
+                            "Inventario",
+                            style: context.textTheme.titleLarge,
+                          ),
+                          Text(
+                            "Gestión de productos terminados, materia prima y retazos.",
+                            style: context.textTheme.bodyLarge,
+                          ),
+                        ],
+                      ),
+
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          final currentIndex = DefaultTabController.of(
+                            tabContext,
+                          ).index;
+
+                          switch (currentIndex) {
+                            case 0:
+                              tabContext.go('/inventory/new-material');
+                              break;
+                            case 1:
+                              tabContext.go('/inventory/new-product');
+                              break;
+                            case 2:
+                              tabContext.go('/inventory/new-scrap');
+                              break;
+                          }
+                        },
+                        label: Text("Nuevo Item"),
+                        icon: Icon(Icons.add),
                       ),
                     ],
                   ),
 
-                  ElevatedButton.icon(
-                    onPressed: () {},
-                    label: Text("Nuevo Item"),
-                    icon: Icon(Icons.add),
+                  const SizedBox(height: 8),
+
+                  TabBar(
+                    isScrollable: true,
+                    tabAlignment: TabAlignment.start,
+                    dividerColor: AppColors.outline,
+
+                    tabs: const [
+                      Tab(text: "Materia Prima"),
+                      Tab(text: "Productos"),
+                      Tab(text: "Retazos"),
+                    ],
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  Expanded(
+                    child: TabBarView(
+                      children: [
+                        _buildRawMaterialsTab(context),
+                        _buildProductsTab(context),
+                        _buildScrapsTab(context),
+                      ],
+                    ),
                   ),
                 ],
               ),
-
-              const SizedBox(height: 8),
-
-              TabBar(
-                isScrollable: true,
-                tabAlignment: TabAlignment.start,
-                dividerColor: AppColors.outline,
-
-                tabs: const [
-                  Tab(text: "Materia Prima"),
-                  Tab(text: "Productos"),
-                  Tab(text: "Retazos"),
-                ],
-              ),
-
-              const SizedBox(height: 16),
-
-              Expanded(
-                child: TabBarView(
-                  children: [
-                    _buildRawMaterialsTab(context),
-                    _buildProductsTab(context),
-                    _buildScrapsTab(context),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }

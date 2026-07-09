@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gestion_integral_jyc/core/presentation/widgets/search_app_bar.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:go_router/go_router.dart';
@@ -30,6 +31,10 @@ class _LayoutState extends State<Layout> {
 
   @override
   Widget build(BuildContext context) {
+    final String currentPath = GoRouterState.of(context).uri.path;
+    final bool haveSearchBar =
+        currentPath == '/inventory' || currentPath == '/clients';
+
     return Scaffold(
       body: Row(
         children: [
@@ -149,7 +154,17 @@ class _LayoutState extends State<Layout> {
             ),
           ),
 
-          Expanded(child: widget.navigationShell),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+
+              children: [
+                if (haveSearchBar) const SearchAppBar(),
+
+                Expanded(child: widget.navigationShell),
+              ],
+            ),
+          ),
         ],
       ),
     );
