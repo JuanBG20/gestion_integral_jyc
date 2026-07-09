@@ -116,7 +116,8 @@ class _LayoutState extends State<Layout> {
                 _buildSidebarItem(
                   icon: Icons.people_alt_outlined,
                   title: "Clientes",
-                  onTap: () {},
+                  onTap: () => _goToBranch(4),
+                  isActive: widget.navigationShell.currentIndex == 4,
                   isExpanded: _isSidebarExpanded,
                 ),
 

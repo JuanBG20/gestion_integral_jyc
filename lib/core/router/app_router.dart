@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gestion_integral_jyc/core/presentation/screens/clients_screen.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/layout.dart';
 import 'package:gestion_integral_jyc/features/dashboard/presentation/screens/dashboard_screen.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/screens/inventory_screen.dart';
@@ -46,6 +47,14 @@ final goRouter = GoRouter(
             GoRoute(
               path: '/sales',
               builder: (context, state) => const SalesScreen(),
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/clients',
+              builder: (context, state) => const ClientsScreen(),
             ),
           ],
         ),
