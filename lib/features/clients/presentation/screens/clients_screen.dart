@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:gestion_integral_jyc/core/domain/entities/address_entity.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gestion_integral_jyc/core/domain/entities/client_entity.dart';
-import 'package:gestion_integral_jyc/core/enums/doc_type.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_cell.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_column.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_header.dart';
@@ -9,9 +8,10 @@ import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_r
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_shell.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
+import 'package:gestion_integral_jyc/features/clients/presentation/providers/client_provider.dart';
 import 'package:go_router/go_router.dart';
 
-class ClientsScreen extends StatelessWidget {
+class ClientsScreen extends ConsumerWidget {
   const ClientsScreen({super.key});
 
   static const _clientColumns = [
@@ -23,8 +23,8 @@ class ClientsScreen extends StatelessWidget {
   ];
 
   @override
-  Widget build(BuildContext context) {
-    final clientes = _mockClients;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final clientsState = ref.watch(clientProvider);
 
     return Scaffold(
       backgroundColor: AppColors.surface,
@@ -67,31 +67,61 @@ class ClientsScreen extends StatelessWidget {
 
             const SizedBox(height: 32),
 
-            AppTableShell(
-              shrinkWrap: true,
-              minWidth: 1200,
-              header: const AppTableHeader(
-                columns: _clientColumns,
-                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-                trailingWidth: 100,
-              ),
-              rows: clientes
-                  .map((c) => _buildClientRow(context, client: c))
-                  .toList(),
-            ),
+            clientsState.when(
+              data: (clients) {
+                if (clients.isEmpty) {
+                  return const Center(
+                    child: Text("No hay clientes registrados."),
+                  );
+                }
 
-            _buildPaginationFooter(context, total: 45, shown: clientes.length),
+                return Column(
+                  children: [
+                    AppTableShell(
+                      shrinkWrap: true,
+                      minWidth: 1200,
+                      header: const AppTableHeader(
+                        columns: _clientColumns,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 20,
+                        ),
+                        trailingWidth: 100,
+                      ),
+                      rows: clients
+                          .map((c) => _buildClientRow(context, ref, client: c))
+                          .toList(),
+                    ),
+
+                    _buildPaginationFooter(
+                      context,
+                      total: clients.length,
+                      shown: clients.length,
+                    ),
+                  ],
+                );
+              },
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (error, stack) => Center(child: Text('Error: $error')),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildClientRow(BuildContext context, {required ClientEntity client}) {
+  Widget _buildClientRow(
+    BuildContext context,
+    WidgetRef ref, {
+    required ClientEntity client,
+  }) {
     return AppTableRow(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       trailingWidth: 100,
-      trailing: SizedBox(width: 40, child: _buildActionMenu(context)),
+      trailing: SizedBox(
+        width: 40,
+        child: _buildActionMenu(context, ref, client),
+      ),
       cells: [
         AppTableCell.text(
           client.fullName,
@@ -205,10 +235,18 @@ class ClientsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildActionMenu(BuildContext context) {
+  Widget _buildActionMenu(
+    BuildContext context,
+    WidgetRef ref,
+    ClientEntity client,
+  ) {
     return PopupMenuButton<String>(
       icon: Icon(Icons.more_horiz, color: AppColors.onBackground),
-      onSelected: (value) {},
+      onSelected: (value) {
+        if (value == 'delete' && client.id != null) {
+          ref.read(clientProvider.notifier).removeClient(client.id!);
+        }
+      },
       itemBuilder: (context) => [
         const PopupMenuItem(value: 'view', child: Text('Ver Perfil')),
         const PopupMenuItem(value: 'edit', child: Text('Editar')),
@@ -275,128 +313,4 @@ class ClientsScreen extends StatelessWidget {
 
     return parts.join(', ');
   }
-
-  static final List<ClientEntity> _mockClients = [
-    ClientEntity(
-      name: 'Roberto',
-      lastName: 'Carlos',
-      docType: DocType.cuit,
-      docNumber: '30-71234567-8',
-      email: 'compras@inghernan.com.ar',
-      phoneNumber: '+54 11 4321-8765',
-      additionalNotes: 'Cliente Frecuente',
-      address: AddressEntity(
-        street: 'Av. Industrial',
-        number: '450',
-        location: 'Parque Ind. Pilar',
-        province: 'BA',
-      ),
-    ),
-    ClientEntity(
-      name: 'Roberto',
-      lastName: 'Carlos',
-      docType: DocType.cuit,
-      docNumber: '30-71234567-8',
-      email: 'compras@inghernan.com.ar',
-      phoneNumber: '+54 11 4321-8765',
-      additionalNotes: 'Cliente Frecuente',
-      address: AddressEntity(
-        street: 'Av. Industrial',
-        number: '450',
-        location: 'Parque Ind. Pilar',
-        province: 'BA',
-      ),
-    ),
-    ClientEntity(
-      name: 'Roberto',
-      lastName: 'Carlos',
-      docType: DocType.cuit,
-      docNumber: '30-71234567-8',
-      email: 'compras@inghernan.com.ar',
-      phoneNumber: '+54 11 4321-8765',
-      additionalNotes: 'Cliente Frecuente',
-      address: AddressEntity(
-        street: 'Av. Industrial',
-        number: '450',
-        location: 'Parque Ind. Pilar',
-        province: 'BA',
-      ),
-    ),
-    ClientEntity(
-      name: 'Roberto',
-      lastName: 'Carlos',
-      docType: DocType.cuit,
-      docNumber: '30-71234567-8',
-      email: 'compras@inghernan.com.ar',
-      phoneNumber: '+54 11 4321-8765',
-      additionalNotes: 'Cliente Frecuente',
-      address: AddressEntity(
-        street: 'Av. Industrial',
-        number: '450',
-        location: 'Parque Ind. Pilar',
-        province: 'BA',
-      ),
-    ),
-    ClientEntity(
-      name: 'Roberto',
-      lastName: 'Carlos',
-      docType: DocType.cuit,
-      docNumber: '30-71234567-8',
-      email: 'compras@inghernan.com.ar',
-      phoneNumber: '+54 11 4321-8765',
-      additionalNotes: 'Cliente Frecuente',
-      address: AddressEntity(
-        street: 'Av. Industrial',
-        number: '450',
-        location: 'Parque Ind. Pilar',
-        province: 'BA',
-      ),
-    ),
-    ClientEntity(
-      name: 'Roberto',
-      lastName: 'Carlos',
-      docType: DocType.cuit,
-      docNumber: '30-71234567-8',
-      email: 'compras@inghernan.com.ar',
-      phoneNumber: '+54 11 4321-8765',
-      additionalNotes: 'Cliente Frecuente',
-      address: AddressEntity(
-        street: 'Av. Industrial',
-        number: '450',
-        location: 'Parque Ind. Pilar',
-        province: 'BA',
-      ),
-    ),
-    ClientEntity(
-      name: 'Lucía',
-      lastName: 'Martínez',
-      docType: DocType.dni,
-      docNumber: '35.456.789',
-      email: 'lmartinez.design@gmail.com',
-      phoneNumber: '+54 9 11 2345-6789',
-      additionalNotes: 'Estudiante de arquitectura',
-      address: AddressEntity(
-        street: 'Calle Falsa',
-        number: '123',
-        floor: '4to',
-        apartment: 'B',
-        location: 'CABA',
-        province: 'CABA',
-      ),
-    ),
-    ClientEntity(
-      name: 'Mecánica',
-      lastName: 'Romero',
-      docType: DocType.cuit,
-      docNumber: '20-22334455-9',
-      phoneNumber: '+54 351 456-7890',
-      additionalNotes: 'Piezas PETG',
-      address: AddressEntity(
-        street: 'Ruta 9 Km 12',
-        number: '',
-        location: 'Córdoba',
-        province: 'Córdoba',
-      ),
-    ),
-  ];
 }
