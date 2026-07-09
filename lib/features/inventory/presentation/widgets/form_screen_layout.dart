@@ -64,7 +64,7 @@ class FormScreenLayout extends StatelessWidget {
                     const SizedBox(width: 16),
 
                     TextButton.icon(
-                      onPressed: () {},
+                      onPressed: onReturn,
                       label: Text(returnLabel),
                       icon: Icon(Icons.arrow_back),
                     ),

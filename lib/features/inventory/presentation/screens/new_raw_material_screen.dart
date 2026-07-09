@@ -3,6 +3,7 @@ import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_text_fiel
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/widgets/form_screen_layout.dart';
+import 'package:go_router/go_router.dart';
 
 class NewRawMaterialScreen extends StatefulWidget {
   const NewRawMaterialScreen({super.key});
@@ -106,9 +107,15 @@ class _NewRawMaterialScreenState extends State<NewRawMaterialScreen> {
         },
       ),
 
-      onReturn: () {},
+      onReturn: () {
+        context.go('/inventory');
+      },
       onSave: () {},
-      onCancel: () {},
+      onCancel: () {
+        if (context.canPop()) {
+          context.pop();
+        }
+      },
     );
   }
 }

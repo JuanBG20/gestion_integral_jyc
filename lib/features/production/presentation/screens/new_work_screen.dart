@@ -5,6 +5,7 @@ import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/widgets/form_screen_layout.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/widgets/work_items_list_section.dart';
+import 'package:go_router/go_router.dart';
 
 class NewWorkScreen extends StatefulWidget {
   const NewWorkScreen({super.key});
@@ -129,9 +130,15 @@ class _NewRawMaterialScreenState extends State<NewWorkScreen> {
           ],
         ),
       ),
-      onReturn: () {},
+      onReturn: () {
+        context.go('/work');
+      },
       onSave: () {},
-      onCancel: () {},
+      onCancel: () {
+        if (context.canPop()) {
+          context.pop();
+        }
+      },
     );
   }
 }

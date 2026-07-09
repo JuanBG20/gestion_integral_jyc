@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/widgets/kanban_board.dart';
+import 'package:go_router/go_router.dart';
 
 class WorkScreen extends StatelessWidget {
   const WorkScreen({super.key});
@@ -38,7 +39,7 @@ class WorkScreen extends StatelessWidget {
                 ),
 
                 ElevatedButton.icon(
-                  onPressed: () {},
+                  onPressed: () => context.go('/work/new'),
                   label: Text("Nuevo Trabajo"),
                   icon: Icon(Icons.add),
                 ),

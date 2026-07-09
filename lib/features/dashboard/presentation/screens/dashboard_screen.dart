@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/quick_action_button.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
+import 'package:go_router/go_router.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -188,13 +189,15 @@ class DashboardScreen extends StatelessWidget {
               QuickActionButton(
                 label: 'Nueva Órden de Trabajo',
                 icon: Icons.add_box_outlined,
+                onPressed: () => context.go('/work/new'),
               ),
 
               const SizedBox(height: 16),
 
               QuickActionButton(
-                label: 'Registrar Material',
+                label: 'Registrar Producto',
                 icon: Icons.draw_outlined,
+                onPressed: () => context.go('/inventory/new-product'),
               ),
 
               const SizedBox(height: 16),
@@ -202,6 +205,7 @@ class DashboardScreen extends StatelessWidget {
               QuickActionButton(
                 label: 'Registar Retazo',
                 icon: Icons.content_cut_outlined,
+                onPressed: () => context.go('/inventory/new-scrap'),
               ),
             ],
           ),
