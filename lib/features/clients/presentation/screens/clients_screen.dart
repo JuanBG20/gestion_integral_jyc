@@ -9,6 +9,7 @@ import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_r
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_shell.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
+import 'package:go_router/go_router.dart';
 
 class ClientsScreen extends StatelessWidget {
   const ClientsScreen({super.key});
@@ -57,7 +58,7 @@ class ClientsScreen extends StatelessWidget {
                 const SizedBox(width: 16),
 
                 ElevatedButton.icon(
-                  onPressed: () {},
+                  onPressed: () => context.go('/clients/new'),
                   label: Text("Nuevo Cliente"),
                   icon: Icon(Icons.add),
                 ),

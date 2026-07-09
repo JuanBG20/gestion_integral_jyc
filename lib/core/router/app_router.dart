@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:gestion_integral_jyc/core/presentation/screens/clients_screen.dart';
+import 'package:gestion_integral_jyc/features/clients/presentation/screens/clients_screen.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/layout.dart';
+import 'package:gestion_integral_jyc/features/clients/presentation/screens/new_client_screen.dart';
 import 'package:gestion_integral_jyc/features/dashboard/presentation/screens/dashboard_screen.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/screens/inventory_screen.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/screens/new_product_screen.dart';
@@ -79,6 +80,12 @@ final goRouter = GoRouter(
             GoRoute(
               path: '/clients',
               builder: (context, state) => const ClientsScreen(),
+              routes: [
+                GoRoute(
+                  path: 'new',
+                  builder: (context, state) => const NewClientScreen(),
+                ),
+              ],
             ),
           ],
         ),
