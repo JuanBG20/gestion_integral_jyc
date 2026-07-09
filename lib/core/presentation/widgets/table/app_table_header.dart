@@ -5,13 +5,13 @@ import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 
 class AppTableHeader extends StatelessWidget {
   final List<AppTableColumn> columns;
-  final double leadingPadding;
+  final EdgeInsetsGeometry padding;
   final double trailingWidth;
 
   const AppTableHeader({
     super.key,
     required this.columns,
-    this.leadingPadding = 24,
+    this.padding = const EdgeInsets.all(24),
     this.trailingWidth = 40,
   });
 
@@ -23,12 +23,7 @@ class AppTableHeader extends StatelessWidget {
     );
 
     return Container(
-      padding: EdgeInsets.only(
-        top: 24,
-        right: 24,
-        bottom: 24,
-        left: leadingPadding,
-      ),
+      padding: padding,
       decoration: const BoxDecoration(color: AppColors.surface),
 
       child: Row(

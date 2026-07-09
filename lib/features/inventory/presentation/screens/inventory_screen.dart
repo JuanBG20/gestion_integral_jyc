@@ -203,7 +203,7 @@ class InventoryScreen extends StatelessWidget {
     return AppTableShell(
       header: const AppTableHeader(
         columns: _productColumns,
-        leadingPadding: 60,
+        padding: EdgeInsets.only(top: 24, right: 24, bottom: 24, left: 60),
       ),
       rows: mockInventory
           .map((product) => _buildExpandableTableRow(context, product: product))

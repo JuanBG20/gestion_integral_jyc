@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_text_field.dart';
+import 'package:gestion_integral_jyc/core/presentation/widgets/quick_action_button.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/widgets/form_screen_layout.dart';
@@ -117,6 +118,13 @@ class _NewRawMaterialScreenState extends State<NewWorkScreen> {
                 Text("Total", style: context.textTheme.titleMedium),
                 Text("\$500", style: context.textTheme.titleLarge),
               ],
+            ),
+
+            const SizedBox(height: 16),
+
+            QuickActionButton(
+              label: "Emitir Presupuesto",
+              icon: Icons.print_outlined,
             ),
           ],
         ),
