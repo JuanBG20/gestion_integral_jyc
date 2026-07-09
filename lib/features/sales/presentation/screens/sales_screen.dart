@@ -8,6 +8,8 @@ import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_s
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/models/sale_mock_data.dart';
+import 'package:gestion_integral_jyc/features/sales/presentation/widgets/payment_method_selector.dart';
+import 'package:go_router/go_router.dart';
 
 class SalesScreen extends StatelessWidget {
   const SalesScreen({super.key});
@@ -55,7 +57,7 @@ class SalesScreen extends StatelessWidget {
                 const SizedBox(width: 16),
 
                 ElevatedButton.icon(
-                  onPressed: () {},
+                  onPressed: () => context.go('/sales/new'),
                   label: Text("Nueva Venta"),
                   icon: Icon(Icons.add),
                 ),
@@ -330,11 +332,7 @@ class SalesScreen extends StatelessWidget {
 
           const SizedBox(height: 16),
 
-          LabeledTextField(
-            controller: TextEditingController(),
-            label: "Método de Pago",
-            hint: "Efectivo",
-          ),
+          const PaymentMethodSelector(),
 
           const SizedBox(height: 16),
 

@@ -182,6 +182,7 @@ class DashboardScreen extends StatelessWidget {
               QuickActionButton(
                 label: 'Nueva Venta',
                 icon: Icons.point_of_sale_outlined,
+                onPressed: () => context.go('/sales/new'),
               ),
 
               const SizedBox(height: 16),

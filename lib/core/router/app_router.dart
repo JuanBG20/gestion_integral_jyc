@@ -9,6 +9,7 @@ import 'package:gestion_integral_jyc/features/inventory/presentation/screens/new
 import 'package:gestion_integral_jyc/features/inventory/presentation/screens/new_scrap_screen.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/screens/new_work_screen.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/screens/work_screen.dart';
+import 'package:gestion_integral_jyc/features/sales/presentation/screens/new_sale_screen.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/screens/sales_screen.dart';
 import 'package:go_router/go_router.dart';
 
@@ -72,6 +73,12 @@ final goRouter = GoRouter(
             GoRoute(
               path: '/sales',
               builder: (context, state) => const SalesScreen(),
+              routes: [
+                GoRoute(
+                  path: 'new',
+                  builder: (context, state) => const NewSaleScreen(),
+                ),
+              ],
             ),
           ],
         ),
