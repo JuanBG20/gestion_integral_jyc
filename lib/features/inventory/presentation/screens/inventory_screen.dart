@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_cell.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_column.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_header.dart';
@@ -11,9 +12,10 @@ import 'package:gestion_integral_jyc/features/inventory/domain/entities/raw_mate
 import 'package:gestion_integral_jyc/features/inventory/domain/entities/scrap_entity.dart';
 import 'package:gestion_integral_jyc/features/inventory/domain/entities/variant_product_entity.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/models/product_group_ui.dart';
+import 'package:gestion_integral_jyc/features/inventory/presentation/providers/raw_material_provider.dart';
 import 'package:go_router/go_router.dart';
 
-class InventoryScreen extends StatelessWidget {
+class InventoryScreen extends ConsumerWidget {
   const InventoryScreen({super.key});
 
   static const _rawMaterialColumns = [
@@ -41,7 +43,7 @@ class InventoryScreen extends StatelessWidget {
   ];
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return DefaultTabController(
       length: 3,
 
@@ -120,7 +122,7 @@ class InventoryScreen extends StatelessWidget {
                   Expanded(
                     child: TabBarView(
                       children: [
-                        _buildRawMaterialsTab(context),
+                        _buildRawMaterialsTab(context, ref),
                         _buildProductsTab(context),
                         _buildScrapsTab(context),
                       ],
@@ -135,36 +137,34 @@ class InventoryScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildRawMaterialsTab(BuildContext context) {
-    final materiasPrimas = [
-      RawMaterialEntity(
-        sku: 'MP-001',
-        stock: 10,
-        category: 'Impresión 3D',
-        subcategory: 'PLA',
-        description: 'Filamento Rojo',
-        minStock: 20,
-      ),
-    ];
+  Widget _buildRawMaterialsTab(BuildContext context, WidgetRef ref) {
+    final rawMaterialsState = ref.watch(rawMaterialProvider);
 
-    return AppTableShell(
-      header: const AppTableHeader(columns: _rawMaterialColumns),
-      rows: materiasPrimas
-          .map(
-            (mp) => AppTableRow(
-              cells: [
-                AppTableCell.text(mp.sku, flex: 2),
-                AppTableCell.text(mp.description, flex: 3),
-                AppTableCell.text(mp.stock.toString(), flex: 1),
-                AppTableCell.text(mp.minStock.toString(), flex: 2),
-                AppTableCell.text(
-                  '${mp.category} > ${mp.subcategory}',
-                  flex: 3,
+    return rawMaterialsState.when(
+      data: (rawMaterials) {
+        if (rawMaterials.isEmpty) {
+          return const Center(child: Text("No hay materia primar registrada."));
+        }
+
+        return AppTableShell(
+          header: const AppTableHeader(columns: _rawMaterialColumns),
+          rows: rawMaterials
+              .map(
+                (mp) => AppTableRow(
+                  cells: [
+                    AppTableCell.text(mp.sku, flex: 2),
+                    AppTableCell.text(mp.description, flex: 3),
+                    AppTableCell.text(mp.stock.toString(), flex: 1),
+                    AppTableCell.text(mp.minStock.toString(), flex: 2),
+                    AppTableCell.text(mp.fullCategory, flex: 3),
+                  ],
                 ),
-              ],
-            ),
-          )
-          .toList(),
+              )
+              .toList(),
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, stack) => Center(child: Text("Error: $e")),
     );
   }
 
