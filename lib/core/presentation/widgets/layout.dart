@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
+import 'package:go_router/go_router.dart';
 
 class Layout extends StatefulWidget {
-  final Widget child;
+  final StatefulNavigationShell navigationShell;
 
-  const Layout({super.key, required this.child});
+  const Layout({super.key, required this.navigationShell});
 
   @override
   State<Layout> createState() => _LayoutState();
@@ -13,6 +14,13 @@ class Layout extends StatefulWidget {
 
 class _LayoutState extends State<Layout> {
   bool _isSidebarExpanded = true;
+
+  void _goToBranch(int index) {
+    widget.navigationShell.goBranch(
+      index,
+      initialLocation: index == widget.navigationShell.currentIndex,
+    );
+  }
 
   void _toggleSidebar() {
     setState(() {
@@ -76,29 +84,32 @@ class _LayoutState extends State<Layout> {
                 _buildSidebarItem(
                   icon: Icons.dashboard_outlined,
                   title: "Dashboard",
-                  onTap: () {},
-                  isActive: true,
+                  onTap: () => _goToBranch(0),
+                  isActive: widget.navigationShell.currentIndex == 0,
                   isExpanded: _isSidebarExpanded,
                 ),
 
                 _buildSidebarItem(
                   icon: Icons.inventory_2_outlined,
                   title: "Inventario",
-                  onTap: () {},
+                  onTap: () => _goToBranch(1),
+                  isActive: widget.navigationShell.currentIndex == 1,
                   isExpanded: _isSidebarExpanded,
                 ),
 
                 _buildSidebarItem(
                   icon: Icons.precision_manufacturing_outlined,
                   title: "Órdenes de Trabajo",
-                  onTap: () {},
+                  onTap: () => _goToBranch(2),
+                  isActive: widget.navigationShell.currentIndex == 2,
                   isExpanded: _isSidebarExpanded,
                 ),
 
                 _buildSidebarItem(
                   icon: Icons.payments_outlined,
                   title: "Ventas y Facturación",
-                  onTap: () {},
+                  onTap: () => _goToBranch(3),
+                  isActive: widget.navigationShell.currentIndex == 3,
                   isExpanded: _isSidebarExpanded,
                 ),
 
@@ -137,7 +148,7 @@ class _LayoutState extends State<Layout> {
             ),
           ),
 
-          Expanded(child: widget.child),
+          Expanded(child: widget.navigationShell),
         ],
       ),
     );

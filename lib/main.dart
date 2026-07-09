@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:gestion_integral_jyc/core/presentation/widgets/layout.dart';
+import 'package:gestion_integral_jyc/core/router/app_router.dart';
 import 'package:gestion_integral_jyc/core/theme/app_theme.dart';
-import 'package:gestion_integral_jyc/features/sales/presentation/screens/sales_screen.dart';
 
 void main() {
   runApp(const MainApp());
@@ -12,8 +11,8 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(body: Layout(child: SalesScreen())),
+    return MaterialApp.router(
+      routerConfig: goRouter,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
     );
