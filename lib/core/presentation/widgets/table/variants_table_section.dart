@@ -4,17 +4,36 @@ import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_c
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_header.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_row.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_shell.dart';
-import 'package:gestion_integral_jyc/features/inventory/presentation/providers/variant_mock_data.dart';
+
+class VariantFormData {
+  final String sku;
+  final String color;
+  final String size;
+  final int stock;
+  final double costPrice;
+  final double salePrice;
+
+  VariantFormData({
+    required this.sku,
+    required this.color,
+    required this.size,
+    required this.stock,
+    required this.costPrice,
+    required this.salePrice,
+  });
+}
 
 class VariantsTableSection extends StatefulWidget {
-  const VariantsTableSection({super.key});
+  final ValueChanged<List<VariantFormData>> onVariantsChanged;
+
+  const VariantsTableSection({super.key, required this.onVariantsChanged});
 
   @override
   State<VariantsTableSection> createState() => _VariantsTableSectionState();
 }
 
 class _VariantsTableSectionState extends State<VariantsTableSection> {
-  final List<VariantMockData> _variants = [];
+  final List<VariantFormData> _variants = [];
 
   final _skuController = TextEditingController();
   final _colorController = TextEditingController();
@@ -37,19 +56,19 @@ class _VariantsTableSectionState extends State<VariantsTableSection> {
 
     setState(() {
       _variants.add(
-        VariantMockData(
+        VariantFormData(
           sku: _skuController.text,
           color: _colorController.text,
           size: _sizeController.text.isEmpty ? '-' : _sizeController.text,
-          stock: _stockController.text.isEmpty ? '0' : _stockController.text,
-          costPrice: _costController.text.isEmpty
-              ? '0.00'
-              : _costController.text,
-          salePrice: _saleController.text.isEmpty
-              ? '0.00'
-              : _saleController.text,
+          stock: int.tryParse(_stockController.text) ?? 0,
+          costPrice:
+              double.tryParse(_costController.text.replaceAll(',', '.')) ?? 0.0,
+          salePrice:
+              double.tryParse(_saleController.text.replaceAll(',', '.')) ?? 0.0,
         ),
       );
+
+      widget.onVariantsChanged(_variants);
 
       _skuController.clear();
       _colorController.clear();
@@ -83,9 +102,15 @@ class _VariantsTableSectionState extends State<VariantsTableSection> {
               AppTableCell.text(variant.sku, flex: 2),
               AppTableCell.text(variant.color, flex: 2),
               AppTableCell.text(variant.size, flex: 2),
-              AppTableCell.text(variant.stock, flex: 1),
-              AppTableCell.text('\$${variant.costPrice}', flex: 2),
-              AppTableCell.text('\$${variant.salePrice}', flex: 2),
+              AppTableCell.text(variant.stock.toString(), flex: 1),
+              AppTableCell.text(
+                '\$${variant.costPrice.toStringAsFixed(2)}',
+                flex: 2,
+              ),
+              AppTableCell.text(
+                '\$${variant.salePrice.toStringAsFixed(2)}',
+                flex: 2,
+              ),
             ],
           ),
         ),

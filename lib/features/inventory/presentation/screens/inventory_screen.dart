@@ -7,11 +7,10 @@ import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_r
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_shell.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
-import 'package:gestion_integral_jyc/features/inventory/domain/entities/base_product_entity.dart';
 import 'package:gestion_integral_jyc/features/inventory/domain/entities/raw_material_entity.dart';
 import 'package:gestion_integral_jyc/features/inventory/domain/entities/scrap_entity.dart';
-import 'package:gestion_integral_jyc/features/inventory/domain/entities/variant_product_entity.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/models/product_group_ui.dart';
+import 'package:gestion_integral_jyc/features/inventory/presentation/providers/product_provider.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/providers/raw_material_provider.dart';
 import 'package:go_router/go_router.dart';
 
@@ -123,7 +122,7 @@ class InventoryScreen extends ConsumerWidget {
                     child: TabBarView(
                       children: [
                         _buildRawMaterialsTab(context, ref),
-                        _buildProductsTab(context),
+                        _buildProductsTab(context, ref),
                         _buildScrapsTab(context),
                       ],
                     ),
@@ -168,70 +167,30 @@ class InventoryScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildProductsTab(BuildContext context) {
-    final baseMate = BaseProductEntity(
-      baseSku: 'PR-001',
-      category: 'Impresión 3D',
-      subcategory: 'Mates',
-      description: 'Mate Pelota de Fútbol',
-    );
+  Widget _buildProductsTab(BuildContext context, WidgetRef ref) {
+    final productsState = ref.watch(inventoryProductsProvider);
 
-    final baseCuadro = BaseProductEntity(
-      baseSku: 'CL-002',
-      category: 'Corte Láser',
-      subcategory: 'Decoración',
-      description: 'Cuadro Árbol de la Vida',
-    );
+    return productsState.when(
+      data: (products) {
+        if (products.isEmpty) {
+          return const Center(child: Text("No hay productos registrada."));
+        }
 
-    final List<ProductGroupUi> mockInventory = [
-      ProductGroupUi(
-        baseProduct: baseMate,
-        variants: [
-          VariantProductEntity(
-            sku: 'PR-001-BCO',
-            stock: 12,
-            costPrice: 1500.0,
-            salePrice: 4500.0,
-            color: 'Blanco',
-            baseProduct: baseMate,
-            manufacturingRecipe: [], // Vacío por ahora
+        return AppTableShell(
+          header: const AppTableHeader(
+            columns: _productColumns,
+            padding: EdgeInsets.only(top: 24, right: 24, bottom: 24, left: 60),
           ),
-          VariantProductEntity(
-            sku: 'PR-001-NG',
-            stock: 3, // Stock bajo para probar la alerta
-            costPrice: 1500.0,
-            salePrice: 4500.0,
-            color: 'Negro',
-            baseProduct: baseMate,
-            manufacturingRecipe: [],
-          ),
-        ],
-      ),
-      ProductGroupUi(
-        baseProduct: baseCuadro,
-        variants: [
-          VariantProductEntity(
-            sku: 'CL-002-MDF3',
-            stock: 25,
-            costPrice: 2200.0,
-            salePrice: 6500.0,
-            color: 'MDF Natural',
-            size: '40x40cm',
-            baseProduct: baseCuadro,
-            manufacturingRecipe: [],
-          ),
-        ],
-      ),
-    ];
-
-    return AppTableShell(
-      header: const AppTableHeader(
-        columns: _productColumns,
-        padding: EdgeInsets.only(top: 24, right: 24, bottom: 24, left: 60),
-      ),
-      rows: mockInventory
-          .map((product) => _buildExpandableTableRow(context, product: product))
-          .toList(),
+          rows: products
+              .map(
+                (product) =>
+                    _buildExpandableTableRow(context, product: product),
+              )
+              .toList(),
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, stack) => Center(child: Text("Error: $e")),
     );
   }
 
