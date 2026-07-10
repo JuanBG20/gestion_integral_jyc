@@ -1,71 +1,96 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_dropdown.dart';
+import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_text_field.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
-import 'package:gestion_integral_jyc/features/inventory/domain/entities/base_product_entity.dart';
 import 'package:gestion_integral_jyc/features/inventory/domain/entities/variant_product_entity.dart';
+import 'package:gestion_integral_jyc/features/inventory/presentation/providers/product_provider.dart';
 import 'package:gestion_integral_jyc/features/production/domain/entities/work_item_entity.dart';
 
-class WorkItemsListSection extends StatefulWidget {
-  const WorkItemsListSection({super.key});
+class WorkItemsListSection extends ConsumerStatefulWidget {
+  final ValueChanged<List<WorkItemEntity>> onItemsChanged;
+
+  const WorkItemsListSection({super.key, required this.onItemsChanged});
 
   @override
-  State<WorkItemsListSection> createState() => _WorkItemsListSectionState();
+  ConsumerState<WorkItemsListSection> createState() =>
+      _WorkItemsListSectionState();
 }
 
-class _WorkItemsListSectionState extends State<WorkItemsListSection> {
+class _WorkItemsListSectionState extends ConsumerState<WorkItemsListSection> {
   List<WorkItemEntity> _items = [];
 
+  VariantProductEntity? _selectedVariant;
+  final _qtyController = TextEditingController(text: '1');
+  final _priceController = TextEditingController();
+  final _descController = TextEditingController();
+
+  bool _isGenericItem = false;
+
+  bool _isAddingItem = false;
+
   @override
-  void initState() {
-    super.initState();
-    _loadMocks();
+  void dispose() {
+    _qtyController.dispose();
+    _priceController.dispose();
+    _descController.dispose();
+    super.dispose();
   }
 
-  void _loadMocks() {
-    _items = [
-      WorkItemEntity(
-        id: 1,
-        isDone: true,
-        quantity: 5,
-        unitPrice: 49.0, // 5 * 49 = 245.00
-        variantProduct: VariantProductEntity(
-          sku: 'VAR-001',
-          stock: 10,
-          costPrice: 20.0,
-          salePrice: 49.0,
-          manufacturingRecipe: [],
-          baseProduct: BaseProductEntity(
-            baseSku: 'BAS-001',
-            category: 'Piezas',
-            subcategory: 'Sensores',
-            description: 'Carcasa Sensor de Temperatu',
-          ),
+  void _addItem() {
+    final int qty = int.tryParse(_qtyController.text) ?? 0;
+    final double price =
+        double.tryParse(_priceController.text.replaceAll(',', '.')) ?? 0.0;
+    final String desc = _descController.text.trim();
+
+    if (qty <= 0) return;
+    if (!_isGenericItem && _selectedVariant == null) return;
+    if (_isGenericItem && desc.isEmpty) {
+      return; // Si es genérico, debe tener descripción
+    }
+
+    setState(() {
+      _items.add(
+        WorkItemEntity(
+          variantProduct: _selectedVariant,
+          quantity: qty,
+          unitPrice: price,
+          description: _isGenericItem ? desc : null,
+          isDone: false,
         ),
-      ),
-      WorkItemEntity(
-        id: 2,
-        isDone: false,
-        quantity: 1,
-        unitPrice: 180.0,
-        variantProduct: VariantProductEntity(
-          sku: 'VAR-002',
-          stock: 5,
-          costPrice: 50.0,
-          salePrice: 180.0,
-          manufacturingRecipe: [],
-          baseProduct: BaseProductEntity(
-            baseSku: 'BAS-002',
-            category: 'Piezas',
-            subcategory: 'Engranajes',
-            description: 'Engranaje Helicoidal M4',
-          ),
-        ),
-      ),
-    ];
+      );
+
+      // Notificar a la pantalla principal
+      widget.onItemsChanged(_items);
+
+      // Limpiar formulario
+      _selectedVariant = null;
+      _qtyController.text = '1';
+      _priceController.clear();
+      _descController.clear();
+      _isGenericItem = false;
+    });
+  }
+
+  void _removeItem(int index) {
+    setState(() {
+      _items.removeAt(index);
+      widget.onItemsChanged(_items);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    final inventoryState = ref.watch(inventoryProductsProvider);
+
+    final List<VariantProductEntity> allVariants = [];
+    if (inventoryState is AsyncData) {
+      for (var group in inventoryState.value!) {
+        allVariants.addAll(group.variants);
+      }
+    }
+
     return Column(
       children: [
         Row(
@@ -74,96 +99,244 @@ class _WorkItemsListSectionState extends State<WorkItemsListSection> {
           children: [
             Text("Ítems a Producir", style: context.textTheme.titleMedium),
 
-            TextButton.icon(
-              onPressed: () {},
-              label: Text("Producto Genérico"),
-              icon: Icon(Icons.add_circle_outline),
-            ),
+            _isGenericItem
+                ? TextButton.icon(
+                    onPressed: () {
+                      setState(() {
+                        _isGenericItem = false;
+                        _descController.clear();
+                        _priceController.clear();
+                      });
+                    },
+                    label: Text("Producto del Inventario"),
+                    icon: Icon(Icons.inventory_2_outlined),
+                  )
+                : TextButton.icon(
+                    onPressed: () {
+                      setState(() {
+                        _isGenericItem = true;
+                        _selectedVariant = null;
+                        _priceController.clear();
+                      });
+                    },
+                    label: Text("Producto Genérico"),
+                    icon: Icon(Icons.add_circle_outline),
+                  ),
           ],
         ),
 
         Divider(color: AppColors.outline),
 
-        ListView.separated(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemBuilder: (context, index) {
-            return _buildItemCard(_items[index], index);
-          },
-          separatorBuilder: (context, index) => const SizedBox(height: 8),
-          itemCount: _items.length,
-        ),
+        if (_items.isNotEmpty)
+          ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemBuilder: (context, index) {
+              return _buildItemCard(_items[index], index);
+            },
+            separatorBuilder: (context, index) => const SizedBox(height: 8),
+            itemCount: _items.length,
+          ),
 
         const SizedBox(height: 8),
 
-        InkWell(
-          onTap: () {},
-          borderRadius: BorderRadius.circular(4),
+        if (!_isAddingItem) ...[
+          InkWell(
+            onTap: () => setState(() {
+              _isAddingItem = true;
+            }),
+            borderRadius: BorderRadius.circular(4),
 
-          child: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              // TODO: Dotted border
-              border: Border.all(color: AppColors.outline),
-              borderRadius: BorderRadius.circular(4),
-            ),
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                // TODO: Dotted border
+                border: Border.all(color: AppColors.outline),
+                borderRadius: BorderRadius.circular(4),
+              ),
 
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
 
-              children: [
-                Icon(Icons.add, color: AppColors.onBackground),
+                children: [
+                  Icon(Icons.add, color: AppColors.onBackground),
 
-                const SizedBox(width: 8),
+                  const SizedBox(width: 8),
 
-                Text(
-                  "Click para agregar otro ítem...",
-                  style: context.textTheme.bodyMedium,
-                ),
-              ],
+                  Text(
+                    "Click para agregar otro ítem...",
+                    style: context.textTheme.bodyMedium,
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
+        ] else
+          Column(
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    flex: 4,
+                    child: _isGenericItem
+                        ? LabeledTextField(
+                            controller: _descController,
+                            label: "Descripción",
+                            hint: "Diseño personalizado",
+                          )
+                        : LabeledDropdown(
+                            value: _selectedVariant,
+                            label: "Producto",
+                            hint: "Seleccione un producto...",
+                            items: allVariants.map((v) {
+                              final title =
+                                  '${v.baseProduct.description} ${v.color ?? ''} ${v.size ?? ''}'
+                                      .trim();
+                              return DropdownMenuItem(
+                                value: v,
+                                child: Text(
+                                  '$title (${v.sku})',
+                                  style: context.textTheme.bodyMedium,
+                                ),
+                              );
+                            }).toList(),
+                            onChanged: (val) {
+                              setState(() {
+                                _selectedVariant = val;
+                                if (val != null) {
+                                  _priceController.text = val.salePrice
+                                      .toStringAsFixed(2);
+                                }
+                              });
+                            },
+                          ),
+                  ),
+
+                  const SizedBox(width: 16),
+
+                  // Cantidad
+                  Expanded(
+                    flex: 1,
+                    child: LabeledTextField(
+                      controller: _qtyController,
+                      label: "Cant.",
+                      hint: "0",
+                      inputType: TextInputType.number,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+
+                  // Precio Unitario
+                  Expanded(
+                    flex: 2,
+                    child: LabeledTextField(
+                      controller: _priceController,
+                      label: "Precio Un. (\$)",
+                      hint: "1000",
+                      inputType: TextInputType.numberWithOptions(decimal: true),
+                      prefixIcon: Icon(Icons.attach_money),
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 16),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+
+                children: [
+                  OutlinedButton.icon(
+                    onPressed: () => setState(() {
+                      _isAddingItem = false;
+                      _isGenericItem = false;
+                    }),
+                    label: Text("Cancelar"),
+                    icon: const Icon(Icons.close),
+                  ),
+
+                  const SizedBox(width: 16),
+
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      _addItem();
+                      setState(() {
+                        _isAddingItem = false;
+                        _isGenericItem = false;
+                      });
+                    },
+                    label: Text("Agregar a la Orden"),
+                    icon: const Icon(Icons.add),
+                  ),
+                ],
+              ),
+            ],
+          ),
       ],
     );
   }
 
   Widget _buildItemCard(WorkItemEntity item, int index) {
-    final itemName =
-        item.variantProduct?.baseProduct.description ??
-        item.description ??
-        'Ítem sin nombre';
+    final itemName = item.variantProduct != null
+        ? '${item.variantProduct!.baseProduct.description} ${item.variantProduct!.color ?? ''}'
+              .trim()
+        : item.description ?? 'Ítem genérico';
 
     return Container(
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
+        color: AppColors.surface,
         border: Border.all(color: AppColors.outline),
         borderRadius: BorderRadius.circular(4),
       ),
-
       child: Row(
         children: [
-          Checkbox(value: item.isDone, onChanged: (bool? newValue) {}),
-
-          Expanded(child: Text(itemName, style: context.textTheme.bodyMedium)),
-
-          Text("Cant:", style: context.textTheme.bodySmall),
-
-          const SizedBox(width: 4),
-
-          SizedBox(width: 60, child: TextField()),
-
-          const SizedBox(width: 32),
-
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Text(
+              '${item.quantity}x',
+              style: context.textTheme.bodyMedium?.copyWith(
+                color: AppColors.primary,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  itemName,
+                  style: context.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                if (item.variantProduct?.sku != null)
+                  Text(
+                    item.variantProduct!.sku,
+                    style: context.textTheme.bodySmall,
+                  ),
+              ],
+            ),
+          ),
           Text(
             "\$${item.subtotal.toStringAsFixed(2)}",
-            style: context.textTheme.bodyMedium,
+            style: context.textTheme.bodyMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
           ),
-
           const SizedBox(width: 16),
-
-          IconButton(onPressed: () {}, icon: Icon(Icons.delete_outline)),
+          IconButton(
+            onPressed: () => _removeItem(index),
+            icon: const Icon(Icons.delete_outline, color: AppColors.error),
+            tooltip: 'Eliminar ítem',
+          ),
         ],
       ),
     );

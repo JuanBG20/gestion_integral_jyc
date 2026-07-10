@@ -8,6 +8,7 @@ class LabeledDropdown<T> extends StatelessWidget {
   final void Function(T?) onChanged;
   final String? hint;
   final Widget? prefixIcon;
+  final String? Function(T?)? validator;
 
   const LabeledDropdown({
     super.key,
@@ -17,6 +18,7 @@ class LabeledDropdown<T> extends StatelessWidget {
     required this.onChanged,
     this.hint,
     this.prefixIcon,
+    this.validator,
   });
 
   @override
@@ -39,8 +41,11 @@ class LabeledDropdown<T> extends StatelessWidget {
           initialValue: value,
           items: items,
           onChanged: onChanged,
-          isDense: true,
+          validator: validator,
           isExpanded: true,
+          style: Theme.of(
+            context,
+          ).textTheme.bodyLarge?.copyWith(color: Colors.black),
           decoration: InputDecoration(hintText: hint, prefixIcon: prefixIcon),
         ),
       ],

@@ -1,111 +1,81 @@
 import 'package:flutter/material.dart';
-import 'package:gestion_integral_jyc/core/domain/entities/client_entity.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gestion_integral_jyc/core/enums/work_state.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/features/production/domain/entities/work_entity.dart';
 import 'package:gestion_integral_jyc/features/production/domain/entities/work_item_entity.dart';
+import 'package:gestion_integral_jyc/features/production/presentation/providers/work_provider.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
-class KanbanBoard extends StatefulWidget {
+class KanbanBoard extends ConsumerWidget {
   const KanbanBoard({super.key});
 
   @override
-  State<KanbanBoard> createState() => _KanbanBoardState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final worksState = ref.watch(workProvider);
 
-class _KanbanBoardState extends State<KanbanBoard> {
-  late List<WorkEntity> _mockWorks;
+    return worksState.when(
+      data: (works) {
+        return Column(
+          children: [
+            Expanded(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
 
-  void initState() {
-    super.initState();
-    final client1 = ClientEntity(id: 1, name: 'Martín', lastName: 'Rodríguez');
-    final client2 = ClientEntity(id: 2, name: 'Laura', lastName: 'Gómez');
+                children: [
+                  _buildColumn(
+                    context,
+                    ref,
+                    'RECIBIDO',
+                    WorkState.recibido,
+                    works,
+                  ),
+                  _buildColumn(
+                    context,
+                    ref,
+                    'DISEÑADO',
+                    WorkState.disenado,
+                    works,
+                  ),
+                  _buildColumn(context, ref, 'HECHO', WorkState.hecho, works),
+                ],
+              ),
+            ),
 
-    _mockWorks = [
-      WorkEntity(
-        id: 1042,
-        client: client1,
-        actualState: WorkState.recibido,
-        creationDate: DateTime.now(),
-        deadline: DateTime.now().add(const Duration(days: 1)),
-        items: [
-          WorkItemEntity(
-            quantity: 3,
-            unitPrice: 500,
-            description: 'Llavero Genérico 3D',
-          ),
-          WorkItemEntity(
-            quantity: 1,
-            unitPrice: 2000,
-            description: 'Cuadro MDF 3mm (Corte)',
-          ),
-        ],
-      ),
-      WorkEntity(
-        id: 1041,
-        client: client2,
-        actualState: WorkState.disenado,
-        creationDate: DateTime.now(),
-        deadline: DateTime.now().add(const Duration(days: 3)),
-        items: [
-          WorkItemEntity(
-            quantity: 5,
-            unitPrice: 800,
-            description: 'Impresión Molde PLA',
-            isDone: true,
-          ),
-        ],
-      ),
-    ];
-  }
+            const SizedBox(height: 16),
 
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Expanded(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-
-            children: [
-              _buildColumn('RECIBIDO', WorkState.recibido),
-              _buildColumn('DISEÑADO', WorkState.disenado),
-              _buildColumn('HECHO', WorkState.hecho),
-            ],
-          ),
-        ),
-
-        const SizedBox(height: 16),
-
-        _buildFinalizadoDropZone(),
-      ],
+            _buildFinalizadoDropZone(context, ref),
+          ],
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, stack) => Center(child: Text("Error: $e")),
     );
   }
 
-  Widget _buildColumn(String title, WorkState columnState) {
-    final columnWorks = _mockWorks
+  Widget _buildColumn(
+    BuildContext context,
+    WidgetRef ref,
+    String title,
+    WorkState columnState,
+    List<WorkEntity> allWorks,
+  ) {
+    final columnWorks = allWorks
         .where((w) => w.actualState == columnState)
         .toList();
 
     return Expanded(
       child: DragTarget<WorkEntity>(
-        onWillAcceptWithDetails: (details) => true,
+        onWillAcceptWithDetails: (details) =>
+            details.data.actualState != columnState,
         onAcceptWithDetails: (details) {
-          setState(() {
-            final index = _mockWorks.indexWhere((w) => w.id == details.data.id);
-            if (index != -1) {
-              // TODO: Llamada a provider
-              _mockWorks[index] = WorkEntity(
-                id: _mockWorks[index].id,
-                client: _mockWorks[index].client,
-                creationDate: _mockWorks[index].creationDate,
-                deadline: _mockWorks[index].deadline,
-                items: _mockWorks[index].items,
-                actualState: columnState,
-              );
-            }
-          });
+          if (details.data.id != null) {
+            ref
+                .read(workProvider.notifier)
+                .updateWorkStatus(details.data.id!, columnState);
+          }
         },
         builder: (context, candidateData, rejectedData) {
           final isHovered = candidateData.isNotEmpty;
@@ -162,7 +132,7 @@ class _KanbanBoardState extends State<KanbanBoard> {
                     padding: const EdgeInsets.all(8),
                     itemCount: columnWorks.length,
                     itemBuilder: (context, index) {
-                      return _buildDraggableCard(columnWorks[index]);
+                      return _buildDraggableCard(context, columnWorks[index]);
                     },
                   ),
                 ),
@@ -174,7 +144,7 @@ class _KanbanBoardState extends State<KanbanBoard> {
     );
   }
 
-  Widget _buildDraggableCard(WorkEntity work) {
+  Widget _buildDraggableCard(BuildContext context, WorkEntity work) {
     final cardUI = Card(
       elevation: 0,
       margin: const EdgeInsets.only(bottom: 8),
@@ -234,13 +204,18 @@ class _KanbanBoardState extends State<KanbanBoard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
 
                 children: work.items
-                    .map((item) => _buildItemRow(item))
+                    .map((item) => _buildItemRow(context, item))
                     .toList(),
               ),
 
             Divider(color: AppColors.outline),
 
-            OutlinedButton(onPressed: () {}, child: Text("Emitir Presupuesto")),
+            OutlinedButton(
+              onPressed: () {
+                context.go('/work/detail', extra: work);
+              },
+              child: Text("Ver Detalles"),
+            ),
           ],
         ),
       ),
@@ -258,7 +233,7 @@ class _KanbanBoardState extends State<KanbanBoard> {
     );
   }
 
-  Widget _buildItemRow(WorkItemEntity item) {
+  Widget _buildItemRow(BuildContext context, WorkItemEntity item) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
 
@@ -278,7 +253,7 @@ class _KanbanBoardState extends State<KanbanBoard> {
 
           Expanded(
             child: Text(
-              '${item.quantity}x ${item.description ?? 'Sin desc.'}',
+              '${item.quantity}x ${item.variantProduct?.baseProduct.description ?? item.description ?? 'Sin desc.'}',
               style: context.textTheme.bodySmall?.copyWith(
                 color: item.isDone
                     ? AppColors.onBackground.withValues(alpha: 0.8)
@@ -298,23 +273,23 @@ class _KanbanBoardState extends State<KanbanBoard> {
   }
 
   // --- DROP ZONE ---
-  Widget _buildFinalizadoDropZone() {
+  Widget _buildFinalizadoDropZone(BuildContext context, WidgetRef ref) {
     return DragTarget<WorkEntity>(
-      onWillAcceptWithDetails: (details) => true,
+      onWillAcceptWithDetails: (details) =>
+          details.data.actualState != WorkState.finalizado,
       onAcceptWithDetails: (details) {
-        setState(() {
-          // TODO: Provider
-
-          _mockWorks.removeWhere((w) => w.id == details.data.id);
-
+        if (details.data.id != null) {
+          ref
+              .read(workProvider.notifier)
+              .updateWorkStatus(details.data.id!, WorkState.finalizado);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                'Trabajo TRB-${details.data.id} cobrado y finalizado.',
+                'Trabajo TRB-${details.data.id} marcado como FINALIZADO y enviado a Ventas.',
               ),
             ),
           );
-        });
+        }
       },
       builder: (context, candidateData, rejectedData) {
         final isHovered = candidateData.isNotEmpty;
@@ -332,16 +307,20 @@ class _KanbanBoardState extends State<KanbanBoard> {
             ),
             borderRadius: BorderRadius.circular(4),
           ),
+
           child: Center(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
+
               children: [
                 Icon(
                   Icons.check_circle_outline,
                   color: isHovered ? Colors.green : Colors.grey.shade600,
                   size: 32,
                 ),
+
                 const SizedBox(width: 12),
+
                 Text(
                   isHovered
                       ? '¡Soltar para finalizar!'

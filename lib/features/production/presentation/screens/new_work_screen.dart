@@ -1,24 +1,97 @@
 import 'package:flutter/material.dart';
-import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_text_field.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gestion_integral_jyc/core/domain/entities/client_entity.dart';
+import 'package:gestion_integral_jyc/core/enums/work_state.dart';
+import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_date_picker.dart';
+import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_dropdown.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/quick_action_button.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
+import 'package:gestion_integral_jyc/features/clients/presentation/providers/client_provider.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/widgets/form_screen_layout.dart';
+import 'package:gestion_integral_jyc/features/production/domain/entities/work_entity.dart';
+import 'package:gestion_integral_jyc/features/production/domain/entities/work_item_entity.dart';
+import 'package:gestion_integral_jyc/features/production/presentation/providers/work_provider.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/widgets/work_items_list_section.dart';
 import 'package:go_router/go_router.dart';
 
-class NewWorkScreen extends StatefulWidget {
+class NewWorkScreen extends ConsumerStatefulWidget {
   const NewWorkScreen({super.key});
 
   @override
-  State<NewWorkScreen> createState() => _NewRawMaterialScreenState();
+  ConsumerState<NewWorkScreen> createState() => _NewRawMaterialScreenState();
 }
 
-class _NewRawMaterialScreenState extends State<NewWorkScreen> {
+class _NewRawMaterialScreenState extends ConsumerState<NewWorkScreen> {
   final _formKey = GlobalKey<FormState>();
+
+  ClientEntity? _selectedClient;
+  DateTime? _selectedDeadline;
+  List<WorkItemEntity> _currentItems = [];
+
+  double get _totalAmount =>
+      _currentItems.fold(0, (sum, item) => sum + item.subtotal);
+
+  Future<void> _pickDeadline() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now().add(const Duration(days: 1)),
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
+    );
+    if (picked != null) {
+      setState(() {
+        _selectedDeadline = picked;
+      });
+    }
+  }
+
+  void _saveWork() {
+    if (_formKey.currentState!.validate()) {
+      if (_selectedClient == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Debe seleccionar un cliente')),
+        );
+        return;
+      }
+      if (_currentItems.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Debe agregar al menos un ítem')),
+        );
+        return;
+      }
+
+      final newWork = WorkEntity(
+        creationDate: DateTime.now(),
+        deadline: _selectedDeadline,
+        client: _selectedClient!,
+        actualState: WorkState.recibido, // Estado inicial por defecto
+        items: _currentItems,
+      );
+
+      ref
+          .read(workProvider.notifier)
+          .addWork(newWork)
+          .then((_) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Órden de Trabajo creada exitosamente'),
+              ),
+            );
+            context.go('/work');
+          })
+          .catchError((error) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text('Error: $error')));
+          });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final clientsState = ref.watch(clientProvider);
+
     return FormScreenLayout(
       title: "Registrar Órden de Trabajo",
       subtitle:
@@ -40,38 +113,53 @@ class _NewRawMaterialScreenState extends State<NewWorkScreen> {
 
             children: [
               SizedBox(
-                width: constraints.maxWidth,
+                width: itemWidth,
 
-                child: LabeledTextField(
-                  controller: TextEditingController(),
-                  label: "Cliente",
-                  hint: "Juan Bautista Galván",
+                child: clientsState.when(
+                  data: (clients) {
+                    return LabeledDropdown(
+                      label: "Cliente",
+                      value: _selectedClient,
+                      items: clients
+                          .map(
+                            (c) => DropdownMenuItem(
+                              value: c,
+                              child: Text(
+                                c.fullName,
+                                style: context.textTheme.bodyMedium,
+                              ),
+                            ),
+                          )
+                          .toList(),
+                      hint: "Seleccione un cliente",
+                      onChanged: (val) => setState(() => _selectedClient = val),
+                      validator: (value) => value == null ? 'Requerido' : null,
+                    );
+                  },
+                  loading: () => const CircularProgressIndicator(),
+                  error: (e, s) => Text('Error al cargar clientes: $e'),
                 ),
               ),
 
               SizedBox(
                 width: itemWidth,
-
-                child: LabeledTextField(
-                  controller: TextEditingController(),
-                  label: "Fecha Límite (Opcional)",
-                  hint: "mm/dd/yyyy",
-                ),
-              ),
-
-              SizedBox(
-                width: itemWidth,
-
-                child: LabeledTextField(
-                  controller: TextEditingController(),
-                  label: "Estado Inicial",
-                  hint: "Recibido",
+                child: LabeledDatePicker(
+                  label: 'Fecha Límite (Opcional)',
+                  hint: 'Seleccione una fecha...',
+                  onTap: _pickDeadline,
+                  value: _selectedDeadline,
                 ),
               ),
 
               SizedBox(
                 width: constraints.maxWidth,
-                child: const WorkItemsListSection(),
+                child: WorkItemsListSection(
+                  onItemsChanged: (items) {
+                    setState(() {
+                      _currentItems = items;
+                    });
+                  },
+                ),
               ),
             ],
           );
@@ -101,8 +189,11 @@ class _NewRawMaterialScreenState extends State<NewWorkScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
               children: [
-                Text("Productos", style: context.textTheme.bodyMedium),
-                Text("\$500", style: context.textTheme.bodyMedium),
+                Text("Total de Ítems", style: context.textTheme.bodyMedium),
+                Text(
+                  "${_currentItems.length}",
+                  style: context.textTheme.bodyMedium,
+                ),
               ],
             ),
 
@@ -117,7 +208,10 @@ class _NewRawMaterialScreenState extends State<NewWorkScreen> {
 
               children: [
                 Text("Total", style: context.textTheme.titleMedium),
-                Text("\$500", style: context.textTheme.titleLarge),
+                Text(
+                  "\$${_totalAmount.toStringAsFixed(2)}",
+                  style: context.textTheme.titleLarge,
+                ),
               ],
             ),
 
@@ -133,7 +227,7 @@ class _NewRawMaterialScreenState extends State<NewWorkScreen> {
       onReturn: () {
         context.go('/work');
       },
-      onSave: () {},
+      onSave: _saveWork,
       onCancel: () {
         if (context.canPop()) {
           context.pop();
