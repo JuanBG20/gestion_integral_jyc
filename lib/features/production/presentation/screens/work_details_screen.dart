@@ -1,18 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gestion_integral_jyc/core/enums/work_state.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/quick_action_button.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/features/production/domain/entities/work_entity.dart';
 import 'package:gestion_integral_jyc/features/production/domain/entities/work_item_entity.dart';
+import 'package:gestion_integral_jyc/features/production/presentation/providers/work_provider.dart';
 import 'package:go_router/go_router.dart';
 
-class WorkDetailsScreen extends StatelessWidget {
-  final WorkEntity work;
+class WorkDetailsScreen extends ConsumerWidget {
+  final WorkEntity initialWork;
 
-  const WorkDetailsScreen({super.key, required this.work});
+  const WorkDetailsScreen({super.key, required this.initialWork});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final worksState = ref.watch(workProvider);
+
+    final currentList = worksState.value ?? [];
+    final matches = currentList.where((w) => w.id == initialWork.id);
+    final currentWork = matches.isNotEmpty ? matches.first : initialWork;
+
     return Scaffold(
       backgroundColor: AppColors.surface,
 
@@ -31,11 +40,11 @@ class WorkDetailsScreen extends StatelessWidget {
 
                     children: [
                       Text(
-                        "Orden TRB-${work.id ?? '---'}",
+                        "Orden TRB-${currentWork.id ?? '---'}",
                         style: context.textTheme.titleLarge,
                       ),
                       Text(
-                        work.client.fullName,
+                        currentWork.client.fullName,
                         style: context.textTheme.bodyLarge,
                       ),
                     ],
@@ -65,20 +74,26 @@ class WorkDetailsScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
 
                     children: [
-                      Expanded(flex: 2, child: _buildLeftColumn(context)),
+                      Expanded(
+                        flex: 2,
+                        child: _buildLeftColumn(context, ref, currentWork),
+                      ),
                       const SizedBox(width: 24),
-                      Expanded(flex: 1, child: _buildRightColumn(context)),
+                      Expanded(
+                        flex: 1,
+                        child: _buildRightColumn(context, ref, currentWork),
+                      ),
                     ],
                   );
                 } else {
                   return SingleChildScrollView(
                     child: Column(
                       children: [
-                        _buildLeftColumn(context),
+                        _buildLeftColumn(context, ref, currentWork),
 
                         const SizedBox(height: 24),
 
-                        _buildRightColumn(context),
+                        _buildRightColumn(context, ref, currentWork),
                       ],
                     ),
                   );
@@ -91,7 +106,11 @@ class WorkDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildLeftColumn(BuildContext context) {
+  Widget _buildLeftColumn(
+    BuildContext context,
+    WidgetRef ref,
+    WorkEntity work,
+  ) {
     final completedItems = work.items.where((item) => item.isDone).length;
     final totalItems = work.items.length;
 
@@ -193,7 +212,7 @@ class WorkDetailsScreen extends StatelessWidget {
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemBuilder: (context, index) {
-                  return _buildItemTile(context, work.items[index]);
+                  return _buildItemTile(context, ref, work.items[index]);
                 },
                 separatorBuilder: (context, index) => const SizedBox(height: 8),
                 itemCount: work.items.length,
@@ -205,7 +224,11 @@ class WorkDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildRightColumn(BuildContext context) {
+  Widget _buildRightColumn(
+    BuildContext context,
+    WidgetRef ref,
+    WorkEntity work,
+  ) {
     final double subtotal = work.items.fold(
       0,
       (sum, item) => sum + item.subtotal,
@@ -281,6 +304,7 @@ class WorkDetailsScreen extends StatelessWidget {
               QuickActionButton(
                 label: 'Actualizar Estado',
                 icon: Icons.history,
+                onPressed: () => _showUpdateStateDialog(context, ref, work),
               ),
 
               const SizedBox(height: 16),
@@ -303,7 +327,11 @@ class WorkDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildItemTile(BuildContext context, WorkItemEntity item) {
+  Widget _buildItemTile(
+    BuildContext context,
+    WidgetRef ref,
+    WorkItemEntity item,
+  ) {
     final String baseName =
         item.variantProduct?.baseProduct.description ??
         item.description ??
@@ -337,13 +365,78 @@ class WorkDetailsScreen extends StatelessWidget {
 
       child: CheckboxListTile(
         value: item.isDone,
-        onChanged: (bool? newValue) {},
+        onChanged: (bool? newValue) {
+          if (newValue != null && item.id != null) {
+            ref.read(workProvider.notifier).toggleItemDone(item.id!, newValue);
+          }
+        },
         controlAffinity: ListTileControlAffinity.leading,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
         title: Text('${item.quantity}x $baseName'),
         subtitle: Text(subtitleText),
       ),
+    );
+  }
+
+  void _showUpdateStateDialog(
+    BuildContext context,
+    WidgetRef ref,
+    WorkEntity work,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: AppColors.background,
+          title: Text(
+            'Actualizar Estado',
+            style: context.textTheme.titleMedium,
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+
+            children: WorkState.values.map((state) {
+              final isCurrent = state == work.actualState;
+
+              return ListTile(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                tileColor: isCurrent
+                    ? AppColors.primary.withValues(alpha: 0.1)
+                    : Colors.transparent,
+                title: Text(
+                  state.dbValue,
+                  style: context.textTheme.bodyMedium?.copyWith(
+                    color: isCurrent
+                        ? AppColors.primary
+                        : AppColors.onBackground,
+                    fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal,
+                  ),
+                ),
+                leading: isCurrent
+                    ? const Icon(Icons.check_circle, color: AppColors.primary)
+                    : const Icon(Icons.circle_outlined),
+                onTap: () {
+                  if (!isCurrent && work.id != null) {
+                    ref
+                        .read(workProvider.notifier)
+                        .updateWorkStatus(work.id!, state);
+                    Navigator.pop(context);
+                  }
+                },
+              );
+            }).toList(),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancelar'),
+            ),
+          ],
+        );
+      },
     );
   }
 }

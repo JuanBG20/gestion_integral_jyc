@@ -70,7 +70,7 @@ final goRouter = GoRouter(
                   path: 'detail',
                   builder: (context, state) {
                     final work = state.extra as WorkEntity;
-                    return WorkDetailsScreen(work: work);
+                    return WorkDetailsScreen(initialWork: work);
                   },
                 ),
               ],

@@ -74,4 +74,13 @@ class WorkNotifier extends StateNotifier<AsyncValue<List<WorkEntity>>> {
       throw Exception('Error al actualizar el estado: $e');
     }
   }
+
+  Future<void> toggleItemDone(int itemId, bool isDone) async {
+    try {
+      await repository.updateWorkItemDone(itemId, isDone);
+      await fetchWorks(); // Recargamos para reflejar cambios en toda la app
+    } catch (e) {
+      throw Exception('Error al actualizar el ítem: $e');
+    }
+  }
 }
