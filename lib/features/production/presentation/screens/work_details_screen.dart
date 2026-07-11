@@ -4,6 +4,7 @@ import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/features/production/domain/entities/work_entity.dart';
 import 'package:gestion_integral_jyc/features/production/domain/entities/work_item_entity.dart';
+import 'package:go_router/go_router.dart';
 
 class WorkDetailsScreen extends StatelessWidget {
   final WorkEntity work;
@@ -44,7 +45,9 @@ class WorkDetailsScreen extends StatelessWidget {
                 const SizedBox(width: 16),
 
                 TextButton.icon(
-                  onPressed: () {},
+                  onPressed: () {
+                    context.go('/work');
+                  },
                   label: Text("Volver al Kanban"),
                   icon: Icon(Icons.arrow_back),
                 ),
@@ -111,7 +114,7 @@ class WorkDetailsScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
 
                 children: [
-                  Text("STATUS", style: context.textTheme.bodySmall),
+                  Text("ESTADO", style: context.textTheme.bodySmall),
 
                   const SizedBox(height: 4),
 
@@ -126,7 +129,7 @@ class WorkDetailsScreen extends StatelessWidget {
                     ),
 
                     child: Text(
-                      work.actualState.name.toUpperCase(),
+                      work.actualState.dbValue,
                       style: context.textTheme.bodySmall?.copyWith(
                         color: AppColors.primary,
                         fontWeight: FontWeight.w600,

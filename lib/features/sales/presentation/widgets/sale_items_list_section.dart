@@ -1,31 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/product_items_list_section.dart';
-import 'package:gestion_integral_jyc/features/production/domain/entities/work_item_entity.dart';
+import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_item_entity.dart';
 
-class WorkItemsListSection extends StatelessWidget {
-  final ValueChanged<List<WorkItemEntity>> onItemsChanged;
+class SaleItemsListSection extends StatelessWidget {
+  final ValueChanged<List<SaleItemEntity>> onItemsChanged;
 
-  const WorkItemsListSection({super.key, required this.onItemsChanged});
+  const SaleItemsListSection({super.key, required this.onItemsChanged});
 
   @override
   Widget build(BuildContext context) {
-    return ProductItemsListSection<WorkItemEntity>(
+    return ProductItemsListSection<SaleItemEntity>(
       onItemsChanged: onItemsChanged,
-      sectionTitle: "Ítems a Producir",
-      genericItemLabel: "Ítem Genérico",
-      genericDescriptionHint: "Diseño personalizado",
+      sectionTitle: "Agregar Producto",
+      genericItemLabel: "Producto Genérico",
+      genericDescriptionHint: "Soporte para Celular",
       itemBuilder:
           ({
             required variantProduct,
             required quantity,
             required unitPrice,
             description,
-          }) => WorkItemEntity(
+          }) => SaleItemEntity(
             variantProduct: variantProduct,
             quantity: quantity,
             unitPrice: unitPrice,
             description: description,
-            isDone: false,
           ),
     );
   }

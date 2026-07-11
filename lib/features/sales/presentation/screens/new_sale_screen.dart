@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_text_field.dart';
+import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_dropdown.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/widgets/form_screen_layout.dart';
+import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_item_entity.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/widgets/payment_method_selector.dart';
+import 'package:gestion_integral_jyc/features/sales/presentation/widgets/sale_items_list_section.dart';
+import 'package:gestion_integral_jyc/features/sales/presentation/widgets/sale_summary_item_card.dart';
 import 'package:go_router/go_router.dart';
 
 class NewSaleScreen extends StatefulWidget {
@@ -16,6 +19,11 @@ class NewSaleScreen extends StatefulWidget {
 class _NewRawMaterialScreenState extends State<NewSaleScreen> {
   final _formKey = GlobalKey<FormState>();
 
+  List<SaleItemEntity> _currentItems = [];
+
+  double get _totalAmount =>
+      _currentItems.fold(0, (sum, item) => sum + item.subtotal);
+
   @override
   Widget build(BuildContext context) {
     return FormScreenLayout(
@@ -27,11 +35,6 @@ class _NewRawMaterialScreenState extends State<NewSaleScreen> {
       formKey: _formKey,
       formContent: LayoutBuilder(
         builder: (context, constraints) {
-          final bool isWide = constraints.maxWidth > 500;
-          final double itemWidth = isWide
-              ? (constraints.maxWidth - 24) / 2
-              : constraints.maxWidth;
-
           return Wrap(
             spacing: 24,
             runSpacing: 24,
@@ -40,52 +43,23 @@ class _NewRawMaterialScreenState extends State<NewSaleScreen> {
               SizedBox(
                 width: constraints.maxWidth,
 
-                child: LabeledTextField(
-                  controller: TextEditingController(),
+                child: LabeledDropdown(
                   label: "Cliente",
-                  hint: "Juan Bautista Galván",
+                  items: [],
+                  onChanged: (newValue) {},
                 ),
               ),
 
-              // TODO: Cliente Genérico
               Divider(color: AppColors.outline),
 
               SizedBox(
                 width: constraints.maxWidth,
-                child: Text(
-                  "Agregar Producto",
-                  style: context.textTheme.titleMedium,
-                ),
-              ),
-
-              SizedBox(
-                width: itemWidth,
-
-                child: LabeledTextField(
-                  controller: TextEditingController(),
-                  label: "Precio Unitario",
-                  hint: "\$500",
-                ),
-              ),
-
-              SizedBox(
-                width: itemWidth,
-
-                child: LabeledTextField(
-                  controller: TextEditingController(),
-                  label: "Cantidad",
-                  hint: "10",
-                ),
-              ),
-
-              // TODO: Producto Genérico
-              SizedBox(
-                width: constraints.maxWidth,
-
-                child: LabeledTextField(
-                  controller: TextEditingController(),
-                  label: "Descripción",
-                  hint: "Soporte para Celular",
+                child: SaleItemsListSection(
+                  onItemsChanged: (items) {
+                    setState(() {
+                      _currentItems = items;
+                    });
+                  },
                 ),
               ),
             ],
@@ -112,43 +86,23 @@ class _NewRawMaterialScreenState extends State<NewSaleScreen> {
 
             const SizedBox(height: 8),
 
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                border: Border.all(color: AppColors.outline),
-                borderRadius: BorderRadius.circular(4),
+            if (_currentItems.isEmpty) ...[
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Text(
+                  "Aún no agregó productos.",
+                  style: context.textTheme.bodySmall,
+                ),
               ),
-
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-
-                    children: [Text("Soporte VESA"), Text("10u.")],
-                  ),
-
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-
-                    children: [
-                      Text("\$1500"),
-                      TextButton(
-                        onPressed: () {},
-                        style: TextButton.styleFrom(
-                          padding: EdgeInsets.zero,
-                          minimumSize: Size.zero,
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        ),
-
-                        child: Text("Eliminar"),
-                      ),
-                    ],
-                  ),
-                ],
+            ] else
+              ListView.separated(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemBuilder: (context, index) =>
+                    SaleSummaryItemCard(item: _currentItems[index]),
+                separatorBuilder: (context, index) => const SizedBox(height: 8),
+                itemCount: _currentItems.length,
               ),
-            ),
 
             const SizedBox(height: 8),
 
@@ -161,7 +115,10 @@ class _NewRawMaterialScreenState extends State<NewSaleScreen> {
 
               children: [
                 Text("Productos", style: context.textTheme.bodyMedium),
-                Text("\$500", style: context.textTheme.bodyMedium),
+                Text(
+                  "\$${_totalAmount.toStringAsFixed(2)}",
+                  style: context.textTheme.bodyMedium,
+                ),
               ],
             ),
 
@@ -176,7 +133,10 @@ class _NewRawMaterialScreenState extends State<NewSaleScreen> {
 
               children: [
                 Text("Total", style: context.textTheme.titleMedium),
-                Text("\$500", style: context.textTheme.titleLarge),
+                Text(
+                  "\$${_totalAmount.toStringAsFixed(2)}",
+                  style: context.textTheme.titleLarge,
+                ),
               ],
             ),
 
