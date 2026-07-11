@@ -33,6 +33,15 @@ class ProductRemoteDataSource {
               'salePrice': v.salePrice,
               'color': v.color,
               'size': v.size,
+              // Agregamos la receta al Payload JSON
+              'recipe': v.manufacturingRecipe
+                  .map(
+                    (r) => {
+                      'rawMaterialId': r.rawMaterial.id,
+                      'quantity': r.quantity,
+                    },
+                  )
+                  .toList(),
             },
           )
           .toList(),
@@ -41,15 +50,14 @@ class ProductRemoteDataSource {
     await supabaseClient.rpc('crear_producto_completo', params: payload);
   }
 
-  Future<void> insertRecipe(
-    int variantId,
-    int rawMaterialId,
-    double quantity,
-  ) async {
-    await supabaseClient.from('fabrica').insert({
-      'producto_variante': variantId,
-      'materia_prima': rawMaterialId,
-      'cantidad': quantity,
-    });
+  Future<void> updateStock(int variantId, int delta, bool deductMp) async {
+    await supabaseClient.rpc(
+      'ajustar_stock_producto',
+      params: {
+        'p_id_variante': variantId,
+        'p_cantidad': delta,
+        'p_descontar_mp': deductMp,
+      },
+    );
   }
 }

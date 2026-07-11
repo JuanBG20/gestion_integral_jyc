@@ -149,6 +149,22 @@ class InventoryScreen extends ConsumerWidget {
           rows: rawMaterials
               .map(
                 (mp) => AppTableRow(
+                  trailingWidth: 40,
+                  trailing: _buildActionMenu(
+                    context,
+                    onUpdateStock: () => _showStockDialog(
+                      context: context,
+                      title: 'Actualizar Stock: ${mp.description}',
+                      isProduct: false,
+                      onConfirm: (delta, _) {
+                        if (mp.id != null) {
+                          ref
+                              .read(rawMaterialProvider.notifier)
+                              .updateStock(mp.id!, delta);
+                        }
+                      },
+                    ),
+                  ),
                   cells: [
                     AppTableCell.text(mp.sku, flex: 2),
                     AppTableCell.text(mp.description, flex: 3),
@@ -183,7 +199,7 @@ class InventoryScreen extends ConsumerWidget {
           rows: products
               .map(
                 (product) =>
-                    _buildExpandableTableRow(context, product: product),
+                    _buildExpandableTableRow(context, ref, product: product),
               )
               .toList(),
         );
@@ -207,6 +223,23 @@ class InventoryScreen extends ConsumerWidget {
           rows: scraps
               .map(
                 (scrap) => AppTableRow(
+                  trailingWidth: 40,
+                  trailing: _buildActionMenu(
+                    context,
+                    onUpdateStock: () => _showStockDialog(
+                      context: context,
+                      title:
+                          'Actualizar Retazo: ${scrap.rawMaterial.description}',
+                      isProduct: false,
+                      onConfirm: (delta, _) {
+                        if (scrap.id != null) {
+                          ref
+                              .read(scrapProvider.notifier)
+                              .updateStock(scrap.id!, delta);
+                        }
+                      },
+                    ),
+                  ),
                   cells: [
                     AppTableCell.text(scrap.rawMaterial.description, flex: 4),
                     AppTableCell.text(
@@ -230,7 +263,8 @@ class InventoryScreen extends ConsumerWidget {
   }
 
   Widget _buildExpandableTableRow(
-    BuildContext context, {
+    BuildContext context,
+    WidgetRef ref, {
     required ProductGroupUi product,
   }) {
     final base = product.baseProduct;
@@ -249,8 +283,6 @@ class InventoryScreen extends ConsumerWidget {
           Expanded(flex: 3, child: Text(base.fullCategory)),
           Expanded(flex: 2, child: Text("")),
           Expanded(flex: 2, child: Text("")),
-
-          SizedBox(width: 40, child: _buildActionMenu(context)),
         ],
       ),
 
@@ -264,6 +296,29 @@ class InventoryScreen extends ConsumerWidget {
                 right: 24,
               ),
               background: AppColors.surface,
+              trailingWidth: 40,
+              trailing: _buildActionMenu(
+                context,
+                onUpdateStock: () => _showStockDialog(
+                  context: context,
+                  title:
+                      'Stock: ${base.description} (${variant.color ?? variant.size ?? variant.sku})',
+                  isProduct: true,
+                  onConfirm: (delta, deductMp) async {
+                    if (variant.id != null) {
+                      await ref
+                          .read(inventoryProductsProvider.notifier)
+                          .updateStock(variant.id!, delta, deductMp);
+                      // Si se descontó materia prima, recargamos esa tabla en segundo plano
+                      if (delta > 0 && deductMp) {
+                        ref
+                            .read(rawMaterialProvider.notifier)
+                            .fetchRawMaterials();
+                      }
+                    }
+                  },
+                ),
+              ),
               cells: [
                 AppTableCell.text(variant.sku, flex: 2),
                 AppTableCell.text(
@@ -290,15 +345,105 @@ class InventoryScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildActionMenu(BuildContext context) {
+  Widget _buildActionMenu(
+    BuildContext context, {
+    required VoidCallback onUpdateStock,
+  }) {
     return PopupMenuButton<String>(
       icon: Icon(Icons.more_horiz, color: AppColors.onBackground),
-      onSelected: (value) {},
+      onSelected: (value) {
+        if (value == 'update') onUpdateStock();
+      },
       itemBuilder: (context) => [
-        const PopupMenuItem(value: 'update', child: Text('Actualizar Stock')),
+        const PopupMenuItem(value: 'update', child: Text('Ajustar Stock')),
         const PopupMenuItem(value: 'edit', child: Text('Modificar')),
         const PopupMenuItem(value: 'delete', child: Text('Eliminar')),
       ],
+    );
+  }
+
+  void _showStockDialog({
+    required BuildContext context,
+    required String title,
+    required bool isProduct,
+    required void Function(int delta, bool deductMp) onConfirm,
+  }) {
+    int delta = 0;
+    bool deductMp = true;
+    final controller = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              backgroundColor: AppColors.background,
+              title: Text(title, style: context.textTheme.titleMedium),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Ingrese la cantidad a sumar o restar.",
+                    style: context.textTheme.bodySmall,
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: controller,
+                    keyboardType: const TextInputType.numberWithOptions(
+                      signed: true,
+                    ),
+                    decoration: const InputDecoration(
+                      labelText: "Cantidad (Ej: 5 o -2)",
+                      hintText: "0",
+                    ),
+                    onChanged: (val) {
+                      setState(() {
+                        delta = int.tryParse(val) ?? 0;
+                      });
+                    },
+                  ),
+                  if (isProduct && delta > 0) ...[
+                    const SizedBox(height: 16),
+                    CheckboxListTile(
+                      value: deductMp,
+                      onChanged: (val) =>
+                          setState(() => deductMp = val ?? true),
+                      title: Text(
+                        "Descontar Materia Prima",
+                        style: context.textTheme.bodyMedium,
+                      ),
+                      subtitle: Text(
+                        "Según la receta asociada a este producto",
+                        style: context.textTheme.bodySmall,
+                      ),
+                      activeColor: AppColors.primary,
+                      contentPadding: EdgeInsets.zero,
+                      controlAffinity: ListTileControlAffinity.leading,
+                    ),
+                  ],
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancelar'),
+                ),
+                ElevatedButton(
+                  onPressed: delta == 0
+                      ? null
+                      : () {
+                          onConfirm(delta, deductMp);
+                          Navigator.pop(context);
+                        },
+                  child: const Text('Confirmar'),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 }

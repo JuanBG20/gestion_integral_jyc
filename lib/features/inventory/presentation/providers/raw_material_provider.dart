@@ -60,4 +60,9 @@ class RawMaterialNotifier
       throw Exception('Error al eliminar materia prima: $e');
     }
   }
+
+  Future<void> updateStock(int id, int delta) async {
+    await repository.updateStock(id, delta);
+    await fetchRawMaterials();
+  }
 }

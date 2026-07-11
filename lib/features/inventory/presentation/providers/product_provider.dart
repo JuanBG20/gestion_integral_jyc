@@ -54,4 +54,9 @@ class InventoryProductsNotifier
       throw Exception('Error al guardar el producto: $e');
     }
   }
+
+  Future<void> updateStock(int variantId, int delta, bool deductMp) async {
+    await repository.updateStock(variantId, delta, deductMp);
+    await fetchInventory();
+  }
 }

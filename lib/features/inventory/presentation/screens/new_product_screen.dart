@@ -65,8 +65,7 @@ class _NewRawMaterialScreenState extends ConsumerState<NewProductScreen> {
           color: v.color.isNotEmpty ? v.color : null,
           size: v.size.isNotEmpty && v.size != '-' ? v.size : null,
           baseProduct: baseProduct,
-          manufacturingRecipe:
-              [], // TODO: Para implementarlo a futuro desde la UI
+          manufacturingRecipe: v.recipe,
         );
       }).toList();
 
@@ -76,7 +75,9 @@ class _NewRawMaterialScreenState extends ConsumerState<NewProductScreen> {
           .then((_) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('Producto y variantes guardados exitosamente'),
+                content: Text(
+                  'Producto, variantes y receta guardados exitosamente',
+                ),
               ),
             );
             context.go('/inventory');
@@ -165,7 +166,7 @@ class _NewRawMaterialScreenState extends ConsumerState<NewProductScreen> {
                 width: constraints.maxWidth,
 
                 child: Text(
-                  "Variantes y Precios",
+                  "Variantes, Precios y Recetas",
                   style: context.textTheme.titleMedium,
                 ),
               ),

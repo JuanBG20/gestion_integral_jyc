@@ -63,4 +63,9 @@ class ProductRepositoryImpl extends ProductRepository {
       return ProductGroupUi(baseProduct: baseModel, variants: variants);
     }).toList();
   }
+
+  @override
+  Future<void> updateStock(int variantId, int delta, bool deductMp) async {
+    await remoteDataSource.updateStock(variantId, delta, deductMp);
+  }
 }

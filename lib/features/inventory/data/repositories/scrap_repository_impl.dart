@@ -23,4 +23,9 @@ class ScrapRepositoryImpl implements ScrapRepository {
   Future<List<ScrapEntity>> getScraps() async {
     return await remoteDataSource.fetchScraps();
   }
+
+  @override
+  Future<void> updateStock(int id, int delta) async {
+    await remoteDataSource.updateStock(id, delta);
+  }
 }

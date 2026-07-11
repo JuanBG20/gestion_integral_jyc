@@ -9,4 +9,5 @@ abstract class ProductRepository {
     List<VariantProductEntity> variants,
   );
   Future<void> deleteBaseProduct(int id);
+  Future<void> updateStock(int variantId, int delta, bool deductMp);
 }

@@ -44,4 +44,9 @@ class RawMaterialRepositoryImpl implements RawMaterialRepository {
     );
     await remoteDataSource.updateRawMaterial(model);
   }
+
+  @override
+  Future<void> updateStock(int id, int delta) async {
+    await remoteDataSource.updateStock(id, delta);
+  }
 }

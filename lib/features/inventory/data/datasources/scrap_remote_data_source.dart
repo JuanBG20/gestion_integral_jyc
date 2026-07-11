@@ -25,4 +25,11 @@ class ScrapRemoteDataSource {
       },
     );
   }
+
+  Future<void> updateStock(int id, int delta) async {
+    await supabaseClient.rpc(
+      'ajustar_stock_retazo',
+      params: {'p_id': id, 'p_cantidad': delta},
+    );
+  }
 }
