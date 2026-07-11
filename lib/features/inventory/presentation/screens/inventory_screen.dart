@@ -7,11 +7,10 @@ import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_r
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_shell.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
-import 'package:gestion_integral_jyc/features/inventory/domain/entities/raw_material_entity.dart';
-import 'package:gestion_integral_jyc/features/inventory/domain/entities/scrap_entity.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/models/product_group_ui.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/providers/product_provider.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/providers/raw_material_provider.dart';
+import 'package:gestion_integral_jyc/features/inventory/presentation/providers/scrap_provider.dart';
 import 'package:go_router/go_router.dart';
 
 class InventoryScreen extends ConsumerWidget {
@@ -123,7 +122,7 @@ class InventoryScreen extends ConsumerWidget {
                       children: [
                         _buildRawMaterialsTab(context, ref),
                         _buildProductsTab(context, ref),
-                        _buildScrapsTab(context),
+                        _buildScrapsTab(context, ref),
                       ],
                     ),
                   ),
@@ -194,39 +193,39 @@ class InventoryScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildScrapsTab(BuildContext context) {
-    final materiaPrima = RawMaterialEntity(
-      sku: "MP-001",
-      stock: 10,
-      category: "Impresión3D",
-      subcategory: "PLA",
-      description: "PLA Rojo",
-      minStock: 15,
-    );
-    final retazos = [
-      ScrapEntity(height: 10, width: 20, rawMaterial: materiaPrima, stock: 1),
-    ];
+  Widget _buildScrapsTab(BuildContext context, WidgetRef ref) {
+    final scrapsState = ref.watch(scrapProvider);
 
-    return AppTableShell(
-      header: const AppTableHeader(columns: _scrapColumns),
-      rows: retazos
-          .map(
-            (scrap) => AppTableRow(
-              cells: [
-                AppTableCell.text(scrap.rawMaterial.description, flex: 4),
-                AppTableCell.text(
-                  '${scrap.width.toStringAsFixed(1)} cm',
-                  flex: 2,
+    return scrapsState.when(
+      data: (scraps) {
+        if (scraps.isEmpty) {
+          return const Center(child: Text("No hay retazos registrados."));
+        }
+
+        return AppTableShell(
+          header: const AppTableHeader(columns: _scrapColumns),
+          rows: scraps
+              .map(
+                (scrap) => AppTableRow(
+                  cells: [
+                    AppTableCell.text(scrap.rawMaterial.description, flex: 4),
+                    AppTableCell.text(
+                      '${scrap.width.toStringAsFixed(1)} cm',
+                      flex: 2,
+                    ),
+                    AppTableCell.text(
+                      '${scrap.height.toStringAsFixed(1)} cm',
+                      flex: 2,
+                    ),
+                    AppTableCell.text(scrap.stock.toString(), flex: 1),
+                  ],
                 ),
-                AppTableCell.text(
-                  '${scrap.height.toStringAsFixed(1)} cm',
-                  flex: 2,
-                ),
-                AppTableCell.text(scrap.stock.toString(), flex: 1),
-              ],
-            ),
-          )
-          .toList(),
+              )
+              .toList(),
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, stack) => Center(child: Text("Error al cargar retazos: $e")),
     );
   }
 
