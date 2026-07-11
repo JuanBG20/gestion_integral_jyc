@@ -4,7 +4,9 @@ import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 
 class PaymentMethodSelector extends StatefulWidget {
-  const PaymentMethodSelector({super.key});
+  final ValueChanged<PaymentMethod> onMethodChanged;
+
+  const PaymentMethodSelector({super.key, required this.onMethodChanged});
 
   @override
   State<PaymentMethodSelector> createState() => _PaymentMethodSelectorState();
@@ -88,6 +90,7 @@ class _PaymentMethodSelectorState extends State<PaymentMethodSelector> {
         onTap: () {
           setState(() {
             _selectedMethod = method;
+            widget.onMethodChanged(method);
           });
         },
         borderRadius: BorderRadius.circular(4),

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gestion_integral_jyc/core/enums/payment_method.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_text_field.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_cell.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_column.dart';
@@ -7,11 +9,13 @@ import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_r
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_shell.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
-import 'package:gestion_integral_jyc/features/sales/presentation/models/sale_mock_data.dart';
+import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_entity.dart';
+import 'package:gestion_integral_jyc/features/sales/presentation/providers/sale_provider.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/widgets/payment_method_selector.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
-class SalesScreen extends StatelessWidget {
+class SalesScreen extends ConsumerWidget {
   const SalesScreen({super.key});
 
   static const _salesColumns = [
@@ -24,7 +28,7 @@ class SalesScreen extends StatelessWidget {
   ];
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: AppColors.surface,
 
@@ -75,7 +79,7 @@ class SalesScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
 
                     children: [
-                      Expanded(flex: 6, child: _buildLeftColumn(context)),
+                      Expanded(flex: 6, child: _buildLeftColumn(context, ref)),
 
                       const SizedBox(width: 24),
 
@@ -85,7 +89,7 @@ class SalesScreen extends StatelessWidget {
                 } else {
                   return Column(
                     children: [
-                      _buildLeftColumn(context),
+                      _buildLeftColumn(context, ref),
                       const SizedBox(height: 24),
                       _buildRightColumn(context),
                     ],
@@ -99,31 +103,8 @@ class SalesScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildLeftColumn(BuildContext context) {
-    final ventas = [
-      const SaleMockData(
-        id: 'V-1042',
-        client: 'Caja',
-        date: '24/10/2023',
-        method: 'Efectivo',
-        amount: 15400.00,
-      ),
-      const SaleMockData(
-        id: 'V-1041',
-        client: 'Martín Rodríguez',
-        date: '24/10/2023',
-        method: 'Transferencia',
-        amount: 42000.00,
-        hasCae: true,
-      ),
-      const SaleMockData(
-        id: 'V-1040',
-        client: 'Genérico',
-        date: '23/10/2023',
-        method: 'Mercado Pago QR',
-        amount: 8500.00,
-      ),
-    ];
+  Widget _buildLeftColumn(BuildContext context, WidgetRef ref) {
+    final salesState = ref.watch(saleProvider);
 
     return Column(
       children: [
@@ -157,17 +138,39 @@ class SalesScreen extends StatelessWidget {
 
               const SizedBox(height: 16),
 
-              AppTableShell(
-                shrinkWrap: true,
-                minWidth: 600,
-                header: const AppTableHeader(
-                  columns: _salesColumns,
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-                  trailingWidth: 16,
+              salesState.when(
+                data: (sales) {
+                  if (sales.isEmpty) {
+                    return const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 24),
+                      child: Center(child: Text("No hay ventas registradas.")),
+                    );
+                  }
+
+                  return AppTableShell(
+                    shrinkWrap: true,
+                    minWidth: 600,
+                    header: const AppTableHeader(
+                      columns: _salesColumns,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 24,
+                      ),
+                      trailingWidth: 16,
+                    ),
+                    rows: sales
+                        .map((venta) => _buildSaleRow(context, venta: venta))
+                        .toList(),
+                  );
+                },
+                loading: () => const Padding(
+                  padding: EdgeInsets.all(24.0),
+                  child: Center(child: CircularProgressIndicator()),
                 ),
-                rows: ventas
-                    .map((venta) => _buildSaleRow(context, venta: venta))
-                    .toList(),
+                error: (e, stack) => Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Center(child: Text("Error: $e")),
+                ),
               ),
             ],
           ),
@@ -332,7 +335,7 @@ class SalesScreen extends StatelessWidget {
 
           const SizedBox(height: 16),
 
-          const PaymentMethodSelector(),
+          PaymentMethodSelector(onMethodChanged: (PaymentMethod value) {}),
 
           const SizedBox(height: 16),
 
@@ -349,37 +352,37 @@ class SalesScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSaleRow(BuildContext context, {required SaleMockData venta}) {
+  Widget _buildSaleRow(BuildContext context, {required SaleEntity venta}) {
     return AppTableRow(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       trailingWidth: 16,
       cells: [
         AppTableCell.text(
-          venta.id,
+          'VTA-${venta.id ?? ''}',
           flex: 2,
           style: context.textTheme.bodyMedium?.copyWith(
             fontWeight: FontWeight.w600,
           ),
         ),
         AppTableCell.text(
-          venta.client,
+          venta.client.fullName,
           flex: 3,
           style: context.textTheme.bodyMedium?.copyWith(
             fontWeight: FontWeight.w600,
           ),
         ),
         AppTableCell.text(
-          venta.date,
+          DateFormat('dd/MM/yyyy').format(venta.date),
           flex: 2,
           style: context.textTheme.bodySmall,
         ),
         AppTableCell.text(
-          venta.method,
+          venta.paymentMethod.dbValue,
           flex: 2,
           style: context.textTheme.bodySmall,
         ),
         AppTableCell.text(
-          '\$${venta.amount.toStringAsFixed(2)}',
+          '\$${venta.finalAmount.toStringAsFixed(2)}',
           flex: 2,
           style: context.textTheme.bodyMedium?.copyWith(
             fontWeight: FontWeight.w600,
@@ -390,7 +393,7 @@ class SalesScreen extends StatelessWidget {
           child: Align(
             alignment: Alignment.centerLeft,
 
-            child: _buildArcaIndicator(context, hasCae: venta.hasCae),
+            child: _buildArcaIndicator(context, hasCae: false),
           ),
         ),
       ],
