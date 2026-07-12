@@ -246,6 +246,9 @@ class ClientsScreen extends ConsumerWidget {
         if (value == 'delete' && client.id != null) {
           ref.read(clientProvider.notifier).removeClient(client.id!);
         }
+        if (value == 'edit') {
+          context.go('/clients/edit', extra: client);
+        }
       },
       itemBuilder: (context) => [
         const PopupMenuItem(value: 'view', child: Text('Ver Perfil')),
@@ -299,18 +302,24 @@ class ClientsScreen extends ConsumerWidget {
     final address = client.address;
     if (address == null) return "Sin dirección";
 
+    final streetLine = [
+      address.street,
+      address.number,
+    ].where((e) => e != null && e.isNotEmpty).join(' ');
+
     final floorAndApt = [
       address.floor,
       address.apartment,
     ].where((e) => e != null && e.isNotEmpty).join(' ');
 
     final parts = [
-      '${address.street} ${address.number}',
+      if (streetLine.isNotEmpty) streetLine,
       if (floorAndApt.isNotEmpty) floorAndApt,
-      address.location,
-      address.province,
+      if (address.location != null && address.location!.isNotEmpty)
+        address.location!,
+      if (address.province != null) address.province!.label,
     ];
 
-    return parts.join(', ');
+    return parts.isEmpty ? "Sin dirección" : parts.join(', ');
   }
 }

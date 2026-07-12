@@ -47,6 +47,15 @@ class ClientNotifier extends StateNotifier<AsyncValue<List<ClientEntity>>> {
     }
   }
 
+  Future<void> updateClient(ClientEntity client) async {
+    try {
+      await repository.updateClient(client);
+      await fetchClients();
+    } catch (e) {
+      throw Exception('Error al actualizar materia prima: $e');
+    }
+  }
+
   Future<void> removeClient(int id) async {
     try {
       await repository.deleteClient(id);

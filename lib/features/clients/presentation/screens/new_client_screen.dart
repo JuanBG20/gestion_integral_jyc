@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gestion_integral_jyc/core/domain/entities/address_entity.dart';
 import 'package:gestion_integral_jyc/core/domain/entities/client_entity.dart';
 import 'package:gestion_integral_jyc/core/enums/doc_type.dart';
+import 'package:gestion_integral_jyc/core/enums/provincia.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_dropdown.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_text_field.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
@@ -12,7 +13,9 @@ import 'package:gestion_integral_jyc/features/inventory/presentation/widgets/for
 import 'package:go_router/go_router.dart';
 
 class NewClientScreen extends ConsumerStatefulWidget {
-  const NewClientScreen({super.key});
+  final ClientEntity? clientToEdit;
+
+  const NewClientScreen({super.key, this.clientToEdit});
 
   @override
   ConsumerState<NewClientScreen> createState() => _NewRawMaterialScreenState();
@@ -29,12 +32,36 @@ class _NewRawMaterialScreenState extends ConsumerState<NewClientScreen> {
   final _streetController = TextEditingController();
   final _numberController = TextEditingController();
   final _locationController = TextEditingController();
-  final _provinceController = TextEditingController();
   final _floorController = TextEditingController();
   final _apartmentController = TextEditingController();
   final _notesController = TextEditingController();
 
-  DocType _selectedDocType = DocType.dni;
+  DocType? _selectedDocType;
+  Provincia? _selectedProvince;
+
+  bool get _isEditing => widget.clientToEdit != null;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final client = widget.clientToEdit;
+    if (client != null) {
+      _nameController.text = client.name;
+      _lastNameController.text = client.lastName;
+      _docNumberController.text = client.docNumber ?? '';
+      _phoneController.text = client.phoneNumber ?? '';
+      _emailController.text = client.email ?? '';
+      _streetController.text = client.address?.street ?? '';
+      _numberController.text = client.address?.number ?? '';
+      _locationController.text = client.address?.location ?? '';
+      _floorController.text = client.address?.floor ?? '';
+      _apartmentController.text = client.address?.apartment ?? '';
+      _notesController.text = client.additionalNotes ?? '';
+      _selectedDocType = client.docType;
+      _selectedProvince = client.address?.province;
+    }
+  }
 
   @override
   void dispose() {
@@ -46,39 +73,53 @@ class _NewRawMaterialScreenState extends ConsumerState<NewClientScreen> {
     _streetController.dispose();
     _numberController.dispose();
     _locationController.dispose();
-    _provinceController.dispose();
     _floorController.dispose();
     _apartmentController.dispose();
     _notesController.dispose();
     super.dispose();
   }
 
+  String? _nullableText(TextEditingController controller) {
+    final text = controller.text.trim();
+    return text.isEmpty ? null : text;
+  }
+
   void _saveClient() {
     if (_formKey.currentState!.validate()) {
-      final newClient = ClientEntity(
+      final address = AddressEntity(
+        street: _nullableText(_streetController),
+        number: _nullableText(_numberController),
+        location: _nullableText(_locationController),
+        province: _selectedProvince,
+        floor: _nullableText(_floorController),
+        apartment: _nullableText(_apartmentController),
+      );
+
+      final client = ClientEntity(
+        id: widget.clientToEdit?.id,
         name: _nameController.text.trim(),
         lastName: _lastNameController.text.trim(),
         docType: _selectedDocType,
-        docNumber: _docNumberController.text.trim(),
-        phoneNumber: _phoneController.text.trim(),
-        email: _emailController.text.trim(),
-        additionalNotes: _notesController.text.trim(),
-        address: AddressEntity(
-          street: _streetController.text.trim(),
-          number: _numberController.text.trim(),
-          location: _locationController.text.trim(),
-          province: _provinceController.text.trim(),
-          floor: _floorController.text.trim(),
-          apartment: _apartmentController.text.trim(),
-        ),
+        docNumber: _nullableText(_docNumberController),
+        phoneNumber: _nullableText(_phoneController),
+        email: _nullableText(_emailController),
+        additionalNotes: _nullableText(_notesController),
+        address: address.isEmpty ? null : address,
       );
 
-      ref
-          .read(clientProvider.notifier)
-          .addClient(newClient)
+      final notifier = ref.read(clientProvider.notifier);
+      final future = _isEditing
+          ? notifier.updateClient(client)
+          : notifier.addClient(client);
+
+      future
           .then((_) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Cliente guardado exitosamente')),
+              SnackBar(
+                content: Text(
+                  _isEditing ? 'Cliente actualizado' : 'Cliente guardado',
+                ),
+              ),
             );
             context.go('/clients');
           })
@@ -93,11 +134,12 @@ class _NewRawMaterialScreenState extends ConsumerState<NewClientScreen> {
   @override
   Widget build(BuildContext context) {
     return FormScreenLayout(
-      title: "Registrar Cliente",
-      subtitle:
-          "Ingrese los detalles para crear un nuevo cliente. Los campos obligatorios están marcados con un asterisco (*).",
+      title: _isEditing ? "Editar Cliente" : "Registrar Cliente",
+      subtitle: _isEditing
+          ? "Modifique los detalles del cliente seleccionado."
+          : "Ingrese los detalles para crear un nuevo cliente. Los campos obligatorios están marcados con un asterisco (*).",
       returnLabel: "Volver a Clientes",
-      saveLabel: "Guardar Cliente",
+      saveLabel: _isEditing ? "Guardar Cambios" : "Guardar Cliente",
       formKey: _formKey,
       formContent: LayoutBuilder(
         builder: (context, constraints) {
@@ -131,15 +173,6 @@ class _NewRawMaterialScreenState extends ConsumerState<NewClientScreen> {
                 ),
               ),
 
-              /* SizedBox(
-                width: itemWidth,
-
-                child: LabeledTextField(
-                  controller: TextEditingController(),
-                  label: "Tido de Documento",
-                  hint: "DNI",
-                ),
-              ), */
               SizedBox(
                 width: itemWidth,
 
@@ -156,11 +189,7 @@ class _NewRawMaterialScreenState extends ConsumerState<NewClientScreen> {
                       ),
                     );
                   }).toList(),
-                  onChanged: (val) {
-                    setState(() {
-                      if (val != null) _selectedDocType = val;
-                    });
-                  },
+                  onChanged: (val) => setState(() => _selectedDocType = val),
                 ),
               ),
 
@@ -243,10 +272,16 @@ class _NewRawMaterialScreenState extends ConsumerState<NewClientScreen> {
               SizedBox(
                 width: itemWidth,
 
-                child: LabeledTextField(
-                  controller: _provinceController,
+                child: LabeledDropdown(
                   label: "Provincia",
-                  hint: "Buenos Aires",
+                  value: _selectedProvince,
+                  hint: "Selecciona una provincia...",
+                  items: Provincia.values
+                      .map(
+                        (p) => DropdownMenuItem(value: p, child: Text(p.label)),
+                      )
+                      .toList(),
+                  onChanged: (val) => setState(() => _selectedProvince = val),
                 ),
               ),
 

@@ -16,18 +16,18 @@ class ClientModel extends ClientEntity {
   });
 
   factory ClientModel.fromJson(Map<String, dynamic> json) {
+    final address = AddressModel.fromJson(json);
+
     return ClientModel(
       id: json['idcliente'],
       name: json['nombre'],
       lastName: json['apellido'],
       additionalNotes: json['notas_adicionales'],
-      docType: json['tipo_documento'] != null
-          ? DocType.fromDB(json['tipo_documento'])
-          : null,
+      docType: DocType.fromDB(json['tipo_documento']),
       docNumber: json['num_documento'],
       email: json['correo'],
       phoneNumber: json['telefono'],
-      address: AddressModel.fromJson(json),
+      address: address.isEmpty ? null : address,
     );
   }
 

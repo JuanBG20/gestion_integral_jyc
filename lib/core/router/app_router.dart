@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gestion_integral_jyc/core/domain/entities/client_entity.dart';
 import 'package:gestion_integral_jyc/features/clients/presentation/screens/clients_screen.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/layout.dart';
 import 'package:gestion_integral_jyc/features/clients/presentation/screens/new_client_screen.dart';
@@ -143,6 +144,13 @@ final goRouter = GoRouter(
                 GoRoute(
                   path: 'new',
                   builder: (context, state) => const NewClientScreen(),
+                ),
+                GoRoute(
+                  path: 'edit',
+                  builder: (context, state) {
+                    final client = state.extra as ClientEntity;
+                    return NewClientScreen(clientToEdit: client);
+                  },
                 ),
               ],
             ),

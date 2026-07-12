@@ -7,10 +7,12 @@ enum DocType {
 
   const DocType(this.dbValue);
 
-  static DocType fromDB(String value) {
-    return DocType.values.firstWhere(
-      (actualEnum) => actualEnum.dbValue == value,
-      orElse: () => DocType.dni,
-    );
+  static DocType? fromDB(String? value) {
+    if (value == null) return null;
+
+    for (final type in DocType.values) {
+      if (type.dbValue == value) return type;
+    }
+    return null;
   }
 }

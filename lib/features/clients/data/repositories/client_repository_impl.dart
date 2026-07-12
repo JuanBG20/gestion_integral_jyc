@@ -68,7 +68,7 @@ class ClientRepositoryImpl implements ClientRepository {
         phoneNumber: client.phoneNumber,
         address: client.address,
       );
-      await remoteDataSource.insertClient(clientModel);
+      await remoteDataSource.updateClient(clientModel);
     } catch (e) {
       throw Exception('Error al actualizar el cliente: $e');
     }
