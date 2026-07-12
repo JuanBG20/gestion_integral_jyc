@@ -11,6 +11,7 @@ import 'package:gestion_integral_jyc/features/production/domain/entities/work_en
 import 'package:gestion_integral_jyc/features/production/presentation/screens/new_work_screen.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/screens/work_details_screen.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/screens/work_screen.dart';
+import 'package:gestion_integral_jyc/features/sales/presentation/screens/all_sales_screen.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/screens/new_sale_screen.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/screens/sales_screen.dart';
 import 'package:go_router/go_router.dart';
@@ -86,6 +87,10 @@ final goRouter = GoRouter(
                 GoRoute(
                   path: 'new',
                   builder: (context, state) => const NewSaleScreen(),
+                ),
+                GoRoute(
+                  path: 'all',
+                  builder: (context, state) => const AllSalesScreen(),
                 ),
               ],
             ),

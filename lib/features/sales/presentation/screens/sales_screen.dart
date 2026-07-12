@@ -2,18 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gestion_integral_jyc/core/enums/payment_method.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_text_field.dart';
-import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_cell.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_column.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_header.dart';
-import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_row.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_shell.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
-import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_entity.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/providers/sale_provider.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/widgets/payment_method_selector.dart';
+import 'package:gestion_integral_jyc/features/sales/presentation/widgets/sale_table_row.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 class SalesScreen extends ConsumerWidget {
   const SalesScreen({super.key});
@@ -128,7 +125,9 @@ class SalesScreen extends ConsumerWidget {
                   ),
 
                   TextButton.icon(
-                    onPressed: () {},
+                    onPressed: () {
+                      context.go('/sales/all');
+                    },
                     label: Text("Ver todas"),
                     icon: Icon(Icons.arrow_forward),
                     iconAlignment: IconAlignment.end,
@@ -156,10 +155,10 @@ class SalesScreen extends ConsumerWidget {
                         horizontal: 16,
                         vertical: 24,
                       ),
-                      trailingWidth: 16,
+                      trailingWidth: 0,
                     ),
                     rows: sales
-                        .map((venta) => _buildSaleRow(context, venta: venta))
+                        .map((venta) => SaleTableRow(sale: venta))
                         .toList(),
                   );
                 },
@@ -350,76 +349,6 @@ class SalesScreen extends ConsumerWidget {
         ],
       ),
     );
-  }
-
-  Widget _buildSaleRow(BuildContext context, {required SaleEntity venta}) {
-    return AppTableRow(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      trailingWidth: 16,
-      cells: [
-        AppTableCell.text(
-          'VTA-${venta.id ?? ''}',
-          flex: 2,
-          style: context.textTheme.bodyMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        AppTableCell.text(
-          venta.client.fullName,
-          flex: 3,
-          style: context.textTheme.bodyMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        AppTableCell.text(
-          DateFormat('dd/MM/yyyy').format(venta.date),
-          flex: 2,
-          style: context.textTheme.bodySmall,
-        ),
-        AppTableCell.text(
-          venta.paymentMethod.dbValue,
-          flex: 2,
-          style: context.textTheme.bodySmall,
-        ),
-        AppTableCell.text(
-          '\$${venta.finalAmount.toStringAsFixed(2)}',
-          flex: 2,
-          style: context.textTheme.bodyMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        AppTableCell(
-          flex: 1,
-          child: Align(
-            alignment: Alignment.centerLeft,
-
-            child: _buildArcaIndicator(context, hasCae: false),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildArcaIndicator(BuildContext context, {required bool hasCae}) {
-    if (hasCae) {
-      return Row(
-        mainAxisSize: MainAxisSize.min,
-
-        children: [
-          const Icon(Icons.check_circle, color: Colors.green, size: 16),
-          const SizedBox(width: 4),
-          Text(
-            "CAE",
-            style: context.textTheme.bodySmall?.copyWith(
-              color: Colors.green,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
-      );
-    }
-
-    return Icon(Icons.description_outlined, color: AppColors.primary);
   }
 
   Widget _buildActionMenu(BuildContext context) {
