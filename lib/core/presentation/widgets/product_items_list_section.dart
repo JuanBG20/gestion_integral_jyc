@@ -23,6 +23,7 @@ class ProductItemsListSection<T extends ProductLineItemEntity>
   final String sectionTitle;
   final String genericItemLabel;
   final String genericDescriptionHint;
+  final List<T> initialItems;
 
   const ProductItemsListSection({
     super.key,
@@ -31,6 +32,7 @@ class ProductItemsListSection<T extends ProductLineItemEntity>
     this.sectionTitle = "Ítems",
     this.genericItemLabel = "Ítem Genérico",
     this.genericDescriptionHint = "Descripción del ítem",
+    this.initialItems = const [],
   });
 
   @override
@@ -40,7 +42,7 @@ class ProductItemsListSection<T extends ProductLineItemEntity>
 
 class _ProductItemsListSectionState<T extends ProductLineItemEntity>
     extends ConsumerState<ProductItemsListSection<T>> {
-  final List<T> _items = [];
+  late List<T> _items;
 
   VariantProductEntity? _selectedVariant;
   final _qtyController = TextEditingController(text: '1');
@@ -49,6 +51,12 @@ class _ProductItemsListSectionState<T extends ProductLineItemEntity>
 
   bool _isGenericItem = false;
   bool _isAddingItem = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _items = List<T>.from(widget.initialItems);
+  }
 
   @override
   void dispose() {

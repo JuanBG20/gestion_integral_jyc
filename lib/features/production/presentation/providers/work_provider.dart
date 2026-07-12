@@ -46,6 +46,15 @@ class WorkNotifier extends StateNotifier<AsyncValue<List<WorkEntity>>> {
     }
   }
 
+  Future<void> updateWork(WorkEntity work) async {
+    try {
+      await repository.updateWork(work);
+      await fetchWorks();
+    } catch (e) {
+      throw Exception('Error al actualizar trabajo: $e');
+    }
+  }
+
   Future<void> updateWorkStatus(int workId, WorkState newState) async {
     try {
       // Optimistic Update: Actualizamos la UI inmediatamente para que sea fluido

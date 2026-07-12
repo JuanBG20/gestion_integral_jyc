@@ -28,10 +28,16 @@ class ScrapRemoteDataSource {
 
   Future<void> updateScrap(ScrapModel scrap) async {
     if (scrap.id == null) throw Exception('El ID es nulo');
-    await supabaseClient
-        .from('retazo')
-        .update(scrap.toJson())
-        .eq('idretazo', scrap.id!);
+    await supabaseClient.rpc(
+      'actualizar_retazo',
+      params: {
+        'p_id': scrap.id,
+        'p_materia_prima': scrap.rawMaterial.id,
+        'p_alto': scrap.height,
+        'p_ancho': scrap.width,
+        'p_stock': scrap.stock,
+      },
+    );
   }
 
   Future<void> updateStock(int id, int delta) async {

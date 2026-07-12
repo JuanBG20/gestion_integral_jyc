@@ -4,13 +4,19 @@ import 'package:gestion_integral_jyc/features/production/domain/entities/work_it
 
 class WorkItemsListSection extends StatelessWidget {
   final ValueChanged<List<WorkItemEntity>> onItemsChanged;
+  final List<WorkItemEntity> initialItems;
 
-  const WorkItemsListSection({super.key, required this.onItemsChanged});
+  const WorkItemsListSection({
+    super.key,
+    required this.onItemsChanged,
+    this.initialItems = const [],
+  });
 
   @override
   Widget build(BuildContext context) {
     return ProductItemsListSection<WorkItemEntity>(
       onItemsChanged: onItemsChanged,
+      initialItems: initialItems,
       sectionTitle: "Ítems a Producir",
       genericItemLabel: "Ítem Genérico",
       genericDescriptionHint: "Diseño personalizado",

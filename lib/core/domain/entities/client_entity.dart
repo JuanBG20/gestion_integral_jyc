@@ -25,4 +25,15 @@ class ClientEntity {
   });
 
   String get fullName => '$name $lastName';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ClientEntity &&
+          runtimeType == other.runtimeType &&
+          id != null &&
+          id == other.id;
+
+  @override
+  int get hashCode => id?.hashCode ?? identityHashCode(this);
 }

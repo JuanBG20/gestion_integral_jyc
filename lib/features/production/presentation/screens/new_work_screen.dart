@@ -16,7 +16,9 @@ import 'package:gestion_integral_jyc/features/production/presentation/widgets/wo
 import 'package:go_router/go_router.dart';
 
 class NewWorkScreen extends ConsumerStatefulWidget {
-  const NewWorkScreen({super.key});
+  final WorkEntity? workToEdit;
+
+  const NewWorkScreen({super.key, this.workToEdit});
 
   @override
   ConsumerState<NewWorkScreen> createState() => _NewRawMaterialScreenState();
@@ -31,6 +33,20 @@ class _NewRawMaterialScreenState extends ConsumerState<NewWorkScreen> {
 
   double get _totalAmount =>
       _currentItems.fold(0, (sum, item) => sum + item.subtotal);
+
+  bool get _isEditing => widget.workToEdit != null;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final work = widget.workToEdit;
+    if (work != null) {
+      _selectedClient = work.client;
+      _selectedDeadline = work.deadline;
+      _currentItems = work.items;
+    }
+  }
 
   Future<void> _pickDeadline() async {
     final picked = await showDatePicker(
@@ -61,21 +77,31 @@ class _NewRawMaterialScreenState extends ConsumerState<NewWorkScreen> {
         return;
       }
 
-      final newWork = WorkEntity(
-        creationDate: DateTime.now(),
+      final work = WorkEntity(
+        id: widget.workToEdit?.id,
+        creationDate: widget.workToEdit?.creationDate ?? DateTime.now(),
         deadline: _selectedDeadline,
         client: _selectedClient!,
-        actualState: WorkState.recibido, // Estado inicial por defecto
+        actualState:
+            widget.workToEdit?.actualState ??
+            WorkState.recibido, // Estado inicial por defecto
         items: _currentItems,
       );
 
-      ref
-          .read(workProvider.notifier)
-          .addWork(newWork)
+      final notifier = ref.read(workProvider.notifier);
+      final future = _isEditing
+          ? notifier.updateWork(work)
+          : notifier.addWork(work);
+
+      future
           .then((_) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Órden de Trabajo creada exitosamente'),
+              SnackBar(
+                content: Text(
+                  _isEditing
+                      ? 'Órden de Trabajo actualizada'
+                      : 'Órden de Trabajo guardada',
+                ),
               ),
             );
             context.go('/work');
@@ -93,11 +119,14 @@ class _NewRawMaterialScreenState extends ConsumerState<NewWorkScreen> {
     final clientsState = ref.watch(clientProvider);
 
     return FormScreenLayout(
-      title: "Registrar Órden de Trabajo",
-      subtitle:
-          "Complete los detalles para registrar una nueva órden de trabajo.",
+      title: _isEditing
+          ? "Editar Órden de Trabajo"
+          : "Registrar Órden de Trabajo",
+      subtitle: _isEditing
+          ? "Modifique los detalles de la órden de trabajo seleccionada."
+          : "Complete los detalles para registrar una nueva órden de trabajo.",
       returnLabel: "Volver al Kanban",
-      saveLabel: "Guardar Órden",
+      saveLabel: _isEditing ? "Guardar Cambios" : "Guardar Órden",
       maxWidth: 1200,
       formKey: _formKey,
       formContent: LayoutBuilder(
@@ -154,6 +183,7 @@ class _NewRawMaterialScreenState extends ConsumerState<NewWorkScreen> {
               SizedBox(
                 width: constraints.maxWidth,
                 child: WorkItemsListSection(
+                  initialItems: widget.workToEdit?.items ?? [],
                   onItemsChanged: (items) {
                     setState(() {
                       _currentItems = items;

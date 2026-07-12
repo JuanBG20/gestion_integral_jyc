@@ -39,6 +39,33 @@ class WorkRemoteDataSource {
     await supabaseClient.rpc('crear_trabajo_completo', params: payload);
   }
 
+  Future<void> updateWork(WorkModel work) async {
+    if (work.id == null) throw Exception('El ID es nulo');
+
+    try {
+      final payload = {
+        'p_id_trabajo': work.id,
+        'p_cliente': work.client.id,
+        'p_fecha_limite': work.deadline?.toIso8601String(),
+        'p_items': work.items
+            .map(
+              (item) => {
+                'producto_variante': item.variantProduct?.id,
+                'descripcion': item.description,
+                'cantidad': item.quantity,
+                'precio_unitario': item.unitPrice,
+                'hecho': item.isDone,
+              },
+            )
+            .toList(),
+      };
+
+      await supabaseClient.rpc('actualizar_trabajo_completo', params: payload);
+    } catch (e) {
+      throw Exception('Error al actualizar el trabajo completo: $e');
+    }
+  }
+
   Future<void> updateWorkStateRPC(int workId, String newStateStr) async {
     await supabaseClient.rpc(
       'actualizar_estado_trabajo',

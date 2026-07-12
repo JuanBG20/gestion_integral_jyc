@@ -119,9 +119,13 @@ class AllWorksScreen extends ConsumerWidget {
         if (value == 'details') {
           context.go('/work/detail', extra: work);
         }
+        if (value == 'edit') {
+          context.go('/work/edit', extra: work);
+        }
       },
       itemBuilder: (context) => [
         const PopupMenuItem(value: 'details', child: Text('Ver Detalle')),
+        const PopupMenuItem(value: 'edit', child: Text('Editar')),
       ],
     );
   }

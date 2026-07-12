@@ -46,4 +46,28 @@ class WorkRepositoryImpl implements WorkRepository {
   Future<void> updateWorkState(int workId, WorkState newState) async {
     await remoteDataSource.updateWorkStateRPC(workId, newState.dbValue);
   }
+
+  @override
+  Future<void> updateWork(WorkEntity work) async {
+    final workModel = WorkModel(
+      id: work.id,
+      creationDate: work.creationDate,
+      deadline: work.deadline,
+      client: work.client,
+      actualState: work.actualState,
+      items: work.items
+          .map(
+            (i) => WorkItemModel(
+              id: i.id,
+              variantProduct: i.variantProduct,
+              quantity: i.quantity,
+              unitPrice: i.unitPrice,
+              isDone: i.isDone,
+              description: i.description,
+            ),
+          )
+          .toList(),
+    );
+    await remoteDataSource.updateWork(workModel);
+  }
 }

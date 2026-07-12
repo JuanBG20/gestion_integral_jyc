@@ -4,6 +4,7 @@ import 'package:gestion_integral_jyc/features/production/domain/entities/work_en
 abstract class WorkRepository {
   Future<List<WorkEntity>> getWorks();
   Future<void> createWork(WorkEntity work);
+  Future<void> updateWork(WorkEntity work);
   Future<void> updateWorkState(int workId, WorkState newState);
   Future<void> updateWorkItemDone(int itemId, bool isDone);
 }

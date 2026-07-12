@@ -95,6 +95,13 @@ final goRouter = GoRouter(
                   builder: (context, state) => const NewWorkScreen(),
                 ),
                 GoRoute(
+                  path: 'edit',
+                  builder: (context, state) {
+                    final work = state.extra as WorkEntity;
+                    return NewWorkScreen(workToEdit: work);
+                  },
+                ),
+                GoRoute(
                   path: 'detail',
                   builder: (context, state) {
                     final work = state.extra as WorkEntity;

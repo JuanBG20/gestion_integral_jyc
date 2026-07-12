@@ -105,8 +105,8 @@ class _NewRawMaterialScreenState extends ConsumerState<NewRawMaterialScreen> {
     return FormScreenLayout(
       title: _isEditing ? "Editar Materia Prima" : "Registrar Materia Prima",
       subtitle: _isEditing
-          ? "Modifique los detalles del material seleccionado"
-          : "Ingrese los detalles del nuevo material para el inventario",
+          ? "Modifique los detalles del material seleccionado."
+          : "Ingrese los detalles del nuevo material para el inventario.",
       returnLabel: "Volver al Inventario",
       saveLabel: _isEditing ? "Guardar Cambios" : "Guardar Material",
       formKey: _formKey,
