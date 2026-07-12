@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:gestion_integral_jyc/core/domain/entities/client_entity.dart';
+import 'package:gestion_integral_jyc/features/auth/presentation/screens/login_screen.dart';
 import 'package:gestion_integral_jyc/features/clients/presentation/screens/clients_screen.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/layout.dart';
 import 'package:gestion_integral_jyc/features/clients/presentation/screens/new_client_screen.dart';
@@ -20,13 +23,42 @@ import 'package:gestion_integral_jyc/features/sales/presentation/screens/all_sal
 import 'package:gestion_integral_jyc/features/sales/presentation/screens/new_sale_screen.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/screens/sales_screen.dart';
 import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
+
+class GoRouterRefreshStream extends ChangeNotifier {
+  GoRouterRefreshStream(Stream<dynamic> stream) {
+    notifyListeners();
+    _subscription = stream.asBroadcastStream().listen((_) => notifyListeners());
+  }
+
+  late final StreamSubscription<dynamic> _subscription;
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
+  }
+}
 
 final goRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
   initialLocation: '/dashboard',
+  refreshListenable: GoRouterRefreshStream(
+    Supabase.instance.client.auth.onAuthStateChange,
+  ),
+  redirect: (context, state) {
+    final isLoggedIn = Supabase.instance.client.auth.currentSession != null;
+    final isLoggingIn = state.matchedLocation == '/login';
+
+    if (!isLoggedIn && !isLoggingIn) return '/login';
+    if (isLoggedIn && isLoggingIn) return '/dashboard';
+    return null;
+  },
   routes: [
+    GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
+
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {
         return Layout(navigationShell: navigationShell);

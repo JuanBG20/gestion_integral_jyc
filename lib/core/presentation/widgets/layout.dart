@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/search_app_bar.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
+import 'package:gestion_integral_jyc/features/auth/presentation/providers/auth_provider.dart';
 import 'package:go_router/go_router.dart';
 
-class Layout extends StatefulWidget {
+class Layout extends ConsumerStatefulWidget {
   final StatefulNavigationShell navigationShell;
 
   const Layout({super.key, required this.navigationShell});
 
   @override
-  State<Layout> createState() => _LayoutState();
+  ConsumerState<Layout> createState() => _LayoutState();
 }
 
-class _LayoutState extends State<Layout> {
+class _LayoutState extends ConsumerState<Layout> {
   bool _isSidebarExpanded = true;
 
   void _goToBranch(int index) {
@@ -138,7 +140,10 @@ class _LayoutState extends State<Layout> {
                 _buildSidebarItem(
                   icon: Icons.logout_outlined,
                   title: "Cerrar Sesión",
-                  onTap: () {},
+                  onTap: () async {
+                    await ref.read(authProvider.notifier).signOut();
+                    if (context.mounted) context.go('/login');
+                  },
                   isExpanded: _isSidebarExpanded,
                 ),
 

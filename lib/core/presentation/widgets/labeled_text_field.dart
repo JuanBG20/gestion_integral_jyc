@@ -9,6 +9,7 @@ class LabeledTextField extends StatelessWidget {
   final Icon? prefixIcon;
   final bool obscureText;
   final Widget? suffixIcon;
+  final String? Function(String?)? validator;
 
   const LabeledTextField({
     super.key,
@@ -19,6 +20,7 @@ class LabeledTextField extends StatelessWidget {
     this.prefixIcon,
     this.obscureText = false,
     this.suffixIcon,
+    this.validator,
   });
 
   @override
@@ -46,6 +48,7 @@ class LabeledTextField extends StatelessWidget {
             prefixIcon: prefixIcon,
             suffixIcon: suffixIcon,
           ),
+          validator: validator,
         ),
       ],
     );

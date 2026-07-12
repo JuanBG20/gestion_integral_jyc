@@ -5,15 +5,17 @@ class UserEntity {
   final String idAuth;
   final String name;
   final String lastName;
-  final Role role;
+  final List<Role> roles;
 
   UserEntity({
     required this.idAuth,
     required this.name,
     required this.lastName,
-    required this.role,
+    required this.roles,
     this.id,
   });
 
   String get fullName => '$name $lastName';
+
+  bool hasRole(Role role) => roles.contains(role);
 }

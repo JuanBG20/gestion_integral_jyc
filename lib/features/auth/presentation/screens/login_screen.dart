@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_text_field.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
+import 'package:gestion_integral_jyc/features/auth/presentation/providers/auth_provider.dart';
+import 'package:go_router/go_router.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
 
   final _emailController = TextEditingController();
@@ -26,8 +29,23 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
+  Future<void> _submit() async {
+    if (_formKey.currentState!.validate()) {
+      await ref
+          .read(authProvider.notifier)
+          .signIn(_emailController.text.trim(), _passwordController.text);
+
+      final authState = ref.read(authProvider);
+      if (authState.isAuthenticated && mounted) {
+        context.go('/dashboard');
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authProvider);
+
     return Scaffold(
       backgroundColor: AppColors.surface,
 
@@ -84,6 +102,10 @@ class _LoginScreenState extends State<LoginScreen> {
                             label: 'Email',
                             hint: 'operario@gmail.com',
                             prefixIcon: const Icon(Icons.person_outline),
+                            validator: (value) =>
+                                (value == null || value.trim().isEmpty)
+                                ? 'Requerido'
+                                : null,
                           ),
 
                           const SizedBox(height: 20),
@@ -106,7 +128,22 @@ class _LoginScreenState extends State<LoginScreen> {
                                     : Icons.visibility,
                               ),
                             ),
+                            validator: (value) =>
+                                (value == null || value.isEmpty)
+                                ? 'Requerido'
+                                : null,
                           ),
+
+                          if (authState.errorMessage != null) ...[
+                            const SizedBox(height: 12),
+
+                            Text(
+                              authState.errorMessage!,
+                              style: context.textTheme.bodySmall?.copyWith(
+                                color: AppColors.error,
+                              ),
+                            ),
+                          ],
 
                           const SizedBox(height: 20),
 
@@ -147,9 +184,19 @@ class _LoginScreenState extends State<LoginScreen> {
                             width: double.infinity,
 
                             child: ElevatedButton.icon(
-                              onPressed: () {},
-                              label: Text("Iniciar Sesión"),
-                              icon: Icon(Icons.arrow_forward),
+                              onPressed: authState.isLoading ? null : _submit,
+                              label: authState.isLoading
+                                  ? const SizedBox(
+                                      width: 16,
+                                      height: 16,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : Text("Iniciar Sesión"),
+                              icon: authState.isLoading
+                                  ? null
+                                  : Icon(Icons.arrow_forward),
                               iconAlignment: IconAlignment.end,
                             ),
                           ),
