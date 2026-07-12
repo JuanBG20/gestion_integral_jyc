@@ -38,10 +38,22 @@ class WorkScreen extends StatelessWidget {
                   ],
                 ),
 
-                ElevatedButton.icon(
-                  onPressed: () => context.go('/work/new'),
-                  label: Text("Nuevo Trabajo"),
-                  icon: Icon(Icons.add),
+                Row(
+                  children: [
+                    OutlinedButton.icon(
+                      onPressed: () => context.go('/work/all'),
+                      label: Text("Ver Trabajos"),
+                      icon: Icon(Icons.visibility_outlined),
+                    ),
+
+                    const SizedBox(width: 16),
+
+                    ElevatedButton.icon(
+                      onPressed: () => context.go('/work/new'),
+                      label: Text("Nuevo Trabajo"),
+                      icon: Icon(Icons.add),
+                    ),
+                  ],
                 ),
               ],
             ),
