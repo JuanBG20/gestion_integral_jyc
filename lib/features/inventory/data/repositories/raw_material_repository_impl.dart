@@ -17,6 +17,7 @@ class RawMaterialRepositoryImpl implements RawMaterialRepository {
       subcategory: material.subcategory,
       description: material.description,
       minStock: material.minStock,
+      measurementUnit: material.measurementUnit,
     );
     await remoteDataSource.insertRawMaterial(model);
   }
@@ -41,12 +42,13 @@ class RawMaterialRepositoryImpl implements RawMaterialRepository {
       subcategory: material.subcategory,
       description: material.description,
       minStock: material.minStock,
+      measurementUnit: material.measurementUnit,
     );
     await remoteDataSource.updateRawMaterial(model);
   }
 
   @override
-  Future<void> updateStock(int id, int delta) async {
+  Future<void> updateStock(int id, double delta) async {
     await remoteDataSource.updateStock(id, delta);
   }
 }

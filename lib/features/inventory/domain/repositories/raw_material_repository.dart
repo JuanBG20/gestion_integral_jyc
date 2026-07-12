@@ -5,5 +5,5 @@ abstract class RawMaterialRepository {
   Future<void> createRawMaterial(RawMaterialEntity material);
   Future<void> updateRawMaterial(RawMaterialEntity material);
   Future<void> deleteRawMaterial(int id);
-  Future<void> updateStock(int id, int delta);
+  Future<void> updateStock(int id, double delta);
 }

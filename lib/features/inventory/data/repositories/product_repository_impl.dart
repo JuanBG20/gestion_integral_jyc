@@ -65,7 +65,7 @@ class ProductRepositoryImpl extends ProductRepository {
   }
 
   @override
-  Future<void> updateStock(int variantId, int delta, bool deductMp) async {
+  Future<void> updateStock(int variantId, double delta, bool deductMp) async {
     await remoteDataSource.updateStock(variantId, delta, deductMp);
   }
 }

@@ -1,3 +1,4 @@
+import 'package:gestion_integral_jyc/core/enums/measurement_unit.dart';
 import 'package:gestion_integral_jyc/features/inventory/domain/entities/raw_material_entity.dart';
 
 class RawMaterialModel extends RawMaterialEntity {
@@ -9,17 +10,19 @@ class RawMaterialModel extends RawMaterialEntity {
     required super.subcategory,
     required super.description,
     required super.minStock,
+    super.measurementUnit,
   });
 
   factory RawMaterialModel.fromJson(Map<String, dynamic> json) {
     return RawMaterialModel(
       id: json['idmateria_prima'],
       sku: json['sku'],
-      stock: json['stock'],
+      stock: (json['stock'] as num).toDouble(),
       category: json['categoria'],
       subcategory: json['subcategoria'],
       description: json['descripcion'],
-      minStock: json['stock_minimo'],
+      minStock: (json['stock_minimo'] as num).toDouble(),
+      measurementUnit: MeasurementUnit.fromDB(json['unidad_medida']),
     );
   }
 
@@ -32,6 +35,7 @@ class RawMaterialModel extends RawMaterialEntity {
       'subcategoria': subcategory,
       'descripcion': description,
       'stock_minimo': minStock,
+      'unidad_medida': measurementUnit.dbValue,
     };
   }
 }

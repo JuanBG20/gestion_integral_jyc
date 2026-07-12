@@ -32,7 +32,7 @@ class RawMaterialRemoteDataSource {
         .eq('idmateria_prima', id);
   }
 
-  Future<void> updateStock(int id, int delta) async {
+  Future<void> updateStock(int id, double delta) async {
     await supabaseClient.rpc(
       'ajustar_stock_mp',
       params: {'p_id': id, 'p_cantidad': delta},

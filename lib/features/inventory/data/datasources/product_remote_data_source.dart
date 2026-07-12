@@ -50,7 +50,7 @@ class ProductRemoteDataSource {
     await supabaseClient.rpc('crear_producto_completo', params: payload);
   }
 
-  Future<void> updateStock(int variantId, int delta, bool deductMp) async {
+  Future<void> updateStock(int variantId, double delta, bool deductMp) async {
     await supabaseClient.rpc(
       'ajustar_stock_producto',
       params: {

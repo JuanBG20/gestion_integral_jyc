@@ -61,7 +61,7 @@ class RawMaterialNotifier
     }
   }
 
-  Future<void> updateStock(int id, int delta) async {
+  Future<void> updateStock(int id, double delta) async {
     await repository.updateStock(id, delta);
     await fetchRawMaterials();
   }

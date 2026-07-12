@@ -168,8 +168,8 @@ class InventoryScreen extends ConsumerWidget {
                   cells: [
                     AppTableCell.text(mp.sku, flex: 2),
                     AppTableCell.text(mp.description, flex: 3),
-                    AppTableCell.text(mp.stock.toString(), flex: 1),
-                    AppTableCell.text(mp.minStock.toString(), flex: 2),
+                    AppTableCell.text(mp.formattedStock, flex: 1),
+                    AppTableCell.text(mp.formattedMinStock, flex: 2),
                     AppTableCell.text(mp.fullCategory, flex: 3),
                   ],
                 ),
@@ -235,7 +235,7 @@ class InventoryScreen extends ConsumerWidget {
                         if (scrap.id != null) {
                           ref
                               .read(scrapProvider.notifier)
-                              .updateStock(scrap.id!, delta);
+                              .updateStock(scrap.id!, delta.round());
                         }
                       },
                     ),
@@ -366,9 +366,9 @@ class InventoryScreen extends ConsumerWidget {
     required BuildContext context,
     required String title,
     required bool isProduct,
-    required void Function(int delta, bool deductMp) onConfirm,
+    required void Function(double delta, bool deductMp) onConfirm,
   }) {
-    int delta = 0;
+    double delta = 0;
     bool deductMp = true;
     final controller = TextEditingController();
 
@@ -393,6 +393,7 @@ class InventoryScreen extends ConsumerWidget {
                     controller: controller,
                     keyboardType: const TextInputType.numberWithOptions(
                       signed: true,
+                      decimal: true,
                     ),
                     decoration: const InputDecoration(
                       labelText: "Cantidad (Ej: 5 o -2)",
@@ -400,7 +401,7 @@ class InventoryScreen extends ConsumerWidget {
                     ),
                     onChanged: (val) {
                       setState(() {
-                        delta = int.tryParse(val) ?? 0;
+                        delta = double.tryParse(val.replaceAll(',', '.')) ?? 0;
                       });
                     },
                   ),

@@ -55,7 +55,7 @@ class InventoryProductsNotifier
     }
   }
 
-  Future<void> updateStock(int variantId, int delta, bool deductMp) async {
+  Future<void> updateStock(int variantId, double delta, bool deductMp) async {
     await repository.updateStock(variantId, delta, deductMp);
     await fetchInventory();
   }

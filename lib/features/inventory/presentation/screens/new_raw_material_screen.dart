@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gestion_integral_jyc/core/enums/measurement_unit.dart';
+import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_dropdown.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_text_field.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
@@ -26,6 +28,8 @@ class _NewRawMaterialScreenState extends ConsumerState<NewRawMaterialScreen> {
   final _stockController = TextEditingController();
   final _minStockController = TextEditingController();
 
+  MeasurementUnit _selectedUnit = MeasurementUnit.unidad;
+
   @override
   void dispose() {
     _descController.dispose();
@@ -44,8 +48,9 @@ class _NewRawMaterialScreenState extends ConsumerState<NewRawMaterialScreen> {
         sku: _skuController.text.trim(),
         category: _catController.text.trim(),
         subcategory: _subcatController.text.trim(),
-        stock: int.tryParse(_stockController.text.trim()) ?? 0,
-        minStock: int.tryParse(_minStockController.text.trim()) ?? 0,
+        stock: double.tryParse(_stockController.text.trim()) ?? 0,
+        minStock: double.tryParse(_minStockController.text.trim()) ?? 0,
+        measurementUnit: _selectedUnit,
       );
 
       ref
@@ -150,6 +155,23 @@ class _NewRawMaterialScreenState extends ConsumerState<NewRawMaterialScreen> {
                   controller: _minStockController,
                   label: "Stock Mínimo",
                   hint: "10",
+                ),
+              ),
+
+              SizedBox(
+                width: itemWidth,
+                child: LabeledDropdown<MeasurementUnit>(
+                  label: "Unidad de Medida",
+                  value: _selectedUnit,
+                  hint: "Seleccione una unidad...",
+                  items: MeasurementUnit.values
+                      .map(
+                        (u) => DropdownMenuItem(value: u, child: Text(u.label)),
+                      )
+                      .toList(),
+                  onChanged: (val) => setState(
+                    () => _selectedUnit = val ?? MeasurementUnit.unidad,
+                  ),
                 ),
               ),
             ],
