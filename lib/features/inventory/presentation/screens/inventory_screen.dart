@@ -152,6 +152,8 @@ class InventoryScreen extends ConsumerWidget {
                   trailingWidth: 40,
                   trailing: _buildActionMenu(
                     context,
+                    onEdit: () =>
+                        context.go('/inventory/edit-material', extra: mp),
                     onUpdateStock: () => _showStockDialog(
                       context: context,
                       title: 'Actualizar Stock: ${mp.description}',
@@ -226,6 +228,8 @@ class InventoryScreen extends ConsumerWidget {
                   trailingWidth: 40,
                   trailing: _buildActionMenu(
                     context,
+                    onEdit: () =>
+                        context.go('/inventory/edit-scrap', extra: scrap),
                     onUpdateStock: () => _showStockDialog(
                       context: context,
                       title:
@@ -299,6 +303,9 @@ class InventoryScreen extends ConsumerWidget {
               trailingWidth: 40,
               trailing: _buildActionMenu(
                 context,
+                onEdit: () {
+                  context.go('/inventory/edit-product', extra: product);
+                },
                 onUpdateStock: () => _showStockDialog(
                   context: context,
                   title:
@@ -348,15 +355,17 @@ class InventoryScreen extends ConsumerWidget {
   Widget _buildActionMenu(
     BuildContext context, {
     required VoidCallback onUpdateStock,
+    required VoidCallback onEdit,
   }) {
     return PopupMenuButton<String>(
       icon: Icon(Icons.more_horiz, color: AppColors.onBackground),
       onSelected: (value) {
         if (value == 'update') onUpdateStock();
+        if (value == 'edit') onEdit();
       },
       itemBuilder: (context) => [
         const PopupMenuItem(value: 'update', child: Text('Ajustar Stock')),
-        const PopupMenuItem(value: 'edit', child: Text('Modificar')),
+        const PopupMenuItem(value: 'edit', child: Text('Editar')),
         const PopupMenuItem(value: 'delete', child: Text('Eliminar')),
       ],
     );

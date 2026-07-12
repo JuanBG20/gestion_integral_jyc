@@ -10,7 +10,13 @@ class ProductRemoteDataSource {
   Future<List<Map<String, dynamic>>> fetchInventoryWithVariants() async {
     final response = await supabaseClient.from('producto_base').select('''
       *,
-      producto_variante (*)
+      producto_variante (
+        *,
+        fabrica (
+          *,
+          materia_prima (*)
+        )
+      )
     ''');
     return List<Map<String, dynamic>>.from(response);
   }
@@ -48,6 +54,44 @@ class ProductRemoteDataSource {
     };
 
     await supabaseClient.rpc('crear_producto_completo', params: payload);
+  }
+
+  Future<void> updateFullProduct(
+    BaseProductModel base,
+    List<VariantProductModel> variants,
+  ) async {
+    try {
+      // 1. Armamos el payload incluyendo el ID del producto base y de las variantes
+      final payload = {
+        'p_id_base': base.id,
+        'p_sku_base': base.baseSku,
+        'p_categoria': base.category,
+        'p_subcategoria': base.subcategory,
+        'p_descripcion': base.description,
+        'p_variantes': variants.map((v) {
+          return {
+            'id': v.id,
+            'sku': v.sku,
+            'stock': v.stock,
+            'costPrice': v.costPrice,
+            'salePrice': v.salePrice,
+            'color': v.color,
+            'size': v.size,
+            'recipe': v.manufacturingRecipe.map((r) {
+              return {
+                'rawMaterialId': r.rawMaterial.id,
+                'quantity': r.quantity,
+              };
+            }).toList(),
+          };
+        }).toList(),
+      };
+
+      // 2. Llamamos a la nueva función RPC de Supabase
+      await supabaseClient.rpc('actualizar_producto_completo', params: payload);
+    } catch (e) {
+      throw Exception('Error al actualizar el producto completo: $e');
+    }
   }
 
   Future<void> updateStock(int variantId, double delta, bool deductMp) async {

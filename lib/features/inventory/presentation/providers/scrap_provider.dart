@@ -45,6 +45,15 @@ class ScrapNotifier extends StateNotifier<AsyncValue<List<ScrapEntity>>> {
     }
   }
 
+  Future<void> updateScrap(ScrapEntity scrap) async {
+    try {
+      await repository.updateScrap(scrap);
+      await fetchScraps();
+    } catch (e) {
+      throw Exception('Error al actualizar el retazo: $e');
+    }
+  }
+
   Future<void> updateStock(int id, int delta) async {
     await repository.updateStock(id, delta);
     await fetchScraps();

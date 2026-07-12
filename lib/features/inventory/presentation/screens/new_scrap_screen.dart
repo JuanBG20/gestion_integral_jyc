@@ -12,7 +12,9 @@ import 'package:gestion_integral_jyc/features/inventory/presentation/widgets/for
 import 'package:go_router/go_router.dart';
 
 class NewScrapScreen extends ConsumerStatefulWidget {
-  const NewScrapScreen({super.key});
+  final ScrapEntity? scrapToEdit;
+
+  const NewScrapScreen({super.key, this.scrapToEdit});
 
   @override
   ConsumerState<NewScrapScreen> createState() => _NewRawMaterialScreenState();
@@ -26,11 +28,21 @@ class _NewRawMaterialScreenState extends ConsumerState<NewScrapScreen> {
   final _heightController = TextEditingController();
   final _qtyController = TextEditingController(text: '1');
 
+  bool get _isEditing => widget.scrapToEdit != null;
+
   @override
   void initState() {
     super.initState();
     _widthController.addListener(() => setState(() {}));
     _heightController.addListener(() => setState(() {}));
+
+    final scrap = widget.scrapToEdit;
+    if (scrap != null) {
+      _widthController.text = scrap.width.toString();
+      _heightController.text = scrap.height.toString();
+      _qtyController.text = scrap.stock.toString();
+      _selectedMaterial = scrap.rawMaterial;
+    }
   }
 
   @override
@@ -65,19 +77,27 @@ class _NewRawMaterialScreenState extends ConsumerState<NewScrapScreen> {
         return;
       }
 
-      final newScrap = ScrapEntity(
+      final scrap = ScrapEntity(
+        id: widget.scrapToEdit?.id,
         width: w,
         height: h,
         stock: stock,
         rawMaterial: _selectedMaterial!,
       );
 
-      ref
-          .read(scrapProvider.notifier)
-          .addScrap(newScrap)
+      final notifier = ref.read(scrapProvider.notifier);
+      final future = _isEditing
+          ? notifier.updateScrap(scrap)
+          : notifier.addScrap(scrap);
+
+      future
           .then((_) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Retazo guardado exitosamente')),
+              SnackBar(
+                content: Text(
+                  _isEditing ? 'Retazo actualizado' : 'Retazo guardado',
+                ),
+              ),
             );
             context.go('/inventory');
           })
@@ -94,10 +114,12 @@ class _NewRawMaterialScreenState extends ConsumerState<NewScrapScreen> {
     final rawMaterialsState = ref.watch(rawMaterialProvider);
 
     return FormScreenLayout(
-      title: "Registrar Retazo",
-      subtitle: "Ingrese los detalles del nuevo retazo para el inventario.",
+      title: _isEditing ? "Editar Retazo" : "Registrar Retazo",
+      subtitle: _isEditing
+          ? "Modifique los detalles del retazo seleccionado"
+          : "Ingrese los detalles del nuevo retazo para el inventario.",
       returnLabel: "Volver al Inventario",
-      saveLabel: "Guardar Retazo",
+      saveLabel: _isEditing ? "Guardar Cambios" : "Guardar Retazo",
       maxWidth: 1200,
       formKey: _formKey,
       formContent: LayoutBuilder(

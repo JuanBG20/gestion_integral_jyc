@@ -3,6 +3,9 @@ import 'package:gestion_integral_jyc/features/clients/presentation/screens/clien
 import 'package:gestion_integral_jyc/core/presentation/widgets/layout.dart';
 import 'package:gestion_integral_jyc/features/clients/presentation/screens/new_client_screen.dart';
 import 'package:gestion_integral_jyc/features/dashboard/presentation/screens/dashboard_screen.dart';
+import 'package:gestion_integral_jyc/features/inventory/domain/entities/raw_material_entity.dart';
+import 'package:gestion_integral_jyc/features/inventory/domain/entities/scrap_entity.dart';
+import 'package:gestion_integral_jyc/features/inventory/presentation/models/product_group_ui.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/screens/inventory_screen.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/screens/new_product_screen.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/screens/new_raw_material_screen.dart';
@@ -47,12 +50,35 @@ final goRouter = GoRouter(
                   builder: (context, state) => const NewRawMaterialScreen(),
                 ),
                 GoRoute(
+                  path: 'edit-material',
+                  builder: (context, state) {
+                    final material = state.extra as RawMaterialEntity;
+                    return NewRawMaterialScreen(rawMaterialToEdit: material);
+                  },
+                ),
+
+                GoRoute(
                   path: 'new-product',
                   builder: (context, state) => const NewProductScreen(),
                 ),
                 GoRoute(
+                  path: 'edit-product',
+                  builder: (context, state) {
+                    final product = state.extra as ProductGroupUi;
+                    return NewProductScreen(productToEdit: product);
+                  },
+                ),
+
+                GoRoute(
                   path: 'new-scrap',
                   builder: (context, state) => const NewScrapScreen(),
+                ),
+                GoRoute(
+                  path: 'edit-scrap',
+                  builder: (context, state) {
+                    final scrap = state.extra as ScrapEntity;
+                    return NewScrapScreen(scrapToEdit: scrap);
+                  },
                 ),
               ],
             ),

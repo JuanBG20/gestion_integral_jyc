@@ -6,12 +6,15 @@ import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/features/inventory/domain/entities/base_product_entity.dart';
 import 'package:gestion_integral_jyc/features/inventory/domain/entities/variant_product_entity.dart';
+import 'package:gestion_integral_jyc/features/inventory/presentation/models/product_group_ui.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/providers/product_provider.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/widgets/form_screen_layout.dart';
 import 'package:go_router/go_router.dart';
 
 class NewProductScreen extends ConsumerStatefulWidget {
-  const NewProductScreen({super.key});
+  final ProductGroupUi? productToEdit;
+
+  const NewProductScreen({super.key, this.productToEdit});
 
   @override
   ConsumerState<NewProductScreen> createState() => _NewRawMaterialScreenState();
@@ -26,6 +29,34 @@ class _NewRawMaterialScreenState extends ConsumerState<NewProductScreen> {
   final _subcatController = TextEditingController();
 
   List<VariantFormData> _currentVariants = [];
+
+  bool get _isEditing => widget.productToEdit != null;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final product = widget.productToEdit;
+    if (product != null) {
+      _descController.text = product.baseProduct.description;
+      _skuController.text = product.baseProduct.baseSku;
+      _catController.text = product.baseProduct.category;
+      _subcatController.text = product.baseProduct.subcategory;
+
+      _currentVariants = product.variants.map((variantEntity) {
+        return VariantFormData(
+          id: variantEntity.id,
+          sku: variantEntity.sku,
+          color: variantEntity.color ?? '',
+          size: variantEntity.size ?? '',
+          stock: variantEntity.stock,
+          costPrice: variantEntity.costPrice,
+          salePrice: variantEntity.salePrice,
+          recipe: variantEntity.manufacturingRecipe,
+        );
+      }).toList();
+    }
+  }
 
   @override
   void dispose() {
@@ -47,17 +78,19 @@ class _NewRawMaterialScreenState extends ConsumerState<NewProductScreen> {
         return;
       }
 
-      // Creamos la entidad base (Aún sin ID)
+      // Producto Base
       final baseProduct = BaseProductEntity(
+        id: widget.productToEdit?.baseProduct.id,
         baseSku: _skuController.text.trim(),
         category: _catController.text.trim(),
         subcategory: _subcatController.text.trim(),
         description: _descController.text.trim(),
       );
 
-      // Mapeamos los datos del form a entidades
+      // Variantes
       final List<VariantProductEntity> variants = _currentVariants.map((v) {
         return VariantProductEntity(
+          id: v.id,
           sku: v.sku,
           stock: v.stock,
           costPrice: v.costPrice,
@@ -69,14 +102,19 @@ class _NewRawMaterialScreenState extends ConsumerState<NewProductScreen> {
         );
       }).toList();
 
-      ref
-          .read(inventoryProductsProvider.notifier)
-          .addProductWithVariants(baseProduct, variants)
+      final notifier = ref.read(inventoryProductsProvider.notifier);
+      final future = _isEditing
+          ? notifier.updateProductWithVariants(baseProduct, variants)
+          : notifier.addProductWithVariants(baseProduct, variants);
+
+      future
           .then((_) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
+              SnackBar(
                 content: Text(
-                  'Producto, variantes y receta guardados exitosamente',
+                  _isEditing
+                      ? 'Producto, variantes y receta actualizados'
+                      : 'Producto, variantes y receta guardados',
                 ),
               ),
             );
@@ -93,10 +131,12 @@ class _NewRawMaterialScreenState extends ConsumerState<NewProductScreen> {
   @override
   Widget build(BuildContext context) {
     return FormScreenLayout(
-      title: "Registrar Producto",
-      subtitle: "Ingrese los detalles del nuevo producto para el inventario",
+      title: _isEditing ? "Editar Producto" : "Registrar Producto",
+      subtitle: _isEditing
+          ? "Modifique los detalles del producto seleccionado"
+          : "Ingrese los detalles del nuevo producto para el inventario",
       returnLabel: "Volver al Inventario",
-      saveLabel: "Guardar Producto",
+      saveLabel: _isEditing ? "Guardar Cambios" : "Guardar Producto",
       maxWidth: double.infinity,
       formKey: _formKey,
       formContent: LayoutBuilder(
@@ -174,6 +214,7 @@ class _NewRawMaterialScreenState extends ConsumerState<NewProductScreen> {
               SizedBox(
                 width: constraints.maxWidth,
                 child: VariantsTableSection(
+                  initialVariants: _currentVariants,
                   onVariantsChanged: (variants) {
                     _currentVariants = variants;
                   },

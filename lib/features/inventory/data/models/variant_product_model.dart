@@ -1,4 +1,5 @@
 import 'package:gestion_integral_jyc/features/inventory/data/models/base_product_model.dart';
+import 'package:gestion_integral_jyc/features/inventory/data/models/material_recipe_model.dart';
 import 'package:gestion_integral_jyc/features/inventory/domain/entities/variant_product_entity.dart';
 
 class VariantProductModel extends VariantProductEntity {
@@ -18,6 +19,12 @@ class VariantProductModel extends VariantProductEntity {
     Map<String, dynamic> json,
     BaseProductModel baseModel,
   ) {
+    final fabricaJson = json['fabrica'] as List<dynamic>? ?? [];
+
+    final recipes = fabricaJson.map((recipeJson) {
+      return MaterialRecipeModel.fromJson(recipeJson as Map<String, dynamic>);
+    }).toList();
+
     return VariantProductModel(
       id: json['idproducto_variante'],
       sku: json['sku_variante'],
@@ -27,8 +34,7 @@ class VariantProductModel extends VariantProductEntity {
       color: json['color'],
       size: json['tamano'],
       baseProduct: baseModel,
-      manufacturingRecipe:
-          [], // Se poblaría si hacemos un JOIN complejo con fabrica
+      manufacturingRecipe: recipes,
     );
   }
 

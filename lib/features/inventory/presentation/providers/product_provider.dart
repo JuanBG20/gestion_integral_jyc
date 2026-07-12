@@ -55,6 +55,18 @@ class InventoryProductsNotifier
     }
   }
 
+  Future<void> updateProductWithVariants(
+    BaseProductEntity base,
+    List<VariantProductEntity> variants,
+  ) async {
+    try {
+      await repository.updateFullProduct(base, variants);
+      await fetchInventory(); // Refrescamos la UI
+    } catch (e) {
+      throw Exception('Error al actualizar el producto: $e');
+    }
+  }
+
   Future<void> updateStock(int variantId, double delta, bool deductMp) async {
     await repository.updateStock(variantId, delta, deductMp);
     await fetchInventory();

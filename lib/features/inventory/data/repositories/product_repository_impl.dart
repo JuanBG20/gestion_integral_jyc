@@ -68,4 +68,36 @@ class ProductRepositoryImpl extends ProductRepository {
   Future<void> updateStock(int variantId, double delta, bool deductMp) async {
     await remoteDataSource.updateStock(variantId, delta, deductMp);
   }
+
+  @override
+  Future<void> updateFullProduct(
+    BaseProductEntity baseProduct,
+    List<VariantProductEntity> variants,
+  ) async {
+    final baseModel = BaseProductModel(
+      id: baseProduct.id,
+      baseSku: baseProduct.baseSku,
+      category: baseProduct.category,
+      subcategory: baseProduct.subcategory,
+      description: baseProduct.description,
+    );
+
+    final variantModels = variants
+        .map(
+          (v) => VariantProductModel(
+            id: v.id,
+            sku: v.sku,
+            stock: v.stock,
+            costPrice: v.costPrice,
+            salePrice: v.salePrice,
+            color: v.color,
+            size: v.size,
+            baseProduct: baseModel,
+            manufacturingRecipe: v.manufacturingRecipe,
+          ),
+        )
+        .toList();
+
+    await remoteDataSource.updateFullProduct(baseModel, variantModels);
+  }
 }

@@ -52,6 +52,15 @@ class RawMaterialNotifier
     }
   }
 
+  Future<void> updateRawMaterial(RawMaterialEntity material) async {
+    try {
+      await repository.updateRawMaterial(material);
+      await fetchRawMaterials();
+    } catch (e) {
+      throw Exception('Error al actualizar materia prima: $e');
+    }
+  }
+
   Future<void> removeRawMaterial(int id) async {
     try {
       await repository.deleteRawMaterial(id);

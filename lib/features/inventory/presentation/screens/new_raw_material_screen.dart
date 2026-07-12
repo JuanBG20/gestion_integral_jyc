@@ -11,7 +11,9 @@ import 'package:gestion_integral_jyc/features/inventory/presentation/widgets/for
 import 'package:go_router/go_router.dart';
 
 class NewRawMaterialScreen extends ConsumerStatefulWidget {
-  const NewRawMaterialScreen({super.key});
+  final RawMaterialEntity? rawMaterialToEdit;
+
+  const NewRawMaterialScreen({super.key, this.rawMaterialToEdit});
 
   @override
   ConsumerState<NewRawMaterialScreen> createState() =>
@@ -30,6 +32,24 @@ class _NewRawMaterialScreenState extends ConsumerState<NewRawMaterialScreen> {
 
   MeasurementUnit _selectedUnit = MeasurementUnit.unidad;
 
+  bool get _isEditing => widget.rawMaterialToEdit != null;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final material = widget.rawMaterialToEdit;
+    if (material != null) {
+      _descController.text = material.description;
+      _skuController.text = material.sku;
+      _catController.text = material.category;
+      _subcatController.text = material.subcategory;
+      _stockController.text = material.stock.toString();
+      _minStockController.text = material.minStock.toString();
+      _selectedUnit = material.measurementUnit;
+    }
+  }
+
   @override
   void dispose() {
     _descController.dispose();
@@ -43,7 +63,8 @@ class _NewRawMaterialScreenState extends ConsumerState<NewRawMaterialScreen> {
 
   void _saveMaterial() {
     if (_formKey.currentState!.validate()) {
-      final newMaterial = RawMaterialEntity(
+      final material = RawMaterialEntity(
+        id: widget.rawMaterialToEdit?.id,
         description: _descController.text.trim(),
         sku: _skuController.text.trim(),
         category: _catController.text.trim(),
@@ -53,12 +74,21 @@ class _NewRawMaterialScreenState extends ConsumerState<NewRawMaterialScreen> {
         measurementUnit: _selectedUnit,
       );
 
-      ref
-          .read(rawMaterialProvider.notifier)
-          .addRawMaterial(newMaterial)
+      final notifier = ref.read(rawMaterialProvider.notifier);
+      final future = _isEditing
+          ? notifier.updateRawMaterial(material)
+          : notifier.addRawMaterial(material);
+
+      future
           .then((_) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Materia Prima guardada')),
+              SnackBar(
+                content: Text(
+                  _isEditing
+                      ? 'Materia Prima actualizada'
+                      : 'Materia Prima guardada',
+                ),
+              ),
             );
             context.go('/inventory');
           })
@@ -73,10 +103,12 @@ class _NewRawMaterialScreenState extends ConsumerState<NewRawMaterialScreen> {
   @override
   Widget build(BuildContext context) {
     return FormScreenLayout(
-      title: "Registrar Materia Prima",
-      subtitle: "Ingrese los detalles del nuevo material para el inventario",
+      title: _isEditing ? "Editar Materia Prima" : "Registrar Materia Prima",
+      subtitle: _isEditing
+          ? "Modifique los detalles del material seleccionado"
+          : "Ingrese los detalles del nuevo material para el inventario",
       returnLabel: "Volver al Inventario",
-      saveLabel: "Guardar Material",
+      saveLabel: _isEditing ? "Guardar Cambios" : "Guardar Material",
       formKey: _formKey,
       formContent: LayoutBuilder(
         builder: (context, constraints) {

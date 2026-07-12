@@ -36,4 +36,15 @@ class RawMaterialEntity {
         return '${value.toStringAsFixed(value.truncateToDouble() == value ? 0 : 1)} cm²';
     }
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is RawMaterialEntity &&
+          runtimeType == other.runtimeType &&
+          id != null &&
+          id == other.id;
+
+  @override
+  int get hashCode => id?.hashCode ?? identityHashCode(this);
 }

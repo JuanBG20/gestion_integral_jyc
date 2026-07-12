@@ -9,6 +9,7 @@ import 'package:gestion_integral_jyc/features/inventory/domain/entities/raw_mate
 import 'package:gestion_integral_jyc/features/inventory/presentation/providers/raw_material_provider.dart';
 
 class VariantFormData {
+  final int? id;
   final String sku;
   final String color;
   final String size;
@@ -25,13 +26,19 @@ class VariantFormData {
     required this.costPrice,
     required this.salePrice,
     required this.recipe,
+    this.id,
   });
 }
 
 class VariantsTableSection extends ConsumerStatefulWidget {
+  final List<VariantFormData>? initialVariants;
   final ValueChanged<List<VariantFormData>> onVariantsChanged;
 
-  const VariantsTableSection({super.key, required this.onVariantsChanged});
+  const VariantsTableSection({
+    super.key,
+    required this.onVariantsChanged,
+    this.initialVariants,
+  });
 
   @override
   ConsumerState<VariantsTableSection> createState() =>
@@ -39,7 +46,7 @@ class VariantsTableSection extends ConsumerStatefulWidget {
 }
 
 class _VariantsTableSectionState extends ConsumerState<VariantsTableSection> {
-  final List<VariantFormData> _variants = [];
+  late List<VariantFormData> _variants;
   List<MaterialRecipeEntity> _pendingRecipe = [];
 
   final _skuController = TextEditingController();
@@ -50,6 +57,14 @@ class _VariantsTableSectionState extends ConsumerState<VariantsTableSection> {
   final _saleController = TextEditingController();
 
   bool _isAddingItem = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _variants = widget.initialVariants != null
+        ? List.from(widget.initialVariants!)
+        : [];
+  }
 
   @override
   void dispose() {
