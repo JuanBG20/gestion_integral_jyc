@@ -7,6 +7,7 @@ import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_r
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_shell.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
+import 'package:gestion_integral_jyc/features/auth/presentation/providers/auth_provider.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/models/product_group_ui.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/providers/product_provider.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/providers/raw_material_provider.dart';
@@ -42,6 +43,8 @@ class InventoryScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isAdmin = ref.watch(isAdminProvider);
+
     return DefaultTabController(
       length: 3,
 
@@ -120,9 +123,9 @@ class InventoryScreen extends ConsumerWidget {
                   Expanded(
                     child: TabBarView(
                       children: [
-                        _buildRawMaterialsTab(context, ref),
-                        _buildProductsTab(context, ref),
-                        _buildScrapsTab(context, ref),
+                        _buildRawMaterialsTab(context, ref, isAdmin),
+                        _buildProductsTab(context, ref, isAdmin),
+                        _buildScrapsTab(context, ref, isAdmin),
                       ],
                     ),
                   ),
@@ -135,7 +138,11 @@ class InventoryScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildRawMaterialsTab(BuildContext context, WidgetRef ref) {
+  Widget _buildRawMaterialsTab(
+    BuildContext context,
+    WidgetRef ref,
+    bool isAdmin,
+  ) {
     final rawMaterialsState = ref.watch(rawMaterialProvider);
 
     return rawMaterialsState.when(
@@ -152,12 +159,14 @@ class InventoryScreen extends ConsumerWidget {
                   trailingWidth: 40,
                   trailing: _buildActionMenu(
                     context,
+                    isAdmin: isAdmin,
                     onEdit: () =>
                         context.go('/inventory/edit-material', extra: mp),
                     onUpdateStock: () => _showStockDialog(
                       context: context,
                       title: 'Actualizar Stock: ${mp.description}',
                       isProduct: false,
+                      isAdmin: isAdmin,
                       onConfirm: (delta, _) {
                         if (mp.id != null) {
                           ref
@@ -184,7 +193,7 @@ class InventoryScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildProductsTab(BuildContext context, WidgetRef ref) {
+  Widget _buildProductsTab(BuildContext context, WidgetRef ref, bool isAdmin) {
     final productsState = ref.watch(inventoryProductsProvider);
 
     return productsState.when(
@@ -200,8 +209,12 @@ class InventoryScreen extends ConsumerWidget {
           ),
           rows: products
               .map(
-                (product) =>
-                    _buildExpandableTableRow(context, ref, product: product),
+                (product) => _buildExpandableTableRow(
+                  context,
+                  ref,
+                  product: product,
+                  isAdmin: isAdmin,
+                ),
               )
               .toList(),
         );
@@ -211,7 +224,7 @@ class InventoryScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildScrapsTab(BuildContext context, WidgetRef ref) {
+  Widget _buildScrapsTab(BuildContext context, WidgetRef ref, bool isAdmin) {
     final scrapsState = ref.watch(scrapProvider);
 
     return scrapsState.when(
@@ -228,6 +241,7 @@ class InventoryScreen extends ConsumerWidget {
                   trailingWidth: 40,
                   trailing: _buildActionMenu(
                     context,
+                    isAdmin: isAdmin,
                     onEdit: () =>
                         context.go('/inventory/edit-scrap', extra: scrap),
                     onUpdateStock: () => _showStockDialog(
@@ -235,6 +249,7 @@ class InventoryScreen extends ConsumerWidget {
                       title:
                           'Actualizar Retazo: ${scrap.rawMaterial.description}',
                       isProduct: false,
+                      isAdmin: isAdmin,
                       onConfirm: (delta, _) {
                         if (scrap.id != null) {
                           ref
@@ -270,6 +285,7 @@ class InventoryScreen extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref, {
     required ProductGroupUi product,
+    required bool isAdmin,
   }) {
     final base = product.baseProduct;
 
@@ -303,6 +319,7 @@ class InventoryScreen extends ConsumerWidget {
               trailingWidth: 40,
               trailing: _buildActionMenu(
                 context,
+                isAdmin: isAdmin,
                 onEdit: () {
                   context.go('/inventory/edit-product', extra: product);
                 },
@@ -311,6 +328,7 @@ class InventoryScreen extends ConsumerWidget {
                   title:
                       'Stock: ${base.description} (${variant.color ?? variant.size ?? variant.sku})',
                   isProduct: true,
+                  isAdmin: isAdmin,
                   onConfirm: (delta, deductMp) async {
                     if (variant.id != null) {
                       await ref
@@ -354,6 +372,7 @@ class InventoryScreen extends ConsumerWidget {
 
   Widget _buildActionMenu(
     BuildContext context, {
+    required bool isAdmin,
     required VoidCallback onUpdateStock,
     required VoidCallback onEdit,
   }) {
@@ -366,7 +385,8 @@ class InventoryScreen extends ConsumerWidget {
       itemBuilder: (context) => [
         const PopupMenuItem(value: 'update', child: Text('Ajustar Stock')),
         const PopupMenuItem(value: 'edit', child: Text('Editar')),
-        const PopupMenuItem(value: 'delete', child: Text('Eliminar')),
+        if (isAdmin)
+          const PopupMenuItem(value: 'delete', child: Text('Eliminar')),
       ],
     );
   }
@@ -375,6 +395,7 @@ class InventoryScreen extends ConsumerWidget {
     required BuildContext context,
     required String title,
     required bool isProduct,
+    required bool isAdmin,
     required void Function(double delta, bool deductMp) onConfirm,
   }) {
     double delta = 0;
@@ -414,7 +435,7 @@ class InventoryScreen extends ConsumerWidget {
                       });
                     },
                   ),
-                  if (isProduct && delta > 0) ...[
+                  if (isProduct && delta > 0 && isAdmin) ...[
                     const SizedBox(height: 16),
                     CheckboxListTile(
                       value: deductMp,

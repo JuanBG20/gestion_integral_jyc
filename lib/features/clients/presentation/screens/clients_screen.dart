@@ -8,6 +8,7 @@ import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_r
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_shell.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
+import 'package:gestion_integral_jyc/features/auth/presentation/providers/auth_provider.dart';
 import 'package:gestion_integral_jyc/features/clients/presentation/providers/client_provider.dart';
 import 'package:go_router/go_router.dart';
 
@@ -24,6 +25,7 @@ class ClientsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isAdmin = ref.watch(isAdminProvider);
     final clientsState = ref.watch(clientProvider);
 
     return Scaffold(
@@ -89,7 +91,14 @@ class ClientsScreen extends ConsumerWidget {
                         trailingWidth: 100,
                       ),
                       rows: clients
-                          .map((c) => _buildClientRow(context, ref, client: c))
+                          .map(
+                            (c) => _buildClientRow(
+                              context,
+                              ref,
+                              client: c,
+                              isAdmin: isAdmin,
+                            ),
+                          )
                           .toList(),
                     ),
 
@@ -114,13 +123,14 @@ class ClientsScreen extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref, {
     required ClientEntity client,
+    required bool isAdmin,
   }) {
     return AppTableRow(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       trailingWidth: 100,
       trailing: SizedBox(
         width: 40,
-        child: _buildActionMenu(context, ref, client),
+        child: _buildActionMenu(context, ref, client, isAdmin),
       ),
       cells: [
         AppTableCell.text(
@@ -239,6 +249,7 @@ class ClientsScreen extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
     ClientEntity client,
+    bool isAdmin,
   ) {
     return PopupMenuButton<String>(
       icon: Icon(Icons.more_horiz, color: AppColors.onBackground),
@@ -253,7 +264,8 @@ class ClientsScreen extends ConsumerWidget {
       itemBuilder: (context) => [
         const PopupMenuItem(value: 'view', child: Text('Ver Perfil')),
         const PopupMenuItem(value: 'edit', child: Text('Editar')),
-        const PopupMenuItem(value: 'delete', child: Text('Eliminar')),
+        if (isAdmin)
+          const PopupMenuItem(value: 'delete', child: Text('Eliminar')),
       ],
     );
   }

@@ -86,3 +86,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = const AuthState.initial();
   }
 }
+
+final isAdminProvider = Provider<bool>((ref) {
+  final authState = ref.watch(authProvider);
+  return authState.activeRole == Role.administrador;
+});
