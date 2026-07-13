@@ -47,7 +47,7 @@ class VariantsTableSection extends ConsumerStatefulWidget {
 
 class _VariantsTableSectionState extends ConsumerState<VariantsTableSection> {
   late List<VariantFormData> _variants;
-  List<MaterialRecipeEntity> _pendingRecipe = [];
+  final List<MaterialRecipeEntity> _pendingRecipe = [];
 
   final _skuController = TextEditingController();
   final _colorController = TextEditingController();

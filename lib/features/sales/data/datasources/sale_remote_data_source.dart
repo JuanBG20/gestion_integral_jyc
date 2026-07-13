@@ -29,7 +29,11 @@ class SaleRemoteDataSource {
     return (response as List).map((json) => SaleModel.fromJson(json)).toList();
   }
 
-  Future<void> createSaleRPC(SaleModel sale) async {
+  Future<void> createSaleRPC(
+    SaleModel sale, {
+    int? materiaPrimaId,
+    double? consumo,
+  }) async {
     final payload = {
       'p_cliente': sale.client.id,
       'p_metodo_pago': sale.paymentMethod.dbValue,
@@ -38,6 +42,8 @@ class SaleRemoteDataSource {
       'p_items': sale.items
           .map((item) => (item as SaleItemModel).toJson())
           .toList(),
+      'p_materia_prima': materiaPrimaId,
+      'p_consumo': consumo,
     };
 
     await supabaseClient.rpc('crear_venta_completa', params: payload);

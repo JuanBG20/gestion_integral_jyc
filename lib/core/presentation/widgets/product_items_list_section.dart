@@ -178,7 +178,6 @@ class _ProductItemsListSectionState<T extends ProductLineItemEntity>
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 color: AppColors.surface,
-                // TODO: Dotted border
                 border: Border.all(color: AppColors.outline),
                 borderRadius: BorderRadius.circular(4),
               ),

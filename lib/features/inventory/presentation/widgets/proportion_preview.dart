@@ -63,7 +63,6 @@ class ProportionPreview extends StatelessWidget {
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        // TODO: Dotted Border
                         border: Border.all(
                           color: hasValues
                               ? AppColors.primary

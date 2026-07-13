@@ -10,7 +10,11 @@ class SaleRepositoryImpl implements SaleRepository {
   SaleRepositoryImpl(this.remoteDataSource);
 
   @override
-  Future<void> createSale(SaleEntity sale) async {
+  Future<void> createSale(
+    SaleEntity sale, {
+    int? materiaPrimaId,
+    double? consumo,
+  }) async {
     final saleModel = SaleModel(
       paymentMethod: sale.paymentMethod,
       date: sale.date,
@@ -28,7 +32,11 @@ class SaleRepositoryImpl implements SaleRepository {
           )
           .toList(),
     );
-    await remoteDataSource.createSaleRPC(saleModel);
+    await remoteDataSource.createSaleRPC(
+      saleModel,
+      materiaPrimaId: materiaPrimaId,
+      consumo: consumo,
+    );
   }
 
   @override
