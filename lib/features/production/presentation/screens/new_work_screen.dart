@@ -8,7 +8,7 @@ import 'package:gestion_integral_jyc/core/presentation/widgets/quick_action_butt
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/features/clients/presentation/providers/client_provider.dart';
-import 'package:gestion_integral_jyc/features/inventory/presentation/widgets/form_screen_layout.dart';
+import 'package:gestion_integral_jyc/core/presentation/screens/form_screen_layout.dart';
 import 'package:gestion_integral_jyc/features/production/domain/entities/work_entity.dart';
 import 'package:gestion_integral_jyc/features/production/domain/entities/work_item_entity.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/providers/work_provider.dart';

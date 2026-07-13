@@ -6,13 +6,12 @@ import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_dropdown.
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/features/clients/presentation/providers/client_provider.dart';
-import 'package:gestion_integral_jyc/features/inventory/presentation/widgets/form_screen_layout.dart';
+import 'package:gestion_integral_jyc/core/presentation/screens/form_screen_layout.dart';
 import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_entity.dart';
 import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_item_entity.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/providers/sale_provider.dart';
-import 'package:gestion_integral_jyc/features/sales/presentation/widgets/payment_method_selector.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/widgets/sale_items_list_section.dart';
-import 'package:gestion_integral_jyc/features/sales/presentation/widgets/sale_summary_item_card.dart';
+import 'package:gestion_integral_jyc/features/sales/presentation/widgets/summary_sale_card.dart';
 import 'package:go_router/go_router.dart';
 
 class NewSaleScreen extends ConsumerStatefulWidget {
@@ -135,92 +134,15 @@ class _NewRawMaterialScreenState extends ConsumerState<NewSaleScreen> {
           );
         },
       ),
-      sidePanel: Container(
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: AppColors.background,
-          border: Border.all(color: AppColors.outline),
-          borderRadius: BorderRadius.circular(4),
-        ),
-
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-
-          children: [
-            Text("Resumen", style: context.textTheme.titleMedium),
-
-            const SizedBox(height: 8),
-
-            Divider(color: AppColors.outline),
-
-            const SizedBox(height: 8),
-
-            if (_currentItems.isEmpty) ...[
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: Text(
-                  "Aún no agregó productos.",
-                  style: context.textTheme.bodySmall,
-                ),
-              ),
-            ] else
-              ListView.separated(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemBuilder: (context, index) =>
-                    SaleSummaryItemCard(item: _currentItems[index]),
-                separatorBuilder: (context, index) => const SizedBox(height: 8),
-                itemCount: _currentItems.length,
-              ),
-
-            const SizedBox(height: 8),
-
-            Divider(color: AppColors.outline),
-
-            const SizedBox(height: 8),
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-              children: [
-                Text("Productos", style: context.textTheme.bodyMedium),
-                Text(
-                  "\$${_totalAmount.toStringAsFixed(2)}",
-                  style: context.textTheme.bodyMedium,
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 8),
-
-            Divider(color: AppColors.outline),
-
-            const SizedBox(height: 8),
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-              children: [
-                Text("Total", style: context.textTheme.titleMedium),
-                Text(
-                  "\$${_totalAmount.toStringAsFixed(2)}",
-                  style: context.textTheme.titleLarge,
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 16),
-
-            PaymentMethodSelector(
-              onMethodChanged: (method) {
-                setState(() {
-                  _selectedMethod = method;
-                });
-              },
-            ),
-          ],
-        ),
+      sidePanel: SummarySaleCard(
+        currentItems: _currentItems,
+        onPaymentMethodChange: (method) {
+          setState(() {
+            _selectedMethod = method;
+          });
+        },
       ),
+
       onReturn: () {
         context.go('/sales');
       },

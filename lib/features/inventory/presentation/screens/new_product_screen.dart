@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_text_field.dart';
-import 'package:gestion_integral_jyc/core/presentation/widgets/table/variants_table_section.dart';
+import 'package:gestion_integral_jyc/features/inventory/presentation/widgets/variants_table_section.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/features/inventory/domain/entities/base_product_entity.dart';
 import 'package:gestion_integral_jyc/features/inventory/domain/entities/variant_product_entity.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/models/product_group_ui.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/providers/product_provider.dart';
-import 'package:gestion_integral_jyc/features/inventory/presentation/widgets/form_screen_layout.dart';
+import 'package:gestion_integral_jyc/core/presentation/screens/form_screen_layout.dart';
 import 'package:go_router/go_router.dart';
 
 class NewProductScreen extends ConsumerStatefulWidget {

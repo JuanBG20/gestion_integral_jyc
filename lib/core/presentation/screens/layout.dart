@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/search_app_bar.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
-import 'package:gestion_integral_jyc/features/auth/presentation/providers/auth_provider.dart';
+import 'package:gestion_integral_jyc/core/presentation/providers/auth_provider.dart';
 import 'package:go_router/go_router.dart';
 
 class Layout extends ConsumerStatefulWidget {

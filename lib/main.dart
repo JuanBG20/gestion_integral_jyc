@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gestion_integral_jyc/core/router/app_router.dart';
 import 'package:gestion_integral_jyc/core/theme/app_theme.dart';
@@ -27,6 +28,13 @@ class MainApp extends StatelessWidget {
       routerConfig: goRouter,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('es', 'AR')],
+      locale: const Locale('es', 'AR'),
     );
   }
 }

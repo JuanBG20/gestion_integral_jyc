@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:gestion_integral_jyc/core/enums/role.dart';
-import 'package:gestion_integral_jyc/features/auth/presentation/providers/auth_state.dart';
+import 'package:gestion_integral_jyc/core/presentation/providers/auth_state.dart';
 import 'package:gestion_integral_jyc/features/auth/data/datasources/user_remote_data_source.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' hide AuthState;
 

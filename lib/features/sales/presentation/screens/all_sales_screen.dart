@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gestion_integral_jyc/core/presentation/widgets/screen_header.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_column.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_header.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_shell.dart';
+import 'package:gestion_integral_jyc/core/presentation/widgets/table/pagination_footer.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
-import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/providers/sale_provider.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/widgets/sale_table_row.dart';
 import 'package:go_router/go_router.dart';
@@ -33,37 +34,13 @@ class AllSalesScreen extends ConsumerWidget {
 
         child: Column(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-
-                    children: [
-                      Text(
-                        "Ventas y Facturación",
-                        style: context.textTheme.titleLarge,
-                      ),
-                      Text(
-                        "Registra ventas, controla las transacciones y emite facturas.",
-                        style: context.textTheme.bodyLarge,
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(width: 16),
-
-                ElevatedButton.icon(
-                  onPressed: () => context.go('/sales/new'),
-                  label: Text("Nueva Venta"),
-                  icon: Icon(Icons.add),
-                ),
-              ],
+            ScreenHeader(
+              title: "Ventas y Facturación",
+              subtitle:
+                  "Registra ventas, controla las transacciones y emite facturas.",
+              buttonLabel: "Nueva Venta",
+              onPressed: () => context.go('/sales/new'),
             ),
-
             const SizedBox(height: 32),
 
             salesState.when(
@@ -92,10 +69,10 @@ class AllSalesScreen extends ConsumerWidget {
                           .toList(),
                     ),
 
-                    _buildPaginationFooter(
-                      context,
+                    PaginationFooter(
                       total: sales.length,
                       shown: sales.length,
+                      label: 'ventas',
                     ),
                   ],
                 );
@@ -105,46 +82,6 @@ class AllSalesScreen extends ConsumerWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildPaginationFooter(
-    BuildContext context, {
-    required int total,
-    required int shown,
-  }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        border: Border.all(color: AppColors.outline),
-      ),
-
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-        children: [
-          Text(
-            "Mostrando 1-$shown de $total clientes",
-            style: context.textTheme.bodySmall?.copyWith(
-              color: AppColors.onBackground,
-            ),
-          ),
-
-          Row(
-            children: [
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(Icons.chevron_left),
-              ),
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(Icons.chevron_right),
-              ),
-            ],
-          ),
-        ],
       ),
     );
   }

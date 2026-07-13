@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:gestion_integral_jyc/core/presentation/widgets/quick_action_button.dart';
+import 'package:gestion_integral_jyc/core/presentation/extensions/screen_size.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
-import 'package:go_router/go_router.dart';
+import 'package:gestion_integral_jyc/features/dashboard/presentation/widgets/latest_moves.dart';
+import 'package:gestion_integral_jyc/features/dashboard/presentation/widgets/production_summary_table.dart';
+import 'package:gestion_integral_jyc/features/dashboard/presentation/widgets/dashboard_quick_actions.dart';
+import 'package:gestion_integral_jyc/features/dashboard/presentation/widgets/summary_card.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -33,9 +36,7 @@ class DashboardScreen extends StatelessWidget {
 
             LayoutBuilder(
               builder: (context, constraints) {
-                final bool isDesktop = constraints.maxWidth > 840;
-
-                if (isDesktop) {
+                if (constraints.isDesktopLayout) {
                   return Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
 
@@ -46,16 +47,14 @@ class DashboardScreen extends StatelessWidget {
                     ],
                   );
                 } else {
-                  return SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        _buildLeftColumn(context),
+                  return Column(
+                    children: [
+                      _buildLeftColumn(context),
 
-                        const SizedBox(height: 24),
+                      const SizedBox(height: 24),
 
-                        _buildRightColumn(context),
-                      ],
-                    ),
+                      _buildRightColumn(context),
+                    ],
                   );
                 }
               },
@@ -82,8 +81,7 @@ class DashboardScreen extends StatelessWidget {
               runSpacing: 16,
 
               children: [
-                _buildSummaryCard(
-                  context,
+                SummaryCard(
                   width: cardWidth,
                   title: 'TOTAL DE VENTAS DEL DÍA',
                   value: '\$45.250',
@@ -92,8 +90,7 @@ class DashboardScreen extends StatelessWidget {
                   iconColor: Colors.green,
                 ),
 
-                _buildSummaryCard(
-                  context,
+                SummaryCard(
                   width: cardWidth,
                   title: 'ÓRDENES ACTIVAS',
                   value: '24',
@@ -102,8 +99,7 @@ class DashboardScreen extends StatelessWidget {
                   iconColor: Colors.deepPurple,
                 ),
 
-                _buildSummaryCard(
-                  context,
+                SummaryCard(
                   width: cardWidth,
                   title: 'ALERTAS DE STOCK',
                   value: '3',
@@ -112,8 +108,7 @@ class DashboardScreen extends StatelessWidget {
                   iconColor: AppColors.error,
                 ),
 
-                _buildSummaryCard(
-                  context,
+                SummaryCard(
                   width: cardWidth,
                   title: 'FACTURAS PENDIENTES',
                   value: '12',
@@ -128,32 +123,7 @@ class DashboardScreen extends StatelessWidget {
 
         const SizedBox(height: 16),
 
-        Container(
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border.all(color: AppColors.outline),
-            borderRadius: BorderRadius.circular(4),
-          ),
-
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-                children: [
-                  Text(
-                    "Resumen de Producción",
-                    style: context.textTheme.titleMedium,
-                  ),
-                  TextButton(onPressed: () {}, child: Text("Ver Todo")),
-                ],
-              ),
-
-              // TODO: Tabla de producción
-            ],
-          ),
-        ),
+        ProductionSummaryTable(),
       ],
     );
   }
@@ -163,209 +133,9 @@ class DashboardScreen extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
 
       children: [
-        Container(
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: AppColors.primary.withValues(alpha: 0.1),
-            border: Border.all(color: AppColors.outline),
-            borderRadius: BorderRadius.circular(4),
-          ),
-
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-
-            children: [
-              Text("Acciones Rápidas", style: context.textTheme.titleMedium),
-
-              const SizedBox(height: 16),
-
-              QuickActionButton(
-                label: 'Nueva Venta',
-                icon: Icons.point_of_sale_outlined,
-                onPressed: () => context.go('/sales/new'),
-              ),
-
-              const SizedBox(height: 16),
-
-              QuickActionButton(
-                label: 'Nueva Órden de Trabajo',
-                icon: Icons.add_box_outlined,
-                onPressed: () => context.go('/work/new'),
-              ),
-
-              const SizedBox(height: 16),
-
-              QuickActionButton(
-                label: 'Registrar Producto',
-                icon: Icons.draw_outlined,
-                onPressed: () => context.go('/inventory/new-product'),
-              ),
-
-              const SizedBox(height: 16),
-
-              QuickActionButton(
-                label: 'Registar Retazo',
-                icon: Icons.content_cut_outlined,
-                onPressed: () => context.go('/inventory/new-scrap'),
-              ),
-            ],
-          ),
-        ),
-
+        DashboardQuickActions(),
         const SizedBox(height: 16),
-
-        Container(
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border.all(color: AppColors.outline),
-            borderRadius: BorderRadius.circular(4),
-          ),
-
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-
-                children: [
-                  Text(
-                    "Últimos Movimientos",
-                    style: context.textTheme.titleMedium,
-                  ),
-                  Icon(Icons.history, color: AppColors.onBackground, size: 20),
-                ],
-              ),
-
-              const SizedBox(height: 24),
-
-              _buildRecentMovement(
-                context,
-                title: 'ORD-088 marcada como Hecho.',
-                subtitle: 'Stock actualizado: -150g PLA Negro',
-                time: 'Hace 10 min.',
-                icon: Icons.check_circle_outline,
-                color: Colors.green,
-              ),
-
-              const SizedBox(height: 16),
-
-              _buildRecentMovement(
-                context,
-                title: 'Nueva venta registrada.',
-                subtitle: 'Monto: \$2.500 (Mercado Pago)',
-                time: 'Hace 45 min.',
-                icon: Icons.point_of_sale_outlined,
-                color: AppColors.primary,
-              ),
-
-              const SizedBox(height: 8),
-
-              Divider(color: AppColors.outline),
-
-              TextButton(
-                onPressed: () {},
-                child: Text(
-                  "Ver Historial Completo",
-                  style: context.textTheme.bodySmall?.copyWith(
-                    color: AppColors.primary,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSummaryCard(
-    BuildContext context, {
-    required double width,
-    required String title,
-    required String value,
-    required String subtitle,
-    required IconData icon,
-    required Color iconColor,
-  }) {
-    return Container(
-      width: width,
-
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: AppColors.outline),
-      ),
-
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-            children: [
-              Expanded(
-                child: Text(
-                  title,
-                  style: context.textTheme.bodySmall?.copyWith(
-                    color: AppColors.onBackground,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 1.2,
-                  ),
-                ),
-              ),
-
-              Icon(icon, color: iconColor, size: 20),
-            ],
-          ),
-
-          const SizedBox(height: 16),
-
-          Text(value, style: context.textTheme.titleLarge),
-
-          const SizedBox(height: 16),
-
-          Text(subtitle, style: context.textTheme.bodySmall),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildRecentMovement(
-    BuildContext context, {
-    required String title,
-    required String subtitle,
-    required String time,
-    required IconData icon,
-    required Color color,
-  }) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-
-      children: [
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.2),
-            borderRadius: BorderRadius.circular(12),
-          ),
-
-          child: Icon(icon, color: color),
-        ),
-
-        const SizedBox(width: 12),
-
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-
-          children: [
-            Text(title, style: context.textTheme.bodyMedium),
-            Text(subtitle, style: context.textTheme.bodyLarge),
-            Text(time, style: context.textTheme.bodySmall),
-          ],
-        ),
+        LatestMoves(),
       ],
     );
   }

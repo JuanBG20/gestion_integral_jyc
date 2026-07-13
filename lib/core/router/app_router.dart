@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:gestion_integral_jyc/core/domain/entities/client_entity.dart';
 import 'package:gestion_integral_jyc/features/auth/presentation/screens/login_screen.dart';
 import 'package:gestion_integral_jyc/features/clients/presentation/screens/clients_screen.dart';
-import 'package:gestion_integral_jyc/core/presentation/widgets/layout.dart';
+import 'package:gestion_integral_jyc/core/presentation/screens/layout.dart';
 import 'package:gestion_integral_jyc/features/clients/presentation/screens/new_client_screen.dart';
 import 'package:gestion_integral_jyc/features/dashboard/presentation/screens/dashboard_screen.dart';
 import 'package:gestion_integral_jyc/features/inventory/domain/entities/raw_material_entity.dart';

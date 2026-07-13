@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gestion_integral_jyc/core/enums/role.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
-import 'package:gestion_integral_jyc/features/auth/presentation/providers/auth_provider.dart';
+import 'package:gestion_integral_jyc/core/presentation/providers/auth_provider.dart';
 
 class SearchAppBar extends ConsumerWidget {
   const SearchAppBar({super.key});

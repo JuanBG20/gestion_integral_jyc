@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gestion_integral_jyc/core/domain/entities/client_entity.dart';
+import 'package:gestion_integral_jyc/core/presentation/extensions/address_formatting.dart';
+import 'package:gestion_integral_jyc/core/presentation/extensions/client_formatting.dart';
+import 'package:gestion_integral_jyc/core/presentation/widgets/app_action_menu.dart';
+import 'package:gestion_integral_jyc/core/presentation/widgets/screen_header.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_cell.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_column.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_header.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_row.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_shell.dart';
+import 'package:gestion_integral_jyc/core/presentation/widgets/table/pagination_footer.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
-import 'package:gestion_integral_jyc/features/auth/presentation/providers/auth_provider.dart';
+import 'package:gestion_integral_jyc/core/presentation/providers/auth_provider.dart';
 import 'package:gestion_integral_jyc/features/clients/presentation/providers/client_provider.dart';
 import 'package:go_router/go_router.dart';
 
@@ -36,35 +41,11 @@ class ClientsScreen extends ConsumerWidget {
 
         child: Column(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-
-                    children: [
-                      Text(
-                        "Gestión de Clientes",
-                        style: context.textTheme.titleLarge,
-                      ),
-                      Text(
-                        "Directorio y perfiles de facturación.",
-                        style: context.textTheme.bodyLarge,
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(width: 16),
-
-                ElevatedButton.icon(
-                  onPressed: () => context.go('/clients/new'),
-                  label: Text("Nuevo Cliente"),
-                  icon: Icon(Icons.add),
-                ),
-              ],
+            ScreenHeader(
+              title: "Gestión de Clientes",
+              subtitle: "Directorio y perfiles de facturación.",
+              buttonLabel: "Nuevo Cliente",
+              onPressed: () => context.go('/clients/new'),
             ),
 
             const SizedBox(height: 32),
@@ -102,10 +83,10 @@ class ClientsScreen extends ConsumerWidget {
                           .toList(),
                     ),
 
-                    _buildPaginationFooter(
-                      context,
+                    PaginationFooter(
                       total: clients.length,
                       shown: clients.length,
+                      label: 'clientes',
                     ),
                   ],
                 );
@@ -130,7 +111,20 @@ class ClientsScreen extends ConsumerWidget {
       trailingWidth: 100,
       trailing: SizedBox(
         width: 40,
-        child: _buildActionMenu(context, ref, client, isAdmin),
+        child: AppActionMenu(
+          items: [
+            const AppActionMenuItem(value: 'view', label: 'Ver Perfil'),
+            const AppActionMenuItem(value: 'edit', label: 'Editar'),
+            if (isAdmin)
+              const AppActionMenuItem(
+                value: 'delete',
+                label: 'Eliminar',
+                isDestructive: true,
+              ),
+          ],
+          onSelected: (value) =>
+              _handleClientAction(context, ref, client, value),
+        ),
       ),
       cells: [
         AppTableCell.text(
@@ -146,7 +140,7 @@ class ClientsScreen extends ConsumerWidget {
           child: _buildContactCell(context, client: client),
         ),
         AppTableCell.text(
-          _formatAddress(client),
+          client.formattedAddress,
           flex: 3,
           style: context.textTheme.bodyMedium,
         ),
@@ -156,14 +150,7 @@ class ClientsScreen extends ConsumerWidget {
   }
 
   Widget _buildDocCell(BuildContext context, {required ClientEntity client}) {
-    if (client.docType == null || client.docNumber == null) {
-      return Text("-", style: context.textTheme.bodyMedium);
-    }
-
-    return Text(
-      '${client.docType!.dbValue} ${client.docNumber}',
-      style: context.textTheme.bodyMedium,
-    );
+    return Text(client.formattedDocument, style: context.textTheme.bodyMedium);
   }
 
   Widget _buildContactCell(
@@ -184,7 +171,7 @@ class ClientsScreen extends ConsumerWidget {
             const SizedBox(width: 6),
 
             Text(
-              client.email ?? "No especificado",
+              client.displayEmail,
               style: context.textTheme.bodyMedium?.copyWith(
                 color: client.email != null
                     ? AppColors.primary
@@ -204,10 +191,7 @@ class ClientsScreen extends ConsumerWidget {
 
             const SizedBox(width: 6),
 
-            Text(
-              client.phoneNumber ?? "No especificado",
-              style: context.textTheme.bodyMedium,
-            ),
+            Text(client.displayPhone, style: context.textTheme.bodyMedium),
           ],
         ),
       ],
@@ -215,7 +199,7 @@ class ClientsScreen extends ConsumerWidget {
   }
 
   Widget _buildNotesCell(BuildContext context, {required ClientEntity client}) {
-    if (client.additionalNotes == null || client.additionalNotes!.isEmpty) {
+    if (!client.hasNotes) {
       return const SizedBox.shrink();
     }
 
@@ -245,93 +229,21 @@ class ClientsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildActionMenu(
+  void _handleClientAction(
     BuildContext context,
     WidgetRef ref,
     ClientEntity client,
-    bool isAdmin,
+    String action,
   ) {
-    return PopupMenuButton<String>(
-      icon: Icon(Icons.more_horiz, color: AppColors.onBackground),
-      onSelected: (value) {
-        if (value == 'delete' && client.id != null) {
+    switch (action) {
+      case 'delete':
+        if (client.id != null) {
           ref.read(clientProvider.notifier).removeClient(client.id!);
         }
-        if (value == 'edit') {
-          context.go('/clients/edit', extra: client);
-        }
-      },
-      itemBuilder: (context) => [
-        const PopupMenuItem(value: 'view', child: Text('Ver Perfil')),
-        const PopupMenuItem(value: 'edit', child: Text('Editar')),
-        if (isAdmin)
-          const PopupMenuItem(value: 'delete', child: Text('Eliminar')),
-      ],
-    );
-  }
-
-  Widget _buildPaginationFooter(
-    BuildContext context, {
-    required int total,
-    required int shown,
-  }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        border: Border.all(color: AppColors.outline),
-      ),
-
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-        children: [
-          Text(
-            "Mostrando 1-$shown de $total clientes",
-            style: context.textTheme.bodySmall?.copyWith(
-              color: AppColors.onBackground,
-            ),
-          ),
-
-          Row(
-            children: [
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(Icons.chevron_left),
-              ),
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(Icons.chevron_right),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  String _formatAddress(ClientEntity client) {
-    final address = client.address;
-    if (address == null) return "Sin dirección";
-
-    final streetLine = [
-      address.street,
-      address.number,
-    ].where((e) => e != null && e.isNotEmpty).join(' ');
-
-    final floorAndApt = [
-      address.floor,
-      address.apartment,
-    ].where((e) => e != null && e.isNotEmpty).join(' ');
-
-    final parts = [
-      if (streetLine.isNotEmpty) streetLine,
-      if (floorAndApt.isNotEmpty) floorAndApt,
-      if (address.location != null && address.location!.isNotEmpty)
-        address.location!,
-      if (address.province != null) address.province!.label,
-    ];
-
-    return parts.isEmpty ? "Sin dirección" : parts.join(', ');
+      case 'edit':
+        context.go('/clients/edit', extra: client);
+      case 'view':
+      // TODO: Ver Perfil de Cliente
+    }
   }
 }

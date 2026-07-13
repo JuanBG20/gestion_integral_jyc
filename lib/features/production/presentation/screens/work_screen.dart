@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:gestion_integral_jyc/core/presentation/widgets/screen_header.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
-import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/widgets/kanban_board.dart';
 import 'package:go_router/go_router.dart';
 
@@ -19,43 +19,16 @@ class WorkScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
 
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            ScreenHeader(
+              title: "Órdenes de Trabajo",
+              subtitle: "Gestión de trabajos en proceso.",
+              buttonLabel: "Nuevo Trabajo",
+              onPressed: () => context.go('/work/new'),
 
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-
-                  children: [
-                    Text(
-                      "Órdenes de Trabajo",
-                      style: context.textTheme.titleLarge,
-                    ),
-                    Text(
-                      "Gestión de trabajos en proceso.",
-                      style: context.textTheme.bodyLarge,
-                    ),
-                  ],
-                ),
-
-                Row(
-                  children: [
-                    OutlinedButton.icon(
-                      onPressed: () => context.go('/work/all'),
-                      label: Text("Ver Trabajos"),
-                      icon: Icon(Icons.visibility_outlined),
-                    ),
-
-                    const SizedBox(width: 16),
-
-                    ElevatedButton.icon(
-                      onPressed: () => context.go('/work/new'),
-                      label: Text("Nuevo Trabajo"),
-                      icon: Icon(Icons.add),
-                    ),
-                  ],
-                ),
-              ],
+              hasSecondaryButton: true,
+              secondaryButtonLabel: "Ver Trabajos",
+              secondaryButtonIcon: Icons.visibility_outlined,
+              onPressedSecundary: () => context.go('/work/all'),
             ),
 
             const SizedBox(height: 24),

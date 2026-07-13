@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gestion_integral_jyc/core/presentation/extensions/date_formatting.dart';
+import 'package:gestion_integral_jyc/core/presentation/widgets/app_action_menu.dart';
+import 'package:gestion_integral_jyc/core/presentation/widgets/screen_header.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_cell.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_column.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_header.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_row.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_shell.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
-import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/features/production/domain/entities/work_entity.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/providers/work_provider.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 class AllWorksScreen extends ConsumerWidget {
   const AllWorksScreen({super.key});
@@ -37,31 +38,11 @@ class AllWorksScreen extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
 
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-
-                  children: [
-                    Text(
-                      "Órdenes de Trabajo",
-                      style: context.textTheme.titleLarge,
-                    ),
-                    Text(
-                      "Gestión de trabajos en proceso.",
-                      style: context.textTheme.bodyLarge,
-                    ),
-                  ],
-                ),
-
-                ElevatedButton.icon(
-                  onPressed: () => context.go('/work/new'),
-                  label: Text("Nuevo Trabajo"),
-                  icon: Icon(Icons.add),
-                ),
-              ],
+            ScreenHeader(
+              title: "Órdenes de Trabajo",
+              subtitle: "Gestión de trabajos en proceso.",
+              buttonLabel: "Nuevo Trabajo",
+              onPressed: () => context.go('/work/new'),
             ),
 
             const SizedBox(height: 24),
@@ -81,20 +62,28 @@ class AllWorksScreen extends ConsumerWidget {
                       .map(
                         (w) => AppTableRow(
                           trailingWidth: 40,
-                          trailing: _buildActionMenu(context, work: w),
+                          trailing: AppActionMenu(
+                            items: [
+                              const AppActionMenuItem(
+                                value: 'details',
+                                label: 'Ver Detalle',
+                              ),
+                              const AppActionMenuItem(
+                                value: 'edit',
+                                label: 'Editar',
+                              ),
+                            ],
+                            onSelected: (value) =>
+                                _handleWorkAction(context, w, value),
+                          ),
 
                           cells: [
                             AppTableCell.text('TRB-${w.id ?? ''}', flex: 2),
                             AppTableCell.text(w.client.fullName, flex: 3),
                             AppTableCell.text(w.actualState.dbValue, flex: 2),
+                            AppTableCell.text(w.creationDate.ddMMyyyy, flex: 2),
                             AppTableCell.text(
-                              DateFormat('dd/MM/yyyy').format(w.creationDate),
-                              flex: 2,
-                            ),
-                            AppTableCell.text(
-                              w.deadline != null
-                                  ? DateFormat('dd/MM/yyyy').format(w.deadline!)
-                                  : '-',
+                              w.deadline != null ? w.deadline!.ddMMyyyy : '-',
                               flex: 2,
                             ),
                           ],
@@ -112,21 +101,12 @@ class AllWorksScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildActionMenu(BuildContext context, {required WorkEntity work}) {
-    return PopupMenuButton<String>(
-      icon: Icon(Icons.more_horiz, color: AppColors.onBackground),
-      onSelected: (value) {
-        if (value == 'details') {
-          context.go('/work/detail', extra: work);
-        }
-        if (value == 'edit') {
-          context.go('/work/edit', extra: work);
-        }
-      },
-      itemBuilder: (context) => [
-        const PopupMenuItem(value: 'details', child: Text('Ver Detalle')),
-        const PopupMenuItem(value: 'edit', child: Text('Editar')),
-      ],
-    );
+  void _handleWorkAction(BuildContext context, WorkEntity work, String action) {
+    switch (action) {
+      case 'details':
+        context.go('/work/detail', extra: work);
+      case 'edit':
+        context.go('/work/edit', extra: work);
+    }
   }
 }

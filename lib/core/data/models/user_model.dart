@@ -1,5 +1,5 @@
 import 'package:gestion_integral_jyc/core/enums/role.dart';
-import 'package:gestion_integral_jyc/features/auth/domain/entities/user_entity.dart';
+import 'package:gestion_integral_jyc/core/domain/entities/user_entity.dart';
 
 class UserModel extends UserEntity {
   UserModel({

@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gestion_integral_jyc/core/enums/work_state.dart';
-import 'package:gestion_integral_jyc/core/presentation/widgets/quick_action_button.dart';
+import 'package:gestion_integral_jyc/core/presentation/extensions/date_formatting.dart';
+import 'package:gestion_integral_jyc/core/presentation/extensions/screen_size.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/features/production/domain/entities/work_entity.dart';
-import 'package:gestion_integral_jyc/features/production/domain/entities/work_item_entity.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/providers/work_provider.dart';
+import 'package:gestion_integral_jyc/features/production/presentation/widgets/item_tile.dart';
+import 'package:gestion_integral_jyc/features/production/presentation/widgets/production_quick_actions.dart';
+import 'package:gestion_integral_jyc/features/production/presentation/widgets/summary_products_card.dart';
 import 'package:go_router/go_router.dart';
 
 class WorkDetailsScreen extends ConsumerWidget {
@@ -67,9 +69,7 @@ class WorkDetailsScreen extends ConsumerWidget {
 
             LayoutBuilder(
               builder: (context, constraints) {
-                final bool isDesktop = constraints.maxWidth > 840;
-
-                if (isDesktop) {
+                if (constraints.isDesktopLayout) {
                   return Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
 
@@ -167,9 +167,7 @@ class WorkDetailsScreen extends ConsumerWidget {
                   const SizedBox(height: 4),
 
                   Text(
-                    work.deadline != null
-                        ? "${work.deadline?.day}/${work.deadline?.month}/${work.deadline?.year}"
-                        : '-',
+                    work.deadline != null ? work.deadline!.ddMMyyyy : '-',
                     style: context.textTheme.bodySmall?.copyWith(
                       color: Colors.black,
                       fontWeight: FontWeight.w600,
@@ -212,7 +210,7 @@ class WorkDetailsScreen extends ConsumerWidget {
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemBuilder: (context, index) {
-                  return _buildItemTile(context, ref, work.items[index]);
+                  return ItemTile(item: work.items[index]);
                 },
                 separatorBuilder: (context, index) => const SizedBox(height: 8),
                 itemCount: work.items.length,
@@ -236,208 +234,12 @@ class WorkDetailsScreen extends ConsumerWidget {
 
     return Column(
       children: [
-        Container(
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: AppColors.background,
-            border: Border.all(color: AppColors.outline),
-            borderRadius: BorderRadius.circular(4),
-          ),
-
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-
-            children: [
-              Text("Resumen", style: context.textTheme.titleMedium),
-
-              const SizedBox(height: 8),
-
-              Divider(color: AppColors.outline),
-
-              const SizedBox(height: 8),
-
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-                children: [
-                  Text("Productos", style: context.textTheme.bodyMedium),
-                  Text("\$$subtotal", style: context.textTheme.bodyMedium),
-                ],
-              ),
-
-              const SizedBox(height: 8),
-
-              Divider(color: AppColors.outline),
-
-              const SizedBox(height: 8),
-
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-                children: [
-                  Text("Total", style: context.textTheme.titleMedium),
-                  Text("\$$subtotal", style: context.textTheme.titleLarge),
-                ],
-              ),
-            ],
-          ),
-        ),
+        SummaryProductsCard(subtotal: subtotal),
 
         const SizedBox(height: 16),
 
-        Container(
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: AppColors.primary.withValues(alpha: 0.1),
-            border: Border.all(color: AppColors.outline),
-            borderRadius: BorderRadius.circular(4),
-          ),
-
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-
-            children: [
-              Text("Acciones Rápidas", style: context.textTheme.titleMedium),
-
-              const SizedBox(height: 16),
-
-              QuickActionButton(
-                label: 'Actualizar Estado',
-                icon: Icons.history,
-                onPressed: () => _showUpdateStateDialog(context, ref, work),
-              ),
-
-              const SizedBox(height: 16),
-
-              QuickActionButton(
-                label: 'Emitir Presupuesto',
-                icon: Icons.print_outlined,
-              ),
-
-              const SizedBox(height: 16),
-
-              QuickActionButton(
-                label: 'Editar Orden',
-                icon: Icons.edit_outlined,
-                onPressed: () => context.go('/work/edit', extra: work),
-              ),
-            ],
-          ),
-        ),
+        ProductionQuickActions(work: work),
       ],
-    );
-  }
-
-  Widget _buildItemTile(
-    BuildContext context,
-    WidgetRef ref,
-    WorkItemEntity item,
-  ) {
-    final String baseName =
-        item.variantProduct?.baseProduct.description ??
-        item.description ??
-        'Sin descripción';
-
-    String? subtitleText;
-    if (item.variantProduct != null) {
-      final attributes =
-          [
-                item.variantProduct!.baseProduct.fullCategory,
-                item.variantProduct!.color,
-                item.variantProduct!.size,
-              ]
-              .where(
-                (attr) => attr != null && attr.toString().trim().isNotEmpty,
-              )
-              .toList();
-
-      if (attributes.isNotEmpty) {
-        subtitleText = attributes.join(' | ');
-      }
-    }
-
-    subtitleText ??= 'Subtotal: \$${item.subtotal.toStringAsFixed(2)}';
-
-    return Container(
-      decoration: BoxDecoration(
-        border: Border.all(color: AppColors.outline),
-        borderRadius: BorderRadius.circular(4),
-      ),
-
-      child: CheckboxListTile(
-        value: item.isDone,
-        onChanged: (bool? newValue) {
-          if (newValue != null && item.id != null) {
-            ref.read(workProvider.notifier).toggleItemDone(item.id!, newValue);
-          }
-        },
-        controlAffinity: ListTileControlAffinity.leading,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-        title: Text('${item.quantity}x $baseName'),
-        subtitle: Text(subtitleText),
-      ),
-    );
-  }
-
-  void _showUpdateStateDialog(
-    BuildContext context,
-    WidgetRef ref,
-    WorkEntity work,
-  ) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          backgroundColor: AppColors.background,
-          title: Text(
-            'Actualizar Estado',
-            style: context.textTheme.titleMedium,
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-
-            children: WorkState.values.map((state) {
-              final isCurrent = state == work.actualState;
-
-              return ListTile(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                tileColor: isCurrent
-                    ? AppColors.primary.withValues(alpha: 0.1)
-                    : Colors.transparent,
-                title: Text(
-                  state.dbValue,
-                  style: context.textTheme.bodyMedium?.copyWith(
-                    color: isCurrent
-                        ? AppColors.primary
-                        : AppColors.onBackground,
-                    fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal,
-                  ),
-                ),
-                leading: isCurrent
-                    ? const Icon(Icons.check_circle, color: AppColors.primary)
-                    : const Icon(Icons.circle_outlined),
-                onTap: () {
-                  if (!isCurrent && work.id != null) {
-                    ref
-                        .read(workProvider.notifier)
-                        .updateWorkStatus(work.id!, state);
-                    Navigator.pop(context);
-                  }
-                },
-              );
-            }).toList(),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancelar'),
-            ),
-          ],
-        );
-      },
     );
   }
 }
