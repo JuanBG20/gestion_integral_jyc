@@ -19,8 +19,10 @@ import 'package:gestion_integral_jyc/features/production/presentation/screens/al
 import 'package:gestion_integral_jyc/features/production/presentation/screens/new_work_screen.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/screens/work_details_screen.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/screens/work_screen.dart';
+import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_entity.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/screens/all_sales_screen.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/screens/new_sale_screen.dart';
+import 'package:gestion_integral_jyc/features/sales/presentation/screens/sale_details_screen.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/screens/sales_screen.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -162,6 +164,13 @@ final goRouter = GoRouter(
                 GoRoute(
                   path: 'all',
                   builder: (context, state) => const AllSalesScreen(),
+                ),
+                GoRoute(
+                  path: 'detail',
+                  builder: (context, state) {
+                    final sale = state.extra as SaleEntity;
+                    return SaleDetailsScreen(sale: sale);
+                  },
                 ),
               ],
             ),

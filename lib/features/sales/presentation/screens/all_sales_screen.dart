@@ -65,7 +65,14 @@ class AllSalesScreen extends ConsumerWidget {
                         trailingWidth: 0,
                       ),
                       rows: sales
-                          .map((sale) => SaleTableRow(sale: sale))
+                          .map(
+                            // TODO: Modificar forma de acceso a detalle
+                            (sale) => GestureDetector(
+                              onTap: () =>
+                                  context.go('/sales/detail', extra: sale),
+                              child: SaleTableRow(sale: sale),
+                            ),
+                          )
                           .toList(),
                     ),
 
