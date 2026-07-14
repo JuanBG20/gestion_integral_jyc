@@ -71,7 +71,9 @@ class SalesRecord extends ConsumerWidget {
                   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 24),
                   trailingWidth: 0,
                 ),
-                rows: sales.map((venta) => SaleTableRow(sale: venta)).toList(),
+                rows: sales
+                    .map((venta) => SaleTableRow(sale: venta, trailingWidth: 0))
+                    .toList(),
               );
             },
             loading: () => const Padding(

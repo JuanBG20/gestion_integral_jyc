@@ -21,6 +21,7 @@ import 'package:gestion_integral_jyc/features/production/presentation/screens/wo
 import 'package:gestion_integral_jyc/features/production/presentation/screens/work_screen.dart';
 import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_entity.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/screens/all_sales_screen.dart';
+import 'package:gestion_integral_jyc/features/sales/presentation/screens/new_invoice_screen.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/screens/new_sale_screen.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/screens/sale_details_screen.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/screens/sales_screen.dart';
@@ -171,6 +172,15 @@ final goRouter = GoRouter(
                     final sale = state.extra as SaleEntity;
                     return SaleDetailsScreen(sale: sale);
                   },
+                  routes: [
+                    GoRoute(
+                      path: 'bill',
+                      builder: (context, state) {
+                        final sale = state.extra as SaleEntity;
+                        return NewInvoiceScreen(sale: sale);
+                      },
+                    ),
+                  ],
                 ),
               ],
             ),

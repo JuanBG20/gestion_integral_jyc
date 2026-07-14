@@ -4,7 +4,6 @@ import 'package:gestion_integral_jyc/core/domain/entities/client_entity.dart';
 import 'package:gestion_integral_jyc/core/enums/work_state.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_date_picker.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_dropdown.dart';
-import 'package:gestion_integral_jyc/core/presentation/widgets/quick_action_button.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/features/clients/presentation/providers/client_provider.dart';
@@ -243,13 +242,6 @@ class _NewRawMaterialScreenState extends ConsumerState<NewWorkScreen> {
                   style: context.textTheme.titleLarge,
                 ),
               ],
-            ),
-
-            const SizedBox(height: 16),
-
-            QuickActionButton(
-              label: "Emitir Presupuesto",
-              icon: Icons.print_outlined,
             ),
           ],
         ),

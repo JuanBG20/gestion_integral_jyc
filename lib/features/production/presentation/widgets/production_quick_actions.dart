@@ -7,6 +7,7 @@ import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/features/production/domain/entities/work_entity.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/providers/work_provider.dart';
+import 'package:gestion_integral_jyc/features/production/presentation/widgets/budget_pdf_generator.dart';
 import 'package:go_router/go_router.dart';
 
 class ProductionQuickActions extends ConsumerWidget {
@@ -27,6 +28,7 @@ class ProductionQuickActions extends ConsumerWidget {
         QuickActionButton(
           label: 'Emitir Presupuesto',
           icon: Icons.print_outlined,
+          onPressed: () => BudgetPdfGenerator.generateAndPreviewBudget(work),
         ),
 
         QuickActionButton(

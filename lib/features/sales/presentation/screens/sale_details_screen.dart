@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gestion_integral_jyc/core/presentation/extensions/client_formatting.dart';
 import 'package:gestion_integral_jyc/core/presentation/extensions/date_formatting.dart';
 import 'package:gestion_integral_jyc/core/presentation/extensions/screen_size.dart';
+import 'package:gestion_integral_jyc/core/presentation/widgets/items_card_layout.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/quick_action_button.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/widgets/summary_products_card.dart';
 import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_entity.dart';
+import 'package:gestion_integral_jyc/features/sales/presentation/widgets/sale_client_info_card.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/widgets/sale_summary_item_card.dart';
 import 'package:go_router/go_router.dart';
 
@@ -77,14 +78,12 @@ class SaleDetailsScreen extends ConsumerWidget {
                     ],
                   );
                 } else {
-                  return SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        _buildLeftColumn(context, sale),
-                        const SizedBox(height: 24),
-                        _buildRightColumn(context, sale),
-                      ],
-                    ),
+                  return Column(
+                    children: [
+                      _buildLeftColumn(context, sale),
+                      const SizedBox(height: 24),
+                      _buildRightColumn(context, sale),
+                    ],
                   );
                 }
               },
@@ -98,112 +97,15 @@ class SaleDetailsScreen extends ConsumerWidget {
   Widget _buildLeftColumn(BuildContext context, SaleEntity sale) {
     return Column(
       children: [
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: AppColors.background,
-            border: Border.all(color: AppColors.outline),
-            borderRadius: BorderRadius.circular(4),
-          ),
-
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-
-            children: [
-              Text(
-                "Información del Cliente",
-                style: context.textTheme.titleMedium,
-              ),
-
-              const SizedBox(height: 16),
-
-              LayoutBuilder(
-                builder: (context, constraints) {
-                  final bool isTwoColumns = constraints.maxWidth > 450;
-                  final double fieldWidth = isTwoColumns
-                      ? (constraints.maxWidth - 24) / 2
-                      : constraints.maxWidth;
-
-                  return Wrap(
-                    spacing: 24,
-                    runSpacing: 16,
-                    children: [
-                      SizedBox(
-                        width: fieldWidth,
-                        child: _InfoField(
-                          label: "Nombre",
-                          value: sale.client.fullName,
-                        ),
-                      ),
-                      SizedBox(
-                        width: fieldWidth,
-                        child: _InfoField(
-                          label: "Documento",
-                          value: sale.client.formattedDocument,
-                        ),
-                      ),
-                      SizedBox(
-                        width: fieldWidth,
-                        child: _InfoField(
-                          label: "Email",
-                          value: sale.client.displayEmail,
-                        ),
-                      ),
-                      SizedBox(
-                        width: fieldWidth,
-                        child: _InfoField(
-                          label: "Teléfono",
-                          value: sale.client.displayPhone,
-                        ),
-                      ),
-                    ],
-                  );
-                },
-              ),
-            ],
-          ),
-        ),
+        SaleClientInfoCard(client: sale.client),
 
         const SizedBox(height: 16),
 
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: AppColors.background,
-            border: Border.all(color: AppColors.outline),
-            borderRadius: BorderRadius.circular(4),
-          ),
-
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-                children: [
-                  Text("Ítems", style: context.textTheme.titleMedium),
-
-                  Text(
-                    "${sale.items.length} ítems",
-                    style: context.textTheme.bodySmall,
-                  ),
-                ],
-              ),
-
-              Divider(color: AppColors.outline),
-
-              ListView.separated(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemBuilder: (context, index) {
-                  return SaleSummaryItemCard(item: sale.items[index]);
-                },
-                separatorBuilder: (context, index) => const SizedBox(height: 8),
-                itemCount: sale.items.length,
-              ),
-            ],
-          ),
+        ItemsCardLayout(
+          itemCount: sale.items.length,
+          itemsSubtitle: "${sale.items.length} ítems",
+          itemBuilder: (context, index) =>
+              SaleSummaryItemCard(item: sale.items[index]),
         ),
       ],
     );
@@ -342,37 +244,12 @@ class SaleDetailsScreen extends ConsumerWidget {
               child: QuickActionButton(
                 label: 'Facturar Venta',
                 icon: Icons.receipt_long_outlined,
-                onPressed: null,
+                onPressed: () => context.go('/sales/detail/bill', extra: sale),
               ),
             ),
           ],
         ],
       ),
-    );
-  }
-}
-
-class _InfoField extends StatelessWidget {
-  final String label;
-  final String value;
-
-  const _InfoField({required this.label, required this.value});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: context.textTheme.bodySmall),
-        const SizedBox(height: 2),
-        Text(
-          value,
-          style: context.textTheme.bodyMedium?.copyWith(
-            color: Colors.black,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ],
     );
   }
 }

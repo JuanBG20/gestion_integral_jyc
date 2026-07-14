@@ -18,10 +18,10 @@ class NewClientScreen extends ConsumerStatefulWidget {
   const NewClientScreen({super.key, this.clientToEdit});
 
   @override
-  ConsumerState<NewClientScreen> createState() => _NewRawMaterialScreenState();
+  ConsumerState<NewClientScreen> createState() => _NewClientScreenState();
 }
 
-class _NewRawMaterialScreenState extends ConsumerState<NewClientScreen> {
+class _NewClientScreenState extends ConsumerState<NewClientScreen> {
   final _formKey = GlobalKey<FormState>();
 
   final _nameController = TextEditingController();

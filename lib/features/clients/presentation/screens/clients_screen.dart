@@ -115,12 +115,6 @@ class ClientsScreen extends ConsumerWidget {
           items: [
             const AppActionMenuItem(value: 'view', label: 'Ver Perfil'),
             const AppActionMenuItem(value: 'edit', label: 'Editar'),
-            if (isAdmin)
-              const AppActionMenuItem(
-                value: 'delete',
-                label: 'Eliminar',
-                isDestructive: true,
-              ),
           ],
           onSelected: (value) =>
               _handleClientAction(context, ref, client, value),
@@ -242,8 +236,6 @@ class ClientsScreen extends ConsumerWidget {
         }
       case 'edit':
         context.go('/clients/edit', extra: client);
-      case 'view':
-      // TODO: Ver Perfil de Cliente
     }
   }
 }

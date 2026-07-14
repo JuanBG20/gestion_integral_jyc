@@ -1,21 +1,45 @@
 import 'package:flutter/material.dart';
+import 'package:gestion_integral_jyc/core/presentation/extensions/date_formatting.dart';
+import 'package:gestion_integral_jyc/core/presentation/widgets/app_action_menu.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_cell.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_row.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_entity.dart';
-import 'package:intl/intl.dart';
+import 'package:go_router/go_router.dart';
 
 class SaleTableRow extends StatelessWidget {
   final SaleEntity sale;
+  final double trailingWidth;
 
-  const SaleTableRow({super.key, required this.sale});
+  const SaleTableRow({
+    super.key,
+    required this.sale,
+    required this.trailingWidth,
+  });
 
   @override
   Widget build(BuildContext context) {
     return AppTableRow(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      trailingWidth: 0,
+      trailingWidth: trailingWidth,
+      trailing: trailingWidth != 0
+          ? AppActionMenu(
+              items: const [
+                AppActionMenuItem(
+                  value: 'detail',
+                  label: 'Ver Detalle',
+                  icon: Icons.visibility_outlined,
+                ),
+              ],
+              onSelected: (value) {
+                if (value == 'detail') {
+                  context.go('/sales/detail', extra: sale);
+                }
+              },
+            )
+          : null,
+
       cells: [
         AppTableCell.text(
           'VTA-${sale.id ?? ''}',
@@ -32,7 +56,7 @@ class SaleTableRow extends StatelessWidget {
           ),
         ),
         AppTableCell.text(
-          DateFormat('dd/MM/yyyy').format(sale.date),
+          sale.date.ddMMyyyy,
           flex: 2,
           style: context.textTheme.bodySmall,
         ),
