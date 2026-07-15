@@ -4,7 +4,6 @@ import 'package:gestion_integral_jyc/core/enums/work_state.dart';
 import 'package:gestion_integral_jyc/core/presentation/extensions/screen_size.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
-import 'package:gestion_integral_jyc/features/dashboard/presentation/widgets/latest_moves.dart';
 import 'package:gestion_integral_jyc/features/dashboard/presentation/widgets/production_summary_table.dart';
 import 'package:gestion_integral_jyc/features/dashboard/presentation/widgets/dashboard_quick_actions.dart';
 import 'package:gestion_integral_jyc/features/dashboard/presentation/widgets/summary_card.dart';
@@ -208,8 +207,10 @@ class DashboardScreen extends ConsumerWidget {
 
       children: [
         DashboardQuickActions(),
-        const SizedBox(height: 16),
-        LatestMoves(),
+
+        // TODO: Últimos movimientos
+        /* const SizedBox(height: 16),
+        LatestMoves(), */
       ],
     );
   }

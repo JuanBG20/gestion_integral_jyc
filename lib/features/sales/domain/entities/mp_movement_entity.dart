@@ -1,6 +1,5 @@
 import 'package:gestion_integral_jyc/core/enums/doc_type.dart';
 import 'package:gestion_integral_jyc/core/enums/payment_method.dart';
-import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_entity.dart';
 
 class MpMovementEntity {
   final int? id;
@@ -10,7 +9,7 @@ class MpMovementEntity {
   final PaymentMethod paymentMethod;
   final DocType? docType;
   final String? docNumber;
-  final SaleEntity? sale;
+  final List<int>? saleIds;
 
   MpMovementEntity({
     required this.idMp,
@@ -19,7 +18,7 @@ class MpMovementEntity {
     required this.paymentMethod,
     this.docType,
     this.docNumber,
-    this.sale,
+    this.saleIds,
     this.id,
   });
 }
