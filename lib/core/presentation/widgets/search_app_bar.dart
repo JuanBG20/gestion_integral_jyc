@@ -1,19 +1,48 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gestion_integral_jyc/core/enums/role.dart';
+import 'package:gestion_integral_jyc/core/presentation/providers/search_provider.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/core/presentation/providers/auth_provider.dart';
 
-class SearchAppBar extends ConsumerWidget {
+class SearchAppBar extends ConsumerStatefulWidget {
   const SearchAppBar({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SearchAppBar> createState() => _SearchAppBarState();
+}
+
+class _SearchAppBarState extends ConsumerState<SearchAppBar> {
+  late TextEditingController _searchController;
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController = TextEditingController(
+      text: ref.read(searchQueryProvider),
+    );
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
     final user = authState.user;
     final activeRole = authState.activeRole;
     final canSwitchRole = user != null && user.roles.length > 1;
+
+    final currentSearch = ref.watch(searchQueryProvider);
+    ref.listen<String>(searchQueryProvider, (previous, next) {
+      if (next != _searchController.text) {
+        _searchController.text = next;
+      }
+    });
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -30,6 +59,10 @@ class SearchAppBar extends ConsumerWidget {
                 width: 256,
 
                 child: TextField(
+                  controller: _searchController,
+                  onChanged: (value) {
+                    ref.read(searchQueryProvider.notifier).state = value;
+                  },
                   decoration: InputDecoration(
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 12,
@@ -37,6 +70,21 @@ class SearchAppBar extends ConsumerWidget {
                     ),
                     hintText: "Buscar...",
                     prefixIcon: Icon(Icons.search, color: AppColors.outline),
+
+                    suffixIcon: currentSearch.isNotEmpty
+                        ? IconButton(
+                            padding: EdgeInsets.zero,
+                            icon: const Icon(
+                              Icons.clear,
+                              color: AppColors.outline,
+                              size: 18,
+                            ),
+                            onPressed: () {
+                              _searchController.clear();
+                              ref.read(searchQueryProvider.notifier).state = '';
+                            },
+                          )
+                        : null,
                   ),
                 ),
               ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gestion_integral_jyc/core/presentation/providers/search_provider.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/app_action_menu.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_cell.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_column.dart';
@@ -25,6 +26,7 @@ class ScrapsTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final searchQuery = ref.watch(searchQueryProvider).toLowerCase();
     final scrapsState = ref.watch(scrapProvider);
 
     return scrapsState.when(
@@ -33,9 +35,26 @@ class ScrapsTab extends ConsumerWidget {
           return const Center(child: Text("No hay retazos registrados."));
         }
 
+        final filteredScraps = scraps.where((scrap) {
+          final descriptionMatch = scrap.rawMaterial.description
+              .toLowerCase()
+              .contains(searchQuery);
+          final skuMatch = scrap.rawMaterial.sku.toLowerCase().contains(
+            searchQuery,
+          );
+
+          return descriptionMatch || skuMatch;
+        }).toList();
+
+        if (filteredScraps.isEmpty) {
+          return const Center(
+            child: Text("No se encontraron materias primas."),
+          );
+        }
+
         return AppTableShell(
           header: const AppTableHeader(columns: _scrapColumns),
-          rows: scraps
+          rows: filteredScraps
               .map(
                 (scrap) => AppTableRow(
                   trailingWidth: 40,

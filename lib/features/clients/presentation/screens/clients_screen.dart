@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gestion_integral_jyc/core/domain/entities/client_entity.dart';
 import 'package:gestion_integral_jyc/core/presentation/extensions/address_formatting.dart';
 import 'package:gestion_integral_jyc/core/presentation/extensions/client_formatting.dart';
+import 'package:gestion_integral_jyc/core/presentation/providers/search_provider.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/app_action_menu.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/screen_header.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_cell.dart';
@@ -30,8 +31,9 @@ class ClientsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isAdmin = ref.watch(isAdminProvider);
+    final searchQuery = ref.watch(searchQueryProvider).toLowerCase();
     final clientsState = ref.watch(clientProvider);
+    final isAdmin = ref.watch(isAdminProvider);
 
     return Scaffold(
       backgroundColor: AppColors.surface,
@@ -58,6 +60,25 @@ class ClientsScreen extends ConsumerWidget {
                   );
                 }
 
+                final filteredClients = clients.where((client) {
+                  final nameMatch = client.name.toLowerCase().contains(
+                    searchQuery,
+                  );
+                  final dniMatch =
+                      client.docNumber?.contains(searchQuery) ?? false;
+                  final emailMatch =
+                      client.email?.toLowerCase().contains(searchQuery) ??
+                      false;
+
+                  return nameMatch || emailMatch || dniMatch;
+                }).toList();
+
+                if (filteredClients.isEmpty) {
+                  return const Center(
+                    child: Text("No se encontraron clientes."),
+                  );
+                }
+
                 return Column(
                   children: [
                     AppTableShell(
@@ -71,7 +92,7 @@ class ClientsScreen extends ConsumerWidget {
                         ),
                         trailingWidth: 100,
                       ),
-                      rows: clients
+                      rows: filteredClients
                           .map(
                             (c) => _buildClientRow(
                               context,
@@ -84,8 +105,8 @@ class ClientsScreen extends ConsumerWidget {
                     ),
 
                     PaginationFooter(
-                      total: clients.length,
-                      shown: clients.length,
+                      total: filteredClients.length,
+                      shown: filteredClients.length,
                       label: 'clientes',
                     ),
                   ],
@@ -113,8 +134,13 @@ class ClientsScreen extends ConsumerWidget {
         width: 40,
         child: AppActionMenu(
           items: [
-            const AppActionMenuItem(value: 'view', label: 'Ver Perfil'),
             const AppActionMenuItem(value: 'edit', label: 'Editar'),
+            if (isAdmin)
+              const AppActionMenuItem(
+                value: 'delete',
+                label: 'Eliminar',
+                isDestructive: true,
+              ),
           ],
           onSelected: (value) =>
               _handleClientAction(context, ref, client, value),

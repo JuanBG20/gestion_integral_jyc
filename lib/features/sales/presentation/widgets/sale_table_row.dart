@@ -25,18 +25,17 @@ class SaleTableRow extends StatelessWidget {
       trailingWidth: trailingWidth,
       trailing: trailingWidth != 0
           ? AppActionMenu(
-              items: const [
-                AppActionMenuItem(
+              items: [
+                const AppActionMenuItem(
                   value: 'detail',
                   label: 'Ver Detalle',
                   icon: Icons.visibility_outlined,
                 ),
+
+                if (!sale.isInvoiced)
+                  AppActionMenuItem(value: 'bill', label: 'Facturar'),
               ],
-              onSelected: (value) {
-                if (value == 'detail') {
-                  context.go('/sales/detail', extra: sale);
-                }
-              },
+              onSelected: (value) => _handleSaleAction(context, value),
             )
           : null,
 
@@ -104,5 +103,14 @@ class SaleTableRow extends StatelessWidget {
     }
 
     return Icon(Icons.description_outlined, color: AppColors.primary);
+  }
+
+  void _handleSaleAction(BuildContext context, String action) {
+    switch (action) {
+      case 'detail':
+        context.go('/sales/detail', extra: sale);
+      case 'bill':
+        context.go('/sales/detail/bill', extra: sale);
+    }
   }
 }

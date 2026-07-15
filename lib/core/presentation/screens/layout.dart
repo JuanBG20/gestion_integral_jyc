@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gestion_integral_jyc/core/presentation/providers/search_provider.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/search_app_bar.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
@@ -19,6 +20,9 @@ class _LayoutState extends ConsumerState<Layout> {
   bool _isSidebarExpanded = true;
 
   void _goToBranch(int index) {
+    // Limpiar texto de búsqueda
+    ref.read(searchQueryProvider.notifier).state = '';
+
     widget.navigationShell.goBranch(
       index,
       initialLocation: index == widget.navigationShell.currentIndex,
@@ -128,13 +132,12 @@ class _LayoutState extends ConsumerState<Layout> {
                   isExpanded: _isSidebarExpanded,
                 ),
 
-                _buildSidebarItem(
+                /* _buildSidebarItem(
                   icon: Icons.settings_outlined,
                   title: "Configuración",
                   onTap: () {},
                   isExpanded: _isSidebarExpanded,
-                ),
-
+                ), */
                 Spacer(),
 
                 _buildSidebarItem(
