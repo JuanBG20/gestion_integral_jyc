@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gestion_integral_jyc/core/enums/work_sort_option.dart';
 import 'package:gestion_integral_jyc/core/presentation/extensions/date_formatting.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/app_action_menu.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/screen_header.dart';
@@ -11,6 +12,8 @@ import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_s
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/features/production/domain/entities/work_entity.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/providers/work_provider.dart';
+import 'package:gestion_integral_jyc/features/production/presentation/providers/work_sort_option_provider.dart';
+import 'package:gestion_integral_jyc/features/production/presentation/screens/work_filters.dart';
 import 'package:go_router/go_router.dart';
 
 class AllWorksScreen extends ConsumerWidget {
@@ -27,6 +30,9 @@ class AllWorksScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final worksState = ref.watch(workProvider);
+
+    final selectedState = ref.watch(workStateFilterProvider);
+    final currentSort = ref.watch(workSortOptionProvider);
 
     return Scaffold(
       backgroundColor: AppColors.surface,
@@ -47,6 +53,10 @@ class AllWorksScreen extends ConsumerWidget {
 
             const SizedBox(height: 24),
 
+            WorkFilters(selectedState: selectedState, currentSort: currentSort),
+
+            const SizedBox(height: 24),
+
             worksState.when(
               data: (works) {
                 if (works.isEmpty) {
@@ -55,10 +65,47 @@ class AllWorksScreen extends ConsumerWidget {
                   );
                 }
 
+                var processedWorks = works.where((w) {
+                  // Filtro de Estado
+                  if (selectedState != null && w.actualState != selectedState) {
+                    return false;
+                  }
+
+                  return true;
+                }).toList();
+
+                // Ordenamiento de fechas
+                processedWorks.sort((a, b) {
+                  switch (currentSort) {
+                    case WorkSortOption.creationDesc:
+                      return b.creationDate.compareTo(a.creationDate);
+                    case WorkSortOption.creationAsc:
+                      return a.creationDate.compareTo(b.creationDate);
+                    case WorkSortOption.deadlineAsc:
+                      if (a.deadline == null && b.deadline == null) return 0;
+                      if (a.deadline == null) return 1;
+                      if (b.deadline == null) return -1;
+                      return a.deadline!.compareTo(b.deadline!);
+                    case WorkSortOption.deadlineDesc:
+                      if (a.deadline == null && b.deadline == null) return 0;
+                      if (a.deadline == null) return 1;
+                      if (b.deadline == null) return -1;
+                      return b.deadline!.compareTo(a.deadline!);
+                  }
+                });
+
+                if (processedWorks.isEmpty) {
+                  return const Center(
+                    child: Text(
+                      "No se encontraron trabajos con estos filtros.",
+                    ),
+                  );
+                }
+
                 return AppTableShell(
                   shrinkWrap: true,
                   header: const AppTableHeader(columns: _workColumns),
-                  rows: works
+                  rows: processedWorks
                       .map(
                         (w) => AppTableRow(
                           trailingWidth: 40,
