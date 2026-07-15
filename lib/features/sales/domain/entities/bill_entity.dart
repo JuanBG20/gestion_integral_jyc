@@ -7,14 +7,14 @@ class BillEntity {
   final bool isSuccessful;
   final DateTime emissionDate;
   final String? cae;
-  final SaleEntity sale;
+  final SaleEntity? sale;
 
   BillEntity({
     required this.arcaData,
     required this.isSuccessful,
     required this.emissionDate,
     this.cae,
-    required this.sale,
+    this.sale,
     this.id,
   });
 }

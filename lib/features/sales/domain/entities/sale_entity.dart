@@ -1,6 +1,7 @@
 import 'package:gestion_integral_jyc/core/domain/entities/client_entity.dart';
 import 'package:gestion_integral_jyc/core/enums/payment_method.dart';
 import 'package:gestion_integral_jyc/features/production/domain/entities/work_entity.dart';
+import 'package:gestion_integral_jyc/features/sales/domain/entities/bill_entity.dart';
 import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_item_entity.dart';
 
 class SaleEntity {
@@ -11,6 +12,7 @@ class SaleEntity {
   final ClientEntity client;
   final WorkEntity? work;
   final List<SaleItemEntity> items;
+  final BillEntity? bill;
 
   SaleEntity({
     required this.paymentMethod,
@@ -19,6 +21,9 @@ class SaleEntity {
     required this.client,
     this.work,
     required this.items,
+    this.bill,
     this.id,
   });
+
+  bool get isInvoiced => bill != null && bill!.isSuccessful;
 }

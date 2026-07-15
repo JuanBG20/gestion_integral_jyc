@@ -1,6 +1,7 @@
 import 'package:gestion_integral_jyc/core/enums/payment_method.dart';
 import 'package:gestion_integral_jyc/features/clients/data/models/client_model.dart';
 import 'package:gestion_integral_jyc/features/production/data/models/work_model.dart';
+import 'package:gestion_integral_jyc/features/sales/data/models/bill_model.dart';
 import 'package:gestion_integral_jyc/features/sales/data/models/sale_item_model.dart';
 import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_entity.dart';
 
@@ -13,6 +14,7 @@ class SaleModel extends SaleEntity {
     required super.client,
     super.work,
     required super.items,
+    super.bill,
   });
 
   factory SaleModel.fromJson(Map<String, dynamic> json) {
@@ -31,6 +33,19 @@ class SaleModel extends SaleEntity {
       }
     }
 
+    BillModel? bill;
+    final facturas = (json['factura'] as List?)
+        ?.where((f) => f['exitoso'] == true)
+        .toList();
+    if (facturas != null && facturas.isNotEmpty) {
+      facturas.sort(
+        (a, b) => DateTime.parse(
+          b['fecha_emision'],
+        ).compareTo(DateTime.parse(a['fecha_emision'])),
+      );
+      bill = BillModel.fromJson(facturas.first);
+    }
+
     return SaleModel(
       id: json['idventa'],
       paymentMethod: PaymentMethod.fromDB(json['metodo_pago']),
@@ -39,6 +54,7 @@ class SaleModel extends SaleEntity {
       client: ClientModel.fromJson(json['cliente']),
       work: linkedWork,
       items: itemsList,
+      bill: bill,
     );
   }
 }

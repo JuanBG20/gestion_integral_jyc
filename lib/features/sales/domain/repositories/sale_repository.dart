@@ -7,4 +7,9 @@ abstract class SaleRepository {
     int? materiaPrimaId,
     double? consumo,
   });
+  Future<void> emitInvoice(
+    int saleId, {
+    required int condicionIvaReceptorId,
+    int concepto = 1,
+  });
 }

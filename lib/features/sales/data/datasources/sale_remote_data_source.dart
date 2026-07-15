@@ -22,7 +22,8 @@ class SaleRemoteDataSource {
           *,
           producto_base (*)
         )
-      )
+      ),
+      factura (*)
     ''')
         .order('fecha', ascending: false);
 

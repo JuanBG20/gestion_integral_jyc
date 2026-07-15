@@ -12,6 +12,7 @@ import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_text_fiel
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_entity.dart';
+import 'package:gestion_integral_jyc/features/sales/presentation/providers/sale_provider.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/widgets/invoice_sale_summary_card.dart';
 
 class NewInvoiceScreen extends ConsumerStatefulWidget {
@@ -86,20 +87,24 @@ class _NewInvoiceScreenState extends ConsumerState<NewInvoiceScreen> {
     setState(() => _isLoading = true);
 
     try {
-      // TODO: reemplazar por la llamada real a la función que genera la
-      // factura en ARCA/AFIP (probablemente un RPC de Postgres que guarde
-      // CAE, tipo/punto de venta, y marque la venta como facturada).
-      await Future.delayed(const Duration(seconds: 1));
+      final concepto = switch (_concept) {
+        'Productos' => 1,
+        'Servicios' => 2,
+        _ => 3,
+      };
 
-      String finalDocNumber = _docNumberController.text.trim();
-      if (finalDocNumber.isEmpty) finalDocNumber = '0';
+      await ref
+          .read(saleProvider.notifier)
+          .emitInvoice(
+            widget.sale.id!,
+            condicionIvaReceptorId: _ivaCondition.arcaId,
+            concepto: concepto,
+          );
 
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Factura generada con éxito en ARCA (simulado)'),
-        ),
+        const SnackBar(content: Text('Factura generada con éxito en ARCA')),
       );
       Navigator.pop(context);
     } catch (e) {

@@ -1,3 +1,4 @@
+import 'package:gestion_integral_jyc/features/sales/data/datasources/bill_remote_data_source.dart';
 import 'package:gestion_integral_jyc/features/sales/data/datasources/sale_remote_data_source.dart';
 import 'package:gestion_integral_jyc/features/sales/data/models/sale_item_model.dart';
 import 'package:gestion_integral_jyc/features/sales/data/models/sale_model.dart';
@@ -6,8 +7,9 @@ import 'package:gestion_integral_jyc/features/sales/domain/repositories/sale_rep
 
 class SaleRepositoryImpl implements SaleRepository {
   final SaleRemoteDataSource remoteDataSource;
+  final BillRemoteDataSource billRemoteDataSource;
 
-  SaleRepositoryImpl(this.remoteDataSource);
+  SaleRepositoryImpl(this.remoteDataSource, this.billRemoteDataSource);
 
   @override
   Future<void> createSale(
@@ -42,5 +44,18 @@ class SaleRepositoryImpl implements SaleRepository {
   @override
   Future<List<SaleEntity>> getSales() async {
     return await remoteDataSource.fetchSales();
+  }
+
+  @override
+  Future<void> emitInvoice(
+    int saleId, {
+    required int condicionIvaReceptorId,
+    int concepto = 1,
+  }) async {
+    await billRemoteDataSource.emitInvoice(
+      saleId: saleId,
+      condicionIvaReceptorId: condicionIvaReceptorId,
+      concepto: concepto,
+    );
   }
 }

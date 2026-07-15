@@ -8,6 +8,8 @@ import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/widgets/summary_products_card.dart';
 import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_entity.dart';
+import 'package:gestion_integral_jyc/features/sales/presentation/pdf/arca_invoice_pdf_generator.dart';
+import 'package:gestion_integral_jyc/features/sales/presentation/providers/sale_provider.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/widgets/sale_client_info_card.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/widgets/sale_summary_item_card.dart';
 import 'package:go_router/go_router.dart';
@@ -19,6 +21,17 @@ class SaleDetailsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final salesAsync = ref.watch(saleProvider);
+    final currentSale = salesAsync.maybeWhen(
+      data: (sales) {
+        for (final s in sales) {
+          if (s.id == sale.id) return s;
+        }
+        return sale;
+      },
+      orElse: () => sale,
+    );
+
     return Scaffold(
       backgroundColor: AppColors.surface,
 
@@ -37,11 +50,11 @@ class SaleDetailsScreen extends ConsumerWidget {
 
                     children: [
                       Text(
-                        "Venta VTA-${sale.id ?? '---'}",
+                        "Venta VTA-${currentSale.id ?? '---'}",
                         style: context.textTheme.titleLarge,
                       ),
                       Text(
-                        "Registrada el ${sale.date.ddMMyyyy} - ${sale.date.hour}:${sale.date.minute} hrs",
+                        "Registrada el ${currentSale.date.ddMMyyyy} - ${currentSale.date.hour}:${currentSale.date.minute} hrs",
                         style: context.textTheme.bodyLarge,
                       ),
                     ],
@@ -69,20 +82,23 @@ class SaleDetailsScreen extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
 
                     children: [
-                      Expanded(flex: 2, child: _buildLeftColumn(context, sale)),
+                      Expanded(
+                        flex: 2,
+                        child: _buildLeftColumn(context, currentSale),
+                      ),
                       const SizedBox(width: 24),
                       Expanded(
                         flex: 1,
-                        child: _buildRightColumn(context, sale),
+                        child: _buildRightColumn(context, currentSale),
                       ),
                     ],
                   );
                 } else {
                   return Column(
                     children: [
-                      _buildLeftColumn(context, sale),
+                      _buildLeftColumn(context, currentSale),
                       const SizedBox(height: 24),
-                      _buildRightColumn(context, sale),
+                      _buildRightColumn(context, currentSale),
                     ],
                   );
                 }
@@ -146,16 +162,14 @@ class SaleDetailsScreen extends ConsumerWidget {
 
         const SizedBox(height: 16),
 
-        _buildInvoiceCard(context),
+        _buildInvoiceCard(context, sale),
       ],
     );
   }
 
-  Widget _buildInvoiceCard(BuildContext context) {
-    // TODO: reemplazar por datos reales de facturación (sale.cae, sale.isInvoiced)
-    // cuando el módulo de ARCA esté implementado en el backend.
-    const bool isInvoiced = false;
-    const String mockCae = '75121736182493';
+  Widget _buildInvoiceCard(BuildContext context, SaleEntity sale) {
+    final bill = sale.bill;
+    final bool isInvoiced = sale.isInvoiced;
 
     return Container(
       width: double.infinity,
@@ -187,7 +201,10 @@ class SaleDetailsScreen extends ConsumerWidget {
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      Text("CAE: $mockCae", style: context.textTheme.bodySmall),
+                      Text(
+                        "CAE: ${bill?.arcaData.cae}",
+                        style: context.textTheme.bodySmall,
+                      ),
                     ],
                   ),
                 ),
@@ -196,28 +213,25 @@ class SaleDetailsScreen extends ConsumerWidget {
 
             const SizedBox(height: 16),
 
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () {
-                      // TODO: abrir/descargar la factura emitida
-                    },
-                    label: Text("Ver Factura"),
-                    icon: Icon(Icons.description_outlined),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      // TODO: reenviar la factura por WhatsApp
-                    },
-                    label: Text("Reenviar"),
-                    icon: Icon(Icons.send_outlined),
-                  ),
-                ),
-              ],
+            SizedBox(
+              width: double.infinity,
+              child: QuickActionButton(
+                label: 'Ver Factura',
+                icon: Icons.description_outlined,
+                onPressed: () async {
+                  try {
+                    await ArcaInvoicePdfGenerator.previewInvoice(sale);
+                  } catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Error al mostrar la factura: $e'),
+                        ),
+                      );
+                    }
+                  }
+                },
+              ),
             ),
           ] else ...[
             Row(

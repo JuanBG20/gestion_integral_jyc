@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/providers/product_provider.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/providers/raw_material_provider.dart';
+import 'package:gestion_integral_jyc/features/sales/data/datasources/bill_remote_data_source.dart';
 import 'package:gestion_integral_jyc/features/sales/data/datasources/sale_remote_data_source.dart';
 import 'package:gestion_integral_jyc/features/sales/data/repositories/sale_repository_impl.dart';
 import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_entity.dart';
@@ -12,8 +13,15 @@ final saleDataSourceProvider = Provider<SaleRemoteDataSource>((ref) {
   return SaleRemoteDataSource(Supabase.instance.client);
 });
 
+final billDataSourceProvider = Provider<BillRemoteDataSource>((ref) {
+  return BillRemoteDataSource(Supabase.instance.client);
+});
+
 final saleRepositoryProvider = Provider<SaleRepository>((ref) {
-  return SaleRepositoryImpl(ref.read(saleDataSourceProvider));
+  return SaleRepositoryImpl(
+    ref.read(saleDataSourceProvider),
+    ref.read(billDataSourceProvider),
+  );
 });
 
 final saleProvider =
@@ -62,5 +70,18 @@ class SaleNotifier extends StateNotifier<AsyncValue<List<SaleEntity>>> {
     } catch (e) {
       throw Exception('Error al registrar la venta: $e');
     }
+  }
+
+  Future<void> emitInvoice(
+    int saleId, {
+    required int condicionIvaReceptorId,
+    int concepto = 1,
+  }) async {
+    await repository.emitInvoice(
+      saleId,
+      condicionIvaReceptorId: condicionIvaReceptorId,
+      concepto: concepto,
+    );
+    await fetchSales();
   }
 }
