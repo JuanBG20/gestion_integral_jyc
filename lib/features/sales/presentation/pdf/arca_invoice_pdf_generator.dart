@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:gestion_integral_jyc/core/presentation/extensions/address_formatting.dart';
 import 'package:gestion_integral_jyc/core/presentation/extensions/bill_formatting.dart';
+import 'package:gestion_integral_jyc/core/presentation/extensions/date_formatting.dart';
 import 'package:gestion_integral_jyc/features/sales/domain/entities/bill_entity.dart';
 import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_entity.dart';
 import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_item_entity.dart';
@@ -57,7 +58,7 @@ class ArcaInvoicePdfGenerator {
     final data = bill.arcaData;
     final qrDataMap = {
       "ver": 1,
-      "fecha": DateFormat('yyyy-MM-dd').format(bill.emissionDate),
+      "fecha": DateFormat('yyyy-MM-dd').format(data.fechaComprobante),
       "cuit": int.parse(EmisorFiscalData.cuit),
       "ptoVta": data.ptoVta,
       "tipoCmp": data.cbteTipo,
@@ -71,7 +72,7 @@ class ArcaInvoicePdfGenerator {
       "codAut": int.tryParse(data.cae) ?? 0,
     };
     final qrBase64 = base64Encode(utf8.encode(jsonEncode(qrDataMap)));
-    return 'https://www.afip.gob.ar/fe/qr/?p=$qrBase64';
+    return 'https://www.arca.gob.ar/fe/qr/?p=$qrBase64';
   }
 
   static pw.Widget _buildHeader(BillEntity bill) {
@@ -153,7 +154,7 @@ class ArcaInvoicePdfGenerator {
                         style: const pw.TextStyle(fontSize: 10),
                       ),
                       pw.Text(
-                        'Fecha de Emisión: ${DateFormat('dd/MM/yyyy').format(bill.emissionDate)}',
+                        'Fecha de Emisión: ${data.fechaComprobante.ddMMyyyy}',
                         style: pw.TextStyle(
                           fontSize: 10,
                           fontWeight: pw.FontWeight.bold,

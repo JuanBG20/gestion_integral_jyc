@@ -4,10 +4,12 @@ class ArcaDataModel extends ArcaDataEntity {
   ArcaDataModel({
     required super.cae,
     required super.caeVencimiento,
+    required super.fechaComprobante,
     required super.impTotal,
     required super.ptoVta,
     required super.cbteTipo,
     required super.cbteNro,
+    required super.concepto,
     required super.docTipo,
     required super.docNro,
     required super.condicionIvaReceptorId,
@@ -35,11 +37,12 @@ class ArcaDataModel extends ArcaDataEntity {
     return ArcaDataModel(
       cae: arca['cae']?.toString() ?? '',
       caeVencimiento: parseAfipDate(arca['caeFchVto']?.toString()),
+      fechaComprobante: parseAfipDate(arca['CbteFch']?.toString()),
       impTotal: (json['impTotal'] as num?)?.toDouble() ?? 0.0,
       ptoVta: (feCabResp['PtoVta'] as num?)?.toInt() ?? 0,
       cbteTipo: (feCabResp['CbteTipo'] as num?)?.toInt() ?? 0,
-      // CbteDesde es el número REAL del comprobante ante AFIP (no el idfactura interno)
       cbteNro: (detalle['CbteDesde'] as num?)?.toInt() ?? 0,
+      concepto: (json['concepto'] as num?)?.toInt() ?? 1,
       docTipo: (json['docTipo'] as num?)?.toInt() ?? 99,
       docNro: (json['docNro'] as num?)?.toInt() ?? 0,
       condicionIvaReceptorId:

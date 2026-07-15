@@ -1,10 +1,12 @@
 class ArcaDataEntity {
   final String cae;
   final DateTime caeVencimiento;
+  final DateTime fechaComprobante;
   final double impTotal;
   final int ptoVta;
   final int cbteTipo;
   final int cbteNro;
+  final int concepto;
   final int docTipo;
   final int docNro;
   final int condicionIvaReceptorId;
@@ -19,5 +21,7 @@ class ArcaDataEntity {
     required this.docTipo,
     required this.docNro,
     required this.condicionIvaReceptorId,
+    required this.concepto,
+    required this.fechaComprobante,
   });
 }

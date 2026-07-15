@@ -10,6 +10,7 @@ class LabeledTextField extends StatelessWidget {
   final bool obscureText;
   final Widget? suffixIcon;
   final String? Function(String?)? validator;
+  final bool readOnly;
 
   const LabeledTextField({
     super.key,
@@ -21,6 +22,7 @@ class LabeledTextField extends StatelessWidget {
     this.obscureText = false,
     this.suffixIcon,
     this.validator,
+    this.readOnly = false,
   });
 
   @override
@@ -40,6 +42,7 @@ class LabeledTextField extends StatelessWidget {
         const SizedBox(height: 4),
 
         TextFormField(
+          readOnly: readOnly,
           controller: controller,
           keyboardType: inputType,
           obscureText: obscureText,

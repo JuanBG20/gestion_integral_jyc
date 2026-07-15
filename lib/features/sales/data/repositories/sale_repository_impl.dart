@@ -50,12 +50,14 @@ class SaleRepositoryImpl implements SaleRepository {
   Future<void> emitInvoice(
     int saleId, {
     required int condicionIvaReceptorId,
+    required DateTime issueDate,
     int concepto = 1,
   }) async {
     await billRemoteDataSource.emitInvoice(
       saleId: saleId,
       condicionIvaReceptorId: condicionIvaReceptorId,
       concepto: concepto,
+      issueDate: issueDate,
     );
   }
 }

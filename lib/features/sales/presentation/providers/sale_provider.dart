@@ -75,12 +75,14 @@ class SaleNotifier extends StateNotifier<AsyncValue<List<SaleEntity>>> {
   Future<void> emitInvoice(
     int saleId, {
     required int condicionIvaReceptorId,
+    required DateTime issueDate,
     int concepto = 1,
   }) async {
     await repository.emitInvoice(
       saleId,
       condicionIvaReceptorId: condicionIvaReceptorId,
       concepto: concepto,
+      issueDate: issueDate,
     );
     await fetchSales();
   }

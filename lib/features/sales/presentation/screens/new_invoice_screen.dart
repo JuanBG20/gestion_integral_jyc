@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gestion_integral_jyc/core/enums/condicion_iva_receptor.dart'
     show CondicionIvaReceptor;
 import 'package:gestion_integral_jyc/core/enums/doc_type.dart';
-import 'package:gestion_integral_jyc/core/enums/payment_method.dart';
 import 'package:gestion_integral_jyc/core/presentation/extensions/address_formatting.dart';
 import 'package:gestion_integral_jyc/core/presentation/screens/form_screen_layout.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_date_picker.dart';
@@ -27,23 +26,17 @@ class NewInvoiceScreen extends ConsumerStatefulWidget {
 class _NewInvoiceScreenState extends ConsumerState<NewInvoiceScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  static const List<String> _mockSalePoints = ['0001 - Oficina Central'];
-  static const List<String> _mockActivities = ['Venta al por menor y mayor'];
-
   bool _isLoading = false;
 
+  late final TextEditingController _docTypeController;
   late final TextEditingController _docNumberController;
   late final TextEditingController _addressController;
-  late final PaymentMethod _paymentWay;
+  late final TextEditingController _paymentWayController;
 
   DateTime _issueDate = DateTime.now();
-  DocType? _selectedDocType;
 
   String _concept = "Productos";
   CondicionIvaReceptor _ivaCondition = CondicionIvaReceptor.consumidorFinal;
-  String _salePoint = _mockSalePoints.first;
-  String _invoiceType = "Factura C";
-  String _activity = _mockActivities.first;
 
   @override
   void initState() {
@@ -51,10 +44,14 @@ class _NewInvoiceScreenState extends ConsumerState<NewInvoiceScreen> {
 
     final client = widget.sale.client;
 
-    _selectedDocType = client.docType;
+    _docTypeController = TextEditingController(
+      text: client.docType?.dbValue ?? '',
+    );
     _docNumberController = TextEditingController(text: client.docNumber ?? '');
     _addressController = TextEditingController(text: client.formattedAddress);
-    _paymentWay = widget.sale.paymentMethod;
+    _paymentWayController = TextEditingController(
+      text: widget.sale.paymentMethod.dbValue,
+    );
 
     _ivaCondition = widget.sale.client.docType == DocType.cuit
         ? CondicionIvaReceptor.responsableInscripto
@@ -63,17 +60,51 @@ class _NewInvoiceScreenState extends ConsumerState<NewInvoiceScreen> {
 
   @override
   void dispose() {
+    _docTypeController.dispose();
     _docNumberController.dispose();
     _addressController.dispose();
+    _paymentWayController.dispose();
     super.dispose();
   }
 
+  (DateTime, DateTime) _allowedDateRange() {
+    final int days = _concept == 'Productos' ? 5 : 10;
+    final today = DateTime.now();
+    final min = DateTime(
+      today.year,
+      today.month,
+      today.day,
+    ).subtract(Duration(days: days));
+    final max = DateTime(
+      today.year,
+      today.month,
+      today.day,
+    ).add(Duration(days: days));
+    return (min, max);
+  }
+
+  void _clampIssueDateToAllowedRange() {
+    final (min, max) = _allowedDateRange();
+    if (_issueDate.isBefore(min)) {
+      setState(() => _issueDate = min);
+    } else if (_issueDate.isAfter(max)) {
+      setState(() => _issueDate = max);
+    }
+  }
+
   Future<void> _pickIssueDate() async {
+    final (min, max) = _allowedDateRange();
+
     final picked = await showDatePicker(
       context: context,
-      initialDate: _issueDate,
-      firstDate: DateTime(2020),
-      lastDate: DateTime.now().add(const Duration(days: 1)),
+      initialDate: _issueDate.isBefore(min)
+          ? min
+          : (_issueDate.isAfter(max) ? max : _issueDate),
+      firstDate: min,
+      lastDate: max,
+      helpText: _concept == 'Productos'
+          ? 'AFIP permite hasta 5 días de diferencia'
+          : 'AFIP permite hasta 10 días de diferencia',
     );
     if (picked != null) {
       setState(() => _issueDate = picked);
@@ -99,6 +130,7 @@ class _NewInvoiceScreenState extends ConsumerState<NewInvoiceScreen> {
             widget.sale.id!,
             condicionIvaReceptorId: _ivaCondition.arcaId,
             concepto: concepto,
+            issueDate: _issueDate,
           );
 
       if (!mounted) return;
@@ -169,24 +201,20 @@ class _NewInvoiceScreenState extends ConsumerState<NewInvoiceScreen> {
                             (c) => DropdownMenuItem(value: c, child: Text(c)),
                           )
                           .toList(),
-                  onChanged: (val) => setState(() => _concept = val!),
+                  onChanged: (val) {
+                    setState(() => _concept = val!);
+                    _clampIssueDateToAllowedRange();
+                  },
                 ),
               ),
 
               SizedBox(
                 width: itemWidth,
-                child: LabeledDropdown<PaymentMethod>(
+                child: LabeledTextField(
+                  controller: _paymentWayController,
                   label: "Forma de Pago",
-                  value: _paymentWay,
-                  items: PaymentMethod.values
-                      .map(
-                        (t) => DropdownMenuItem<PaymentMethod>(
-                          value: t,
-                          child: Text(t.dbValue),
-                        ),
-                      )
-                      .toList(),
-                  onChanged: (val) => setState(() => _paymentWay = val!),
+                  hint: "",
+                  readOnly: true,
                 ),
               ),
 
@@ -202,21 +230,11 @@ class _NewInvoiceScreenState extends ConsumerState<NewInvoiceScreen> {
 
               SizedBox(
                 width: itemWidth,
-
-                child: LabeledDropdown(
+                child: LabeledTextField(
+                  controller: _docTypeController,
                   label: "Tipo de Documento",
-                  value: _selectedDocType,
-                  hint: "Selecciona un tipo...",
-                  items: DocType.values.map((type) {
-                    return DropdownMenuItem<DocType>(
-                      value: type,
-                      child: Text(
-                        type.dbValue,
-                        style: context.textTheme.bodyMedium,
-                      ),
-                    );
-                  }).toList(),
-                  onChanged: (val) => setState(() => _selectedDocType = val),
+                  hint: "",
+                  readOnly: true,
                 ),
               ),
 
@@ -225,7 +243,8 @@ class _NewInvoiceScreenState extends ConsumerState<NewInvoiceScreen> {
                 child: LabeledTextField(
                   controller: _docNumberController,
                   label: "Número de Documento",
-                  hint: "46427900",
+                  hint: "",
+                  readOnly: true,
                 ),
               ),
 
@@ -250,11 +269,12 @@ class _NewInvoiceScreenState extends ConsumerState<NewInvoiceScreen> {
                 child: LabeledTextField(
                   controller: _addressController,
                   label: "Domicilio",
-                  hint: "Tucumán 199, Arribeños, Buenos Aires",
+                  hint: "",
+                  readOnly: true,
                 ),
               ),
 
-              Divider(color: AppColors.outline),
+              /* Divider(color: AppColors.outline),
 
               SizedBox(
                 width: constraints.maxWidth,
@@ -279,18 +299,6 @@ class _NewInvoiceScreenState extends ConsumerState<NewInvoiceScreen> {
               SizedBox(
                 width: itemWidth,
                 child: LabeledDropdown<String>(
-                  label: "Tipo de Factura",
-                  value: _invoiceType,
-                  items: const ["Factura A", "Factura B", "Factura C"]
-                      .map((t) => DropdownMenuItem(value: t, child: Text(t)))
-                      .toList(),
-                  onChanged: (val) => setState(() => _invoiceType = val!),
-                ),
-              ),
-
-              SizedBox(
-                width: itemWidth,
-                child: LabeledDropdown<String>(
                   label: "Actividad Asociada",
                   value: _activity,
                   items: _mockActivities
@@ -298,7 +306,7 @@ class _NewInvoiceScreenState extends ConsumerState<NewInvoiceScreen> {
                       .toList(),
                   onChanged: (val) => setState(() => _activity = val!),
                 ),
-              ),
+              ), */
             ],
           );
         },

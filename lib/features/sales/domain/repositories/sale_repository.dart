@@ -10,6 +10,7 @@ abstract class SaleRepository {
   Future<void> emitInvoice(
     int saleId, {
     required int condicionIvaReceptorId,
+    required DateTime issueDate,
     int concepto = 1,
   });
 }
