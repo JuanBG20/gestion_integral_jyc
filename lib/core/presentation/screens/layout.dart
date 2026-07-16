@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gestion_integral_jyc/core/presentation/providers/search_provider.dart';
@@ -40,6 +41,11 @@ class _LayoutState extends ConsumerState<Layout> {
     final String currentPath = GoRouterState.of(context).uri.path;
     final bool haveSearchBar =
         currentPath == '/inventory' || currentPath == '/clients';
+
+    final isMobile =
+        !kIsWeb &&
+        (defaultTargetPlatform == TargetPlatform.iOS ||
+            defaultTargetPlatform == TargetPlatform.android);
 
     return Scaffold(
       body: Row(
@@ -131,6 +137,15 @@ class _LayoutState extends ConsumerState<Layout> {
                   isActive: widget.navigationShell.currentIndex == 4,
                   isExpanded: _isSidebarExpanded,
                 ),
+
+                if (isMobile)
+                  _buildSidebarItem(
+                    icon: Icons.qr_code_scanner,
+                    title: "Escáner",
+                    onTap: () => context.push('/scanner'),
+                    isActive: false,
+                    isExpanded: _isSidebarExpanded,
+                  ),
 
                 /* _buildSidebarItem(
                   icon: Icons.settings_outlined,

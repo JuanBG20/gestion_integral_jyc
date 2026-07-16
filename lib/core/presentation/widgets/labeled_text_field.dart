@@ -11,6 +11,7 @@ class LabeledTextField extends StatelessWidget {
   final Widget? suffixIcon;
   final String? Function(String?)? validator;
   final bool readOnly;
+  final FocusNode? focusNode;
 
   const LabeledTextField({
     super.key,
@@ -23,6 +24,7 @@ class LabeledTextField extends StatelessWidget {
     this.suffixIcon,
     this.validator,
     this.readOnly = false,
+    this.focusNode,
   });
 
   @override
@@ -42,6 +44,7 @@ class LabeledTextField extends StatelessWidget {
         const SizedBox(height: 4),
 
         TextFormField(
+          focusNode: focusNode,
           readOnly: readOnly,
           controller: controller,
           keyboardType: inputType,

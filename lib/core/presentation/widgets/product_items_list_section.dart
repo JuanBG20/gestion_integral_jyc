@@ -7,6 +7,7 @@ import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/features/inventory/domain/entities/variant_product_entity.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/providers/product_provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 typedef ProductLineItemBuilder<T extends ProductLineItemEntity> =
     T Function({
@@ -49,6 +50,9 @@ class _ProductItemsListSectionState<T extends ProductLineItemEntity>
   final _priceController = TextEditingController();
   final _descController = TextEditingController();
 
+  final _qtyFocusNode = FocusNode();
+  RealtimeChannel? _scannerChannel;
+
   bool _isGenericItem = false;
   bool _isAddingItem = false;
 
@@ -56,6 +60,7 @@ class _ProductItemsListSectionState<T extends ProductLineItemEntity>
   void initState() {
     super.initState();
     _items = List<T>.from(widget.initialItems);
+    _setupScannerListener();
   }
 
   @override
@@ -63,7 +68,67 @@ class _ProductItemsListSectionState<T extends ProductLineItemEntity>
     _qtyController.dispose();
     _priceController.dispose();
     _descController.dispose();
+    _qtyFocusNode.dispose();
+
+    if (_scannerChannel != null) {
+      Supabase.instance.client.removeChannel(_scannerChannel!);
+    }
     super.dispose();
+  }
+
+  void _setupScannerListener() {
+    final supabase = Supabase.instance.client;
+    final userId = supabase.auth.currentUser?.id;
+
+    if (userId == null) return;
+
+    // Escuchamos el canal único de este usuario
+    _scannerChannel = supabase.channel('scanner-$userId');
+    _scannerChannel!
+        .onBroadcast(
+          event: 'sku_scanned',
+          callback: (payload) {
+            final sku = payload['sku'] as String?;
+            if (sku != null) {
+              _handleScannedSku(sku);
+            }
+          },
+        )
+        .subscribe();
+  }
+
+  void _handleScannedSku(String sku) {
+    // Leemos el estado actual del inventario
+    final inventoryState = ref.read(inventoryProductsProvider);
+
+    if (inventoryState is AsyncData) {
+      // Aplanamos todas las variantes en una sola lista
+      final List<VariantProductEntity> allVariants = [];
+      for (var group in inventoryState.value!) {
+        allVariants.addAll(group.variants);
+      }
+
+      // Buscamos la variante que coincida con el SKU
+      // (Si usás package:collection podés usar firstWhereOrNull)
+      final matchedVariant = allVariants.where((v) => v.sku == sku).firstOrNull;
+
+      if (matchedVariant != null) {
+        setState(() {
+          _isAddingItem = true;
+          _isGenericItem = false;
+          _selectedVariant = matchedVariant;
+          _priceController.text = matchedVariant.salePrice.toStringAsFixed(2);
+          _qtyController.text = '1';
+        });
+
+        // Magia de UX: Le damos foco a la cantidad para que solo tipeen el número
+        _qtyFocusNode.requestFocus();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('SKU no encontrado en inventario: $sku')),
+        );
+      }
+    }
   }
 
   void _addItem() {
@@ -246,6 +311,7 @@ class _ProductItemsListSectionState<T extends ProductLineItemEntity>
                     flex: 1,
                     child: LabeledTextField(
                       controller: _qtyController,
+                      focusNode: _qtyFocusNode,
                       label: "Cant.",
                       hint: "0",
                       inputType: TextInputType.number,

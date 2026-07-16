@@ -25,6 +25,7 @@ import 'package:gestion_integral_jyc/features/sales/presentation/screens/new_inv
 import 'package:gestion_integral_jyc/features/sales/presentation/screens/new_sale_screen.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/screens/sale_details_screen.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/screens/sales_screen.dart';
+import 'package:gestion_integral_jyc/features/sales/presentation/screens/scanner_screen.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -61,6 +62,10 @@ final goRouter = GoRouter(
   },
   routes: [
     GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
+    GoRoute(
+      path: '/scanner',
+      builder: (context, state) => const ScannerScreen(),
+    ),
 
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {
