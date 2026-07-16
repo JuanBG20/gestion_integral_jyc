@@ -26,20 +26,19 @@ class ProductRemoteDataSource {
     List<VariantProductModel> variants,
   ) async {
     final payload = {
-      'p_sku_base': base.baseSku,
+      'p_sku_base': base.baseSku.trim().isEmpty ? null : base.baseSku.trim(),
       'p_categoria': base.category,
       'p_subcategoria': base.subcategory,
       'p_descripcion': base.description,
       'p_variantes': variants
           .map(
             (v) => {
-              'sku': v.sku,
+              'sku': v.sku.trim().isEmpty ? null : v.sku.trim(),
               'stock': v.stock,
               'costPrice': v.costPrice,
               'salePrice': v.salePrice,
               'color': v.color,
               'size': v.size,
-              // Agregamos la receta al Payload JSON
               'recipe': v.manufacturingRecipe
                   .map(
                     (r) => {
@@ -61,17 +60,16 @@ class ProductRemoteDataSource {
     List<VariantProductModel> variants,
   ) async {
     try {
-      // 1. Armamos el payload incluyendo el ID del producto base y de las variantes
       final payload = {
         'p_id_base': base.id,
-        'p_sku_base': base.baseSku,
+        'p_sku_base': base.baseSku.trim().isEmpty ? null : base.baseSku.trim(),
         'p_categoria': base.category,
         'p_subcategoria': base.subcategory,
         'p_descripcion': base.description,
         'p_variantes': variants.map((v) {
           return {
             'id': v.id,
-            'sku': v.sku,
+            'sku': v.sku.trim().isEmpty ? null : v.sku.trim(),
             'stock': v.stock,
             'costPrice': v.costPrice,
             'salePrice': v.salePrice,
@@ -87,7 +85,6 @@ class ProductRemoteDataSource {
         }).toList(),
       };
 
-      // 2. Llamamos a la nueva función RPC de Supabase
       await supabaseClient.rpc('actualizar_producto_completo', params: payload);
     } catch (e) {
       throw Exception('Error al actualizar el producto completo: $e');

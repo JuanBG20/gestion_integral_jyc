@@ -76,7 +76,7 @@ class SaleTableRow extends StatelessWidget {
           child: Align(
             alignment: Alignment.centerLeft,
 
-            child: _buildArcaIndicator(context, hasCae: false),
+            child: _buildArcaIndicator(context, hasCae: sale.isInvoiced),
           ),
         ),
       ],

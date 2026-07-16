@@ -6,7 +6,6 @@ import 'package:gestion_integral_jyc/core/presentation/widgets/app_action_menu.d
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/features/sales/domain/entities/mp_movement_entity.dart';
-import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_entity.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/providers/mp_movement_provider.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/widgets/link_sale_dialog.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/widgets/view_linked_sales_dialog.dart';
@@ -116,7 +115,7 @@ class MpMovements extends ConsumerWidget {
       decoration: BoxDecoration(
         border: Border.all(color: AppColors.outline),
         borderRadius: BorderRadius.circular(4),
-        color: isLinked ? AppColors.surface.withValues(alpha: 0.5) : null,
+        color: isLinked ? AppColors.primary.withValues(alpha: 0.1) : null,
       ),
 
       child: Row(

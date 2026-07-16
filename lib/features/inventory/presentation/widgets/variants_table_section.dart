@@ -78,7 +78,7 @@ class _VariantsTableSectionState extends ConsumerState<VariantsTableSection> {
   }
 
   void _addVariant() {
-    if (_skuController.text.trim().isEmpty) return;
+    /* if (_skuController.text.trim().isEmpty) return; */
 
     setState(() {
       _variants.add(
