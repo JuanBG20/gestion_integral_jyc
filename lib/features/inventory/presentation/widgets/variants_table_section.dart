@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gestion_integral_jyc/core/presentation/extensions/screen_size.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_dropdown.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_text_field.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
@@ -443,34 +444,73 @@ class _VariantsTableSectionState extends ConsumerState<VariantsTableSection> {
                                     : null,
                               ),
                             ),
+
                             const SizedBox(height: 16),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: OutlinedButton.icon(
-                                    onPressed: () => setState(() {
-                                      _isAddingItem = false;
-                                      _pendingRecipe.clear();
-                                    }),
-                                    label: Text("Cancelar"),
-                                    icon: const Icon(Icons.close),
-                                  ),
-                                ),
-                                const SizedBox(width: 16),
-                                Expanded(
-                                  child: ElevatedButton.icon(
-                                    onPressed: () {
-                                      _addVariant();
-                                      setState(() {
+
+                            if (context.isMobileLayout) ...[
+                              Column(
+                                children: [
+                                  SizedBox(
+                                    width: double.infinity,
+
+                                    child: OutlinedButton.icon(
+                                      onPressed: () => setState(() {
                                         _isAddingItem = false;
-                                      });
-                                    },
-                                    label: Text("Agregar Variante"),
-                                    icon: const Icon(Icons.add),
+                                        _pendingRecipe.clear();
+                                      }),
+                                      label: Text("Cancelar"),
+                                      icon: const Icon(Icons.close),
+                                    ),
                                   ),
-                                ),
-                              ],
-                            ),
+
+                                  const SizedBox(height: 16),
+
+                                  SizedBox(
+                                    width: double.infinity,
+
+                                    child: ElevatedButton.icon(
+                                      onPressed: () {
+                                        _addVariant();
+                                        setState(() {
+                                          _isAddingItem = false;
+                                        });
+                                      },
+                                      label: Text("Agregar Variante"),
+                                      icon: const Icon(Icons.add),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ] else
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: OutlinedButton.icon(
+                                      onPressed: () => setState(() {
+                                        _isAddingItem = false;
+                                        _pendingRecipe.clear();
+                                      }),
+                                      label: Text("Cancelar"),
+                                      icon: const Icon(Icons.close),
+                                    ),
+                                  ),
+
+                                  const SizedBox(width: 16),
+
+                                  Expanded(
+                                    child: ElevatedButton.icon(
+                                      onPressed: () {
+                                        _addVariant();
+                                        setState(() {
+                                          _isAddingItem = false;
+                                        });
+                                      },
+                                      label: Text("Agregar Variante"),
+                                      icon: const Icon(Icons.add),
+                                    ),
+                                  ),
+                                ],
+                              ),
                           ],
                         ),
                 ],

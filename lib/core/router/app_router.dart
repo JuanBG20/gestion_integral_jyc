@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:gestion_integral_jyc/core/domain/entities/client_entity.dart';
 import 'package:gestion_integral_jyc/features/auth/presentation/screens/login_screen.dart';
@@ -17,8 +16,8 @@ import 'package:gestion_integral_jyc/features/inventory/presentation/screens/new
 import 'package:gestion_integral_jyc/features/production/domain/entities/work_entity.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/screens/all_works_screen.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/screens/new_work_screen.dart';
+import 'package:gestion_integral_jyc/features/production/presentation/screens/work_adaptative_screen.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/screens/work_details_screen.dart';
-import 'package:gestion_integral_jyc/features/production/presentation/screens/work_screen.dart';
 import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_entity.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/screens/all_sales_screen.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/screens/new_invoice_screen.dart';
@@ -129,7 +128,7 @@ final goRouter = GoRouter(
           routes: [
             GoRoute(
               path: '/work',
-              builder: (context, state) => const WorkScreen(),
+              builder: (context, state) => const WorkAdaptativeScreen(),
               routes: [
                 GoRoute(
                   path: 'new',

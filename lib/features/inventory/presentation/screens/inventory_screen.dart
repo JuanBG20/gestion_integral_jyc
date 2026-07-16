@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gestion_integral_jyc/core/presentation/extensions/screen_size.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/screen_header.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/presentation/providers/auth_provider.dart';
@@ -23,6 +24,13 @@ class InventoryScreen extends ConsumerWidget {
           return Scaffold(
             backgroundColor: AppColors.surface,
 
+            floatingActionButton: context.isMobileLayout
+                ? FloatingActionButton(
+                    onPressed: () => _newItemNavigation(tabContext),
+                    child: const Icon(Icons.add),
+                  )
+                : null,
+
             body: Padding(
               padding: const EdgeInsets.all(24),
 
@@ -36,23 +44,7 @@ class InventoryScreen extends ConsumerWidget {
                     subtitle:
                         "Gestión de productos terminados, materia prima y retazos.",
                     buttonLabel: "Nuevo Item",
-                    onPressed: () {
-                      final currentIndex = DefaultTabController.of(
-                        tabContext,
-                      ).index;
-
-                      switch (currentIndex) {
-                        case 0:
-                          tabContext.go('/inventory/new-material');
-                          break;
-                        case 1:
-                          tabContext.go('/inventory/new-product');
-                          break;
-                        case 2:
-                          tabContext.go('/inventory/new-scrap');
-                          break;
-                      }
-                    },
+                    onPressed: () => _newItemNavigation(tabContext),
                   ),
 
                   const SizedBox(height: 8),
@@ -87,5 +79,21 @@ class InventoryScreen extends ConsumerWidget {
         },
       ),
     );
+  }
+
+  void _newItemNavigation(BuildContext tabContext) {
+    final currentIndex = DefaultTabController.of(tabContext).index;
+
+    switch (currentIndex) {
+      case 0:
+        tabContext.go('/inventory/new-material');
+        break;
+      case 1:
+        tabContext.go('/inventory/new-product');
+        break;
+      case 2:
+        tabContext.go('/inventory/new-scrap');
+        break;
+    }
   }
 }

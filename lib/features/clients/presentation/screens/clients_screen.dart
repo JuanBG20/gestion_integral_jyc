@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gestion_integral_jyc/core/domain/entities/client_entity.dart';
 import 'package:gestion_integral_jyc/core/presentation/extensions/address_formatting.dart';
 import 'package:gestion_integral_jyc/core/presentation/extensions/client_formatting.dart';
+import 'package:gestion_integral_jyc/core/presentation/extensions/screen_size.dart';
 import 'package:gestion_integral_jyc/core/presentation/providers/search_provider.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/app_action_menu.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/screen_header.dart';
@@ -38,10 +39,19 @@ class ClientsScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: AppColors.surface,
 
+      floatingActionButton: context.isMobileLayout
+          ? FloatingActionButton(
+              onPressed: () => context.go('/clients/new'),
+              child: const Icon(Icons.add),
+            )
+          : null,
+
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
 
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+
           children: [
             ScreenHeader(
               title: "Gestión de Clientes",

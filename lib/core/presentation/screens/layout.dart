@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gestion_integral_jyc/core/presentation/extensions/screen_size.dart';
 import 'package:gestion_integral_jyc/core/presentation/providers/search_provider.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/search_app_bar.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
@@ -42,140 +43,32 @@ class _LayoutState extends ConsumerState<Layout> {
     final bool haveSearchBar =
         currentPath == '/inventory' || currentPath == '/clients';
 
-    final isMobile =
-        !kIsWeb &&
-        (defaultTargetPlatform == TargetPlatform.iOS ||
-            defaultTargetPlatform == TargetPlatform.android);
-
     return Scaffold(
+      drawer: context.isMobileLayout
+          ? Drawer(child: _buildSidebarContent())
+          : null,
+
+      appBar: context.isMobileLayout
+          ? AppBar(title: const Text("J&C Impresiones 3D"))
+          : null,
+
       body: Row(
         children: [
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 250),
-            curve: Curves.easeInOut,
-            width: _isSidebarExpanded ? 256 : 80,
+          if (!context.isMobileLayout)
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeInOut,
+              width: _isSidebarExpanded ? 256 : 80,
 
-            padding: const EdgeInsets.symmetric(vertical: 24),
-            decoration: const BoxDecoration(
-              border: Border(
-                right: BorderSide(color: AppColors.outline, width: 1),
+              padding: const EdgeInsets.symmetric(vertical: 24),
+              decoration: const BoxDecoration(
+                border: Border(
+                  right: BorderSide(color: AppColors.outline, width: 1),
+                ),
               ),
+
+              child: _buildSidebarContent(),
             ),
-
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-
-              children: [
-                SizedBox(
-                  height: 80,
-
-                  child: _isSidebarExpanded
-                      ? Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-
-                            children: [
-                              Text(
-                                "J&C Impresiones 3D",
-                                style: context.textTheme.titleMedium,
-                              ),
-
-                              Text(
-                                "Software de Gestión Empresarial",
-                                style: context.textTheme.bodySmall,
-                              ),
-                            ],
-                          ),
-                        )
-                      : const Center(
-                          child: Icon(
-                            Icons.precision_manufacturing,
-                            color: AppColors.primary,
-                            size: 28,
-                          ),
-                        ),
-                ),
-
-                _buildSidebarItem(
-                  icon: Icons.dashboard_outlined,
-                  title: "Dashboard",
-                  onTap: () => _goToBranch(0),
-                  isActive: widget.navigationShell.currentIndex == 0,
-                  isExpanded: _isSidebarExpanded,
-                ),
-
-                _buildSidebarItem(
-                  icon: Icons.inventory_2_outlined,
-                  title: "Inventario",
-                  onTap: () => _goToBranch(1),
-                  isActive: widget.navigationShell.currentIndex == 1,
-                  isExpanded: _isSidebarExpanded,
-                ),
-
-                _buildSidebarItem(
-                  icon: Icons.precision_manufacturing_outlined,
-                  title: "Órdenes de Trabajo",
-                  onTap: () => _goToBranch(2),
-                  isActive: widget.navigationShell.currentIndex == 2,
-                  isExpanded: _isSidebarExpanded,
-                ),
-
-                _buildSidebarItem(
-                  icon: Icons.payments_outlined,
-                  title: "Ventas y Facturación",
-                  onTap: () => _goToBranch(3),
-                  isActive: widget.navigationShell.currentIndex == 3,
-                  isExpanded: _isSidebarExpanded,
-                ),
-
-                _buildSidebarItem(
-                  icon: Icons.people_alt_outlined,
-                  title: "Clientes",
-                  onTap: () => _goToBranch(4),
-                  isActive: widget.navigationShell.currentIndex == 4,
-                  isExpanded: _isSidebarExpanded,
-                ),
-
-                if (isMobile)
-                  _buildSidebarItem(
-                    icon: Icons.qr_code_scanner,
-                    title: "Escáner",
-                    onTap: () => context.push('/scanner'),
-                    isActive: false,
-                    isExpanded: _isSidebarExpanded,
-                  ),
-
-                /* _buildSidebarItem(
-                  icon: Icons.settings_outlined,
-                  title: "Configuración",
-                  onTap: () {},
-                  isExpanded: _isSidebarExpanded,
-                ), */
-                Spacer(),
-
-                _buildSidebarItem(
-                  icon: Icons.logout_outlined,
-                  title: "Cerrar Sesión",
-                  onTap: () async {
-                    await ref.read(authProvider.notifier).signOut();
-                    if (context.mounted) context.go('/login');
-                  },
-                  isExpanded: _isSidebarExpanded,
-                ),
-
-                _buildSidebarItem(
-                  icon: _isSidebarExpanded
-                      ? Icons.keyboard_double_arrow_left
-                      : Icons.keyboard_double_arrow_right,
-                  title: "Colapsar Menú",
-                  onTap: _toggleSidebar,
-                  isExpanded: _isSidebarExpanded,
-                ),
-              ],
-            ),
-          ),
 
           Expanded(
             child: Column(
@@ -188,6 +81,130 @@ class _LayoutState extends ConsumerState<Layout> {
               ],
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSidebarContent() {
+    final isMobile =
+        !kIsWeb &&
+        (defaultTargetPlatform == TargetPlatform.iOS ||
+            defaultTargetPlatform == TargetPlatform.android);
+
+    return SafeArea(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+
+        children: [
+          SizedBox(
+            height: 80,
+
+            child: _isSidebarExpanded
+                ? Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+
+                      children: [
+                        Text(
+                          "J&C Impresiones 3D",
+                          style: context.textTheme.titleMedium,
+                        ),
+
+                        Text(
+                          "Software de Gestión Empresarial",
+                          style: context.textTheme.bodySmall,
+                        ),
+                      ],
+                    ),
+                  )
+                : const Center(
+                    child: Icon(
+                      Icons.precision_manufacturing,
+                      color: AppColors.primary,
+                      size: 28,
+                    ),
+                  ),
+          ),
+
+          _buildSidebarItem(
+            icon: Icons.dashboard_outlined,
+            title: "Dashboard",
+            onTap: () => _goToBranch(0),
+            isActive: widget.navigationShell.currentIndex == 0,
+            isExpanded: _isSidebarExpanded,
+          ),
+
+          _buildSidebarItem(
+            icon: Icons.inventory_2_outlined,
+            title: "Inventario",
+            onTap: () => _goToBranch(1),
+            isActive: widget.navigationShell.currentIndex == 1,
+            isExpanded: _isSidebarExpanded,
+          ),
+
+          _buildSidebarItem(
+            icon: Icons.precision_manufacturing_outlined,
+            title: "Órdenes de Trabajo",
+            onTap: () => _goToBranch(2),
+            isActive: widget.navigationShell.currentIndex == 2,
+            isExpanded: _isSidebarExpanded,
+          ),
+
+          _buildSidebarItem(
+            icon: Icons.payments_outlined,
+            title: "Ventas y Facturación",
+            onTap: () => _goToBranch(3),
+            isActive: widget.navigationShell.currentIndex == 3,
+            isExpanded: _isSidebarExpanded,
+          ),
+
+          _buildSidebarItem(
+            icon: Icons.people_alt_outlined,
+            title: "Clientes",
+            onTap: () => _goToBranch(4),
+            isActive: widget.navigationShell.currentIndex == 4,
+            isExpanded: _isSidebarExpanded,
+          ),
+
+          if (isMobile)
+            _buildSidebarItem(
+              icon: Icons.qr_code_scanner,
+              title: "Escáner",
+              onTap: () => context.push('/scanner'),
+              isActive: false,
+              isExpanded: _isSidebarExpanded,
+            ),
+
+          /* _buildSidebarItem(
+                    icon: Icons.settings_outlined,
+                    title: "Configuración",
+                    onTap: () {},
+                    isExpanded: _isSidebarExpanded,
+                  ), */
+          Spacer(),
+
+          _buildSidebarItem(
+            icon: Icons.logout_outlined,
+            title: "Cerrar Sesión",
+            onTap: () async {
+              await ref.read(authProvider.notifier).signOut();
+              if (context.mounted) context.go('/login');
+            },
+            isExpanded: _isSidebarExpanded,
+          ),
+
+          if (!isMobile)
+            _buildSidebarItem(
+              icon: _isSidebarExpanded
+                  ? Icons.keyboard_double_arrow_left
+                  : Icons.keyboard_double_arrow_right,
+              title: "Colapsar Menú",
+              onTap: _toggleSidebar,
+              isExpanded: _isSidebarExpanded,
+            ),
         ],
       ),
     );

@@ -61,15 +61,17 @@ class SaleDetailsScreen extends ConsumerWidget {
                   ),
                 ),
 
-                const SizedBox(width: 16),
+                if (!context.isMobileLayout) ...[
+                  const SizedBox(width: 16),
 
-                TextButton.icon(
-                  onPressed: () {
-                    context.go('/sales');
-                  },
-                  label: Text("Volver a Ventas"),
-                  icon: Icon(Icons.arrow_back),
-                ),
+                  TextButton.icon(
+                    onPressed: () {
+                      context.go('/sales');
+                    },
+                    label: Text("Volver a Ventas"),
+                    icon: Icon(Icons.arrow_back),
+                  ),
+                ],
               ],
             ),
 

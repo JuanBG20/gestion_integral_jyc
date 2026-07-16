@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gestion_integral_jyc/core/presentation/extensions/screen_size.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 
 class ScreenHeader extends StatelessWidget {
@@ -25,43 +26,58 @@ class ScreenHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-      children: [
-        Expanded(
-          child: Column(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.isMobileLayout) {
+          return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
 
             children: [
               Text(title, style: context.textTheme.titleLarge),
               Text(subtitle, style: context.textTheme.bodyLarge),
             ],
-          ),
-        ),
+          );
+        }
 
-        const SizedBox(width: 16),
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
-        Row(
           children: [
-            if (hasSecondaryButton) ...[
-              OutlinedButton.icon(
-                onPressed: onPressedSecundary,
-                label: Text(secondaryButtonLabel ?? ''),
-                icon: Icon(secondaryButtonIcon),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+
+                children: [
+                  Text(title, style: context.textTheme.titleLarge),
+                  Text(subtitle, style: context.textTheme.bodyLarge),
+                ],
               ),
+            ),
 
-              const SizedBox(width: 16),
-            ],
+            const SizedBox(width: 16),
 
-            ElevatedButton.icon(
-              onPressed: onPressed,
-              label: Text(buttonLabel),
-              icon: Icon(Icons.add),
+            Row(
+              children: [
+                if (hasSecondaryButton) ...[
+                  OutlinedButton.icon(
+                    onPressed: onPressedSecundary,
+                    label: Text(secondaryButtonLabel ?? ''),
+                    icon: Icon(secondaryButtonIcon),
+                  ),
+
+                  const SizedBox(width: 16),
+                ],
+
+                ElevatedButton.icon(
+                  onPressed: onPressed,
+                  label: Text(buttonLabel),
+                  icon: Icon(Icons.add),
+                ),
+              ],
             ),
           ],
-        ),
-      ],
+        );
+      },
     );
   }
 }

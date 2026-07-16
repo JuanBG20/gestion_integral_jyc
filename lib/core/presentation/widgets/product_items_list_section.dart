@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gestion_integral_jyc/core/domain/entities/product_line_item_entity.dart';
+import 'package:gestion_integral_jyc/core/presentation/extensions/screen_size.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_dropdown.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_text_field.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
@@ -189,7 +190,13 @@ class _ProductItemsListSectionState<T extends ProductLineItemEntity>
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
           children: [
-            Text(widget.sectionTitle, style: context.textTheme.titleMedium),
+            Expanded(
+              child: Text(
+                widget.sectionTitle,
+                style: context.textTheme.titleMedium,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
 
             _isGenericItem
                 ? TextButton.icon(
@@ -200,7 +207,7 @@ class _ProductItemsListSectionState<T extends ProductLineItemEntity>
                         _priceController.clear();
                       });
                     },
-                    label: Text("Producto del Inventario"),
+                    label: Text("Del Inventario"),
                     icon: Icon(Icons.inventory_2_outlined),
                   )
                 : TextButton.icon(
@@ -211,7 +218,7 @@ class _ProductItemsListSectionState<T extends ProductLineItemEntity>
                         _priceController.clear();
                       });
                     },
-                    label: Text("Producto Genérico"),
+                    label: Text("Genérico"),
                     icon: Icon(Icons.add_circle_outline),
                   ),
           ],
@@ -266,49 +273,45 @@ class _ProductItemsListSectionState<T extends ProductLineItemEntity>
         ] else
           Column(
             children: [
+              _isGenericItem
+                  ? LabeledTextField(
+                      controller: _descController,
+                      label: "Descripción",
+                      hint: widget.genericDescriptionHint,
+                    )
+                  : LabeledDropdown(
+                      value: _selectedVariant,
+                      label: "Producto",
+                      hint: "Seleccione un producto...",
+                      items: allVariants.map((v) {
+                        final title =
+                            '${v.baseProduct.description} ${v.color ?? ''} ${v.size ?? ''}'
+                                .trim();
+                        return DropdownMenuItem(
+                          value: v,
+                          child: Text(
+                            '$title (${v.sku})',
+                            style: context.textTheme.bodyMedium,
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (val) {
+                        setState(() {
+                          _selectedVariant = val;
+                          if (val != null) {
+                            _priceController.text = val.salePrice
+                                .toStringAsFixed(2);
+                          }
+                        });
+                      },
+                    ),
+
+              const SizedBox(height: 16),
+
               Row(
                 children: [
-                  Expanded(
-                    flex: 4,
-                    child: _isGenericItem
-                        ? LabeledTextField(
-                            controller: _descController,
-                            label: "Descripción",
-                            hint: widget.genericDescriptionHint,
-                          )
-                        : LabeledDropdown(
-                            value: _selectedVariant,
-                            label: "Producto",
-                            hint: "Seleccione un producto...",
-                            items: allVariants.map((v) {
-                              final title =
-                                  '${v.baseProduct.description} ${v.color ?? ''} ${v.size ?? ''}'
-                                      .trim();
-                              return DropdownMenuItem(
-                                value: v,
-                                child: Text(
-                                  '$title (${v.sku})',
-                                  style: context.textTheme.bodyMedium,
-                                ),
-                              );
-                            }).toList(),
-                            onChanged: (val) {
-                              setState(() {
-                                _selectedVariant = val;
-                                if (val != null) {
-                                  _priceController.text = val.salePrice
-                                      .toStringAsFixed(2);
-                                }
-                              });
-                            },
-                          ),
-                  ),
-
-                  const SizedBox(width: 16),
-
                   // Cantidad
                   Expanded(
-                    flex: 1,
                     child: LabeledTextField(
                       controller: _qtyController,
                       focusNode: _qtyFocusNode,
@@ -322,7 +325,6 @@ class _ProductItemsListSectionState<T extends ProductLineItemEntity>
 
                   // Precio Unitario
                   Expanded(
-                    flex: 2,
                     child: LabeledTextField(
                       controller: _priceController,
                       label: "Precio Un. (\$)",
@@ -336,34 +338,70 @@ class _ProductItemsListSectionState<T extends ProductLineItemEntity>
 
               const SizedBox(height: 16),
 
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+              if (context.isMobileLayout) ...[
+                Column(
+                  children: [
+                    SizedBox(
+                      width: double.infinity,
 
-                children: [
-                  OutlinedButton.icon(
-                    onPressed: () => setState(() {
-                      _isAddingItem = false;
-                      _isGenericItem = false;
-                    }),
-                    label: Text("Cancelar"),
-                    icon: const Icon(Icons.close),
-                  ),
+                      child: OutlinedButton.icon(
+                        onPressed: () => setState(() {
+                          _isAddingItem = false;
+                          _isGenericItem = false;
+                        }),
+                        label: Text("Cancelar"),
+                        icon: const Icon(Icons.close),
+                      ),
+                    ),
 
-                  const SizedBox(width: 16),
+                    const SizedBox(height: 8),
 
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      _addItem();
-                      setState(() {
+                    SizedBox(
+                      width: double.infinity,
+
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          _addItem();
+                          setState(() {
+                            _isAddingItem = false;
+                            _isGenericItem = false;
+                          });
+                        },
+                        label: Text("Agregar"),
+                        icon: const Icon(Icons.add),
+                      ),
+                    ),
+                  ],
+                ),
+              ] else
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+
+                  children: [
+                    OutlinedButton.icon(
+                      onPressed: () => setState(() {
                         _isAddingItem = false;
                         _isGenericItem = false;
-                      });
-                    },
-                    label: Text("Agregar"),
-                    icon: const Icon(Icons.add),
-                  ),
-                ],
-              ),
+                      }),
+                      label: Text("Cancelar"),
+                      icon: const Icon(Icons.close),
+                    ),
+
+                    const SizedBox(width: 8),
+
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        _addItem();
+                        setState(() {
+                          _isAddingItem = false;
+                          _isGenericItem = false;
+                        });
+                      },
+                      label: Text("Agregar"),
+                      icon: const Icon(Icons.add),
+                    ),
+                  ],
+                ),
             ],
           ),
       ],

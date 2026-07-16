@@ -37,7 +37,7 @@ class AllWorksScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: AppColors.surface,
 
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
 
         child: Column(

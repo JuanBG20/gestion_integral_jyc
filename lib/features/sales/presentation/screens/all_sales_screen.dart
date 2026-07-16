@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gestion_integral_jyc/core/presentation/extensions/screen_size.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/screen_header.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_column.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_header.dart';
@@ -28,6 +29,13 @@ class AllSalesScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: AppColors.surface,
+
+      floatingActionButton: context.isMobileLayout
+          ? FloatingActionButton(
+              onPressed: () => context.go('/sales/new'),
+              child: const Icon(Icons.add),
+            )
+          : null,
 
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),

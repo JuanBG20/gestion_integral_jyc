@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gestion_integral_jyc/core/presentation/extensions/screen_size.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/screen_header.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/widgets/kanban_board.dart';
@@ -11,6 +12,13 @@ class WorkScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.surface,
+
+      floatingActionButton: context.isMobileLayout
+          ? FloatingActionButton(
+              onPressed: () => context.go('/work/new'),
+              child: const Icon(Icons.add),
+            )
+          : null,
 
       body: Padding(
         padding: const EdgeInsets.all(24),

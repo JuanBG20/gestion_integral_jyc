@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gestion_integral_jyc/core/presentation/extensions/screen_size.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 
@@ -61,13 +62,15 @@ class FormScreenLayout extends StatelessWidget {
                       ),
                     ),
 
-                    const SizedBox(width: 16),
+                    if (!context.isMobileLayout) ...[
+                      const SizedBox(width: 16),
 
-                    TextButton.icon(
-                      onPressed: onReturn,
-                      label: Text(returnLabel),
-                      icon: Icon(Icons.arrow_back),
-                    ),
+                      TextButton.icon(
+                        onPressed: onReturn,
+                        label: Text(returnLabel),
+                        icon: Icon(Icons.arrow_back),
+                      ),
+                    ],
                   ],
                 ),
 
@@ -75,8 +78,6 @@ class FormScreenLayout extends StatelessWidget {
 
                 LayoutBuilder(
                   builder: (context, constraints) {
-                    final bool isDesktop = constraints.maxWidth > 800;
-
                     final Widget mainFormCard = Container(
                       padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
@@ -100,28 +101,58 @@ class FormScreenLayout extends StatelessWidget {
 
                             const SizedBox(height: 16),
 
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
+                            if (constraints.isDesktopLayout) ...[
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
 
-                              children: [
-                                OutlinedButton(
-                                  onPressed: onCancel,
-                                  child: Text("Cancelar"),
-                                ),
+                                children: [
+                                  OutlinedButton(
+                                    onPressed: onCancel,
+                                    child: Text("Cancelar"),
+                                  ),
 
-                                const SizedBox(width: 16),
+                                  const SizedBox(width: 16),
 
-                                ElevatedButton.icon(
-                                  onPressed: () {
-                                    if (formKey.currentState!.validate()) {
-                                      onSave();
-                                    }
-                                  },
-                                  label: Text(saveLabel),
-                                  icon: Icon(Icons.save_outlined),
-                                ),
-                              ],
-                            ),
+                                  ElevatedButton.icon(
+                                    onPressed: () {
+                                      if (formKey.currentState!.validate()) {
+                                        onSave();
+                                      }
+                                    },
+                                    label: Text(saveLabel),
+                                    icon: Icon(Icons.save_outlined),
+                                  ),
+                                ],
+                              ),
+                            ] else
+                              Column(
+                                children: [
+                                  SizedBox(
+                                    width: double.infinity,
+
+                                    child: OutlinedButton(
+                                      onPressed: onCancel,
+                                      child: Text("Cancelar"),
+                                    ),
+                                  ),
+
+                                  const SizedBox(height: 16),
+
+                                  SizedBox(
+                                    width: double.infinity,
+
+                                    child: ElevatedButton.icon(
+                                      onPressed: () {
+                                        if (formKey.currentState!.validate()) {
+                                          onSave();
+                                        }
+                                      },
+                                      label: Text(saveLabel),
+                                      icon: Icon(Icons.save_outlined),
+                                    ),
+                                  ),
+                                ],
+                              ),
                           ],
                         ),
                       ),
@@ -129,7 +160,7 @@ class FormScreenLayout extends StatelessWidget {
 
                     if (sidePanel == null) return mainFormCard;
 
-                    if (isDesktop) {
+                    if (constraints.isDesktopLayout) {
                       return Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
 

@@ -15,6 +15,13 @@ class SalesScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.surface,
 
+      floatingActionButton: context.isMobileLayout
+          ? FloatingActionButton(
+              onPressed: () => context.go('/sales/new'),
+              child: const Icon(Icons.add),
+            )
+          : null,
+
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
 
