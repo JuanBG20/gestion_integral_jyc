@@ -55,7 +55,7 @@ class MpMovements extends ConsumerWidget {
           ),
         ),
 
-        Container(
+        /* Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
             color: AppColors.surface,
@@ -70,8 +70,7 @@ class MpMovements extends ConsumerWidget {
           ),
         ),
 
-        const SizedBox(width: 8),
-
+        const SizedBox(width: 8), */
         IconButton(
           icon: const Icon(Icons.refresh, size: 20),
           onPressed: () {
