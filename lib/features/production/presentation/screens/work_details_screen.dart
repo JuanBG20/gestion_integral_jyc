@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gestion_integral_jyc/core/presentation/extensions/date_formatting.dart';
+import 'package:gestion_integral_jyc/core/presentation/extensions/deadline_extensions.dart';
 import 'package:gestion_integral_jyc/core/presentation/extensions/screen_size.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/items_card_layout.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
@@ -169,10 +170,12 @@ class WorkDetailsScreen extends ConsumerWidget {
 
                   Text(
                     work.deadline != null ? work.deadline!.ddMMyyyy : '-',
-                    style: context.textTheme.bodySmall?.copyWith(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: work.deadline != null
+                        ? context.textTheme.bodySmall?.copyWith(
+                            color: work.deadline!.deadlineColor,
+                            fontWeight: FontWeight.w600,
+                          )
+                        : null,
                   ),
                 ],
               ),

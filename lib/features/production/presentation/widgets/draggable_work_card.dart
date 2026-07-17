@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gestion_integral_jyc/core/presentation/extensions/date_formatting.dart';
+import 'package:gestion_integral_jyc/core/presentation/extensions/deadline_extensions.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/features/production/domain/entities/work_entity.dart';
@@ -60,7 +61,9 @@ class DraggableWorkCard extends StatelessWidget {
 
                   Text(
                     work.deadline!.mmmDd,
-                    style: context.textTheme.bodySmall,
+                    style: context.textTheme.bodySmall?.copyWith(
+                      color: work.deadline!.deadlineColor,
+                    ),
                   ),
                 ],
               ),

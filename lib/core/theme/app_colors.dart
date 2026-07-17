@@ -9,4 +9,8 @@ class AppColors {
   static const Color surface = Color(0xFFE6E8EA);
   static const Color outline = Color(0xFFC6C6CD);
   static const Color error = Color(0xFFBA1A1A);
+
+  static const deadlineRed = Color(0xFFE53935);
+  static const deadlineOrange = Color(0xFFFB8C00);
+  static const deadlineYellow = Color(0xFFFDD835);
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gestion_integral_jyc/core/enums/work_sort_option.dart';
 import 'package:gestion_integral_jyc/core/presentation/extensions/date_formatting.dart';
+import 'package:gestion_integral_jyc/core/presentation/extensions/deadline_extensions.dart';
 import 'package:gestion_integral_jyc/core/presentation/extensions/screen_size.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/app_action_menu.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/screen_header.dart';
@@ -140,6 +141,9 @@ class AllWorksScreen extends ConsumerWidget {
                             AppTableCell.text(
                               w.deadline != null ? w.deadline!.ddMMyyyy : '-',
                               flex: 2,
+                              style: w.deadline != null
+                                  ? TextStyle(color: w.deadline!.deadlineColor)
+                                  : null,
                             ),
                           ],
                         ),
