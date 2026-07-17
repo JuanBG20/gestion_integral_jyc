@@ -123,7 +123,11 @@ class RawMaterialsTab extends ConsumerWidget {
       case 'edit':
         context.go('/inventory/edit-material', extra: material);
       case 'delete':
-      // TODO: Delete Material
+        if (material.id != null) {
+          ref
+              .read(rawMaterialProvider.notifier)
+              .removeRawMaterial(material.id!);
+        }
     }
   }
 }

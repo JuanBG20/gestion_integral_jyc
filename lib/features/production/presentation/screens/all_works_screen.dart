@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gestion_integral_jyc/core/enums/work_sort_option.dart';
 import 'package:gestion_integral_jyc/core/presentation/extensions/date_formatting.dart';
+import 'package:gestion_integral_jyc/core/presentation/extensions/screen_size.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/app_action_menu.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/screen_header.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_cell.dart';
@@ -36,6 +37,13 @@ class AllWorksScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: AppColors.surface,
+
+      floatingActionButton: context.isMobileLayout
+          ? FloatingActionButton(
+              onPressed: () => context.go('/work/new'),
+              child: const Icon(Icons.add),
+            )
+          : null,
 
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),

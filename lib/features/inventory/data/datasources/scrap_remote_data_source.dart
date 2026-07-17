@@ -40,6 +40,10 @@ class ScrapRemoteDataSource {
     );
   }
 
+  Future<void> deleteScrap(int id) async {
+    await supabaseClient.from('retazo').delete().eq('idretazo', id);
+  }
+
   Future<void> updateStock(int id, int delta) async {
     await supabaseClient.rpc(
       'ajustar_stock_retazo',

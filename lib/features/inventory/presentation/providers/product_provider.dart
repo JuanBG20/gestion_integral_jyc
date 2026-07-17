@@ -67,6 +67,24 @@ class InventoryProductsNotifier
     }
   }
 
+  Future<void> removeProductWithVariants(int id) async {
+    try {
+      await repository.deleteProductWithVariants(id);
+      await fetchInventory();
+    } catch (e) {
+      throw Exception('Error al eliminar producto con variantes: $e');
+    }
+  }
+
+  Future<void> removeVariant(int id) async {
+    try {
+      await repository.deleteVariant(id);
+      await fetchInventory();
+    } catch (e) {
+      throw Exception('Error al eliminar variante: $e');
+    }
+  }
+
   Future<void> updateStock(int variantId, double delta, bool deductMp) async {
     await repository.updateStock(variantId, delta, deductMp);
     await fetchInventory();

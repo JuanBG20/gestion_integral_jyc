@@ -40,4 +40,9 @@ class ScrapRepositoryImpl implements ScrapRepository {
     );
     await remoteDataSource.updateScrap(model);
   }
+
+  @override
+  Future<void> deleteScrap(int id) async {
+    await remoteDataSource.deleteScrap(id);
+  }
 }

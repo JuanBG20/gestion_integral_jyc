@@ -122,7 +122,9 @@ class ScrapsTab extends ConsumerWidget {
       case 'edit':
         context.go('/inventory/edit-scrap', extra: scrap);
       case 'delete':
-      // TODO: Delete Material
+        if (scrap.id != null) {
+          ref.read(scrapProvider.notifier).removeScrap(scrap.id!);
+        }
     }
   }
 }

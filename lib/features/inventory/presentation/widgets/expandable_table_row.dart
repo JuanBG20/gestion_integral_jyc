@@ -4,6 +4,7 @@ import 'package:gestion_integral_jyc/core/presentation/widgets/app_action_menu.d
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_cell.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_row.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
+import 'package:gestion_integral_jyc/features/inventory/domain/entities/base_product_entity.dart';
 import 'package:gestion_integral_jyc/features/inventory/domain/entities/variant_product_entity.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/models/product_group_ui.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/providers/product_provider.dart';
@@ -26,10 +27,22 @@ class ExpandableTableRow extends ConsumerWidget {
     final base = product.baseProduct;
 
     return ExpansionTile(
-      showTrailingIcon: false,
       tilePadding: const EdgeInsets.only(left: 24, right: 24),
 
       leading: Icon(Icons.keyboard_arrow_down),
+
+      trailing: AppActionMenu(
+        items: [
+          const AppActionMenuItem(value: 'edit', label: 'Editar'),
+          if (isAdmin)
+            const AppActionMenuItem(
+              value: 'delete',
+              label: 'Eliminar',
+              isDestructive: true,
+            ),
+        ],
+        onSelected: (value) => _handleBaseAction(context, ref, base, value),
+      ),
 
       title: Row(
         children: [
@@ -59,11 +72,10 @@ class ExpandableTableRow extends ConsumerWidget {
                     value: 'update',
                     label: 'Ajustar Stock',
                   ),
-                  const AppActionMenuItem(value: 'edit', label: 'Editar'),
                   if (isAdmin)
                     const AppActionMenuItem(
                       value: 'delete',
-                      label: 'Eliminar',
+                      label: 'Eliminar Variante',
                       isDestructive: true,
                     ),
                 ],
@@ -125,10 +137,30 @@ class ExpandableTableRow extends ConsumerWidget {
             }
           },
         );
+      case 'delete':
+        if (variant.id != null) {
+          ref
+              .read(inventoryProductsProvider.notifier)
+              .removeVariant(variant.id!);
+        }
+    }
+  }
+
+  void _handleBaseAction(
+    BuildContext context,
+    WidgetRef ref,
+    BaseProductEntity base,
+    String action,
+  ) {
+    switch (action) {
       case 'edit':
         context.go('/inventory/edit-product', extra: product);
       case 'delete':
-      // TODO: Delete Material
+        if (base.id != null) {
+          ref
+              .read(inventoryProductsProvider.notifier)
+              .removeProductWithVariants(base.id!);
+        }
     }
   }
 }

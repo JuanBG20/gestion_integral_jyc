@@ -26,58 +26,58 @@ class ScreenHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        if (constraints.isMobileLayout) {
-          return Column(
+    if (context.isMobileLayout) {
+      return SizedBox(
+        width: double.infinity,
+
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+
+          children: [
+            Text(title, style: context.textTheme.titleLarge),
+            Text(subtitle, style: context.textTheme.bodyLarge),
+          ],
+        ),
+      );
+    }
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+      children: [
+        Expanded(
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
 
             children: [
               Text(title, style: context.textTheme.titleLarge),
               Text(subtitle, style: context.textTheme.bodyLarge),
             ],
-          );
-        }
+          ),
+        ),
 
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        const SizedBox(width: 16),
 
+        Row(
           children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-
-                children: [
-                  Text(title, style: context.textTheme.titleLarge),
-                  Text(subtitle, style: context.textTheme.bodyLarge),
-                ],
+            if (hasSecondaryButton) ...[
+              OutlinedButton.icon(
+                onPressed: onPressedSecundary,
+                label: Text(secondaryButtonLabel ?? ''),
+                icon: Icon(secondaryButtonIcon),
               ),
-            ),
 
-            const SizedBox(width: 16),
+              const SizedBox(width: 16),
+            ],
 
-            Row(
-              children: [
-                if (hasSecondaryButton) ...[
-                  OutlinedButton.icon(
-                    onPressed: onPressedSecundary,
-                    label: Text(secondaryButtonLabel ?? ''),
-                    icon: Icon(secondaryButtonIcon),
-                  ),
-
-                  const SizedBox(width: 16),
-                ],
-
-                ElevatedButton.icon(
-                  onPressed: onPressed,
-                  label: Text(buttonLabel),
-                  icon: Icon(Icons.add),
-                ),
-              ],
+            ElevatedButton.icon(
+              onPressed: onPressed,
+              label: Text(buttonLabel),
+              icon: Icon(Icons.add),
             ),
           ],
-        );
-      },
+        ),
+      ],
     );
   }
 }

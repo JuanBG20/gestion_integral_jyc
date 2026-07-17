@@ -91,6 +91,20 @@ class ProductRemoteDataSource {
     }
   }
 
+  Future<void> deleteProductWithVariants(int id) async {
+    await supabaseClient.rpc(
+      'eliminar_producto_completo',
+      params: {'p_idproducto_base': id},
+    );
+  }
+
+  Future<void> deleteVariant(int id) async {
+    await supabaseClient.rpc(
+      'eliminar_producto_variante',
+      params: {'p_idproducto_variante': id},
+    );
+  }
+
   Future<void> updateStock(int variantId, double delta, bool deductMp) async {
     await supabaseClient.rpc(
       'ajustar_stock_producto',

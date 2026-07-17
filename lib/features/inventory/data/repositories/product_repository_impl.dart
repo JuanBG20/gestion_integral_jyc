@@ -42,9 +42,13 @@ class ProductRepositoryImpl extends ProductRepository {
   }
 
   @override
-  Future<void> deleteBaseProduct(int id) async {
-    // TODO: implement deleteBaseProduct
-    throw UnimplementedError();
+  Future<void> deleteProductWithVariants(int id) async {
+    await remoteDataSource.deleteProductWithVariants(id);
+  }
+
+  @override
+  Future<void> deleteVariant(int id) async {
+    await remoteDataSource.deleteVariant(id);
   }
 
   @override
