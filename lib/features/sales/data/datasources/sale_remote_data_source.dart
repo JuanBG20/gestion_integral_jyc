@@ -14,7 +14,21 @@ class SaleRemoteDataSource {
       *,
       cliente (*),
       venta_trabajo (
-        trabajo (*)
+        trabajo (
+          *,
+          cliente (*),
+          historial_estado (
+            *,
+            estado (*)
+          ),
+          contiene_trabajo (
+            *,
+            producto_variante (
+              *,
+              producto_base (*)
+            )
+          )
+        )
       ),
       contiene_venta (
         *,
@@ -30,7 +44,7 @@ class SaleRemoteDataSource {
     return (response as List).map((json) => SaleModel.fromJson(json)).toList();
   }
 
-  Future<void> createSaleRPC(
+  Future<int> createSaleRPC(
     SaleModel sale, {
     int? materiaPrimaId,
     double? consumo,
@@ -47,6 +61,11 @@ class SaleRemoteDataSource {
       'p_consumo': consumo,
     };
 
-    await supabaseClient.rpc('crear_venta_completa', params: payload);
+    final response = await supabaseClient.rpc(
+      'crear_venta_completa',
+      params: payload,
+    );
+
+    return (response as num).toInt();
   }
 }

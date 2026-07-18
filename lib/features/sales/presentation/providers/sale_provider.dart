@@ -47,13 +47,13 @@ class SaleNotifier extends StateNotifier<AsyncValue<List<SaleEntity>>> {
     }
   }
 
-  Future<void> addSale(
+  Future<SaleEntity> createSale(
     SaleEntity sale, {
     int? materiaPrimaId,
     double? consumo,
   }) async {
     try {
-      await repository.createSale(
+      final savedSale = await repository.createSale(
         sale,
         materiaPrimaId: materiaPrimaId,
         consumo: consumo,
@@ -67,9 +67,19 @@ class SaleNotifier extends StateNotifier<AsyncValue<List<SaleEntity>>> {
       if (materiaPrimaId != null) {
         ref.read(rawMaterialProvider.notifier).fetchRawMaterials();
       }
+
+      return savedSale;
     } catch (e) {
       throw Exception('Error al registrar la venta: $e');
     }
+  }
+
+  Future<void> addSale(
+    SaleEntity sale, {
+    int? materiaPrimaId,
+    double? consumo,
+  }) async {
+    await createSale(sale, materiaPrimaId: materiaPrimaId, consumo: consumo);
   }
 
   Future<void> emitInvoice(

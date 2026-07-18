@@ -57,6 +57,11 @@ class SaleDetailsScreen extends ConsumerWidget {
                         "Registrada el ${currentSale.date.ddMMyyyy} - ${currentSale.date.hour}:${currentSale.date.minute} hrs",
                         style: context.textTheme.bodyLarge,
                       ),
+                      if (currentSale.work != null)
+                        Text(
+                          "Corresponde al trabajo TRB-${currentSale.work!.id}",
+                          style: context.textTheme.bodyLarge,
+                        ),
                     ],
                   ),
                 ),

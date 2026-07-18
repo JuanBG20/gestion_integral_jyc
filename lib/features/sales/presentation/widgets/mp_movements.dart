@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gestion_integral_jyc/core/domain/entities/client_entity.dart';
 import 'package:gestion_integral_jyc/core/enums/payment_method.dart';
 import 'package:gestion_integral_jyc/core/presentation/extensions/date_formatting.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/app_action_menu.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
+import 'package:gestion_integral_jyc/features/clients/presentation/providers/client_provider.dart';
 import 'package:gestion_integral_jyc/features/sales/domain/entities/mp_movement_entity.dart';
+import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_entity.dart';
+import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_item_entity.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/providers/mp_movement_provider.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/widgets/link_sale_dialog.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/widgets/view_linked_sales_dialog.dart';
+import 'package:go_router/go_router.dart';
 
 class MpMovements extends ConsumerWidget {
   const MpMovements({super.key});
@@ -32,7 +37,7 @@ class MpMovements extends ConsumerWidget {
           const SizedBox(height: 16),
 
           movementsState.when(
-            data: (movements) => _buildMovementsList(context, movements),
+            data: (movements) => _buildMovementsList(context, ref, movements),
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (err, stack) => Text('Error al cargar movimientos: $err'),
           ),
@@ -84,6 +89,7 @@ class MpMovements extends ConsumerWidget {
 
   Widget _buildMovementsList(
     BuildContext context,
+    WidgetRef ref,
     List<MpMovementEntity> movements,
   ) {
     if (movements.isEmpty) {
@@ -100,12 +106,16 @@ class MpMovements extends ConsumerWidget {
       separatorBuilder: (context, index) => const SizedBox(height: 12),
       itemBuilder: (context, index) {
         final movement = movements[index];
-        return _buildMovementItem(context, movement);
+        return _buildMovementItem(context, ref, movement);
       },
     );
   }
 
-  Widget _buildMovementItem(BuildContext context, MpMovementEntity movement) {
+  Widget _buildMovementItem(
+    BuildContext context,
+    WidgetRef ref,
+    MpMovementEntity movement,
+  ) {
     final (icon, title) = _getPaymentMethodDetails(movement.paymentMethod);
     final isLinked = movement.saleIds != null && movement.saleIds!.isNotEmpty;
 
@@ -173,7 +183,7 @@ class MpMovements extends ConsumerWidget {
                 ),
               ],
               onSelected: (value) =>
-                  _handleMpMovementAction(context, value, movement),
+                  _handleMpMovementAction(context, ref, value, movement),
             ),
           ),
         ],
@@ -196,18 +206,53 @@ class MpMovements extends ConsumerWidget {
 
   void _handleMpMovementAction(
     BuildContext context,
+    WidgetRef ref,
     String action,
     MpMovementEntity movement,
   ) {
     switch (action) {
       case 'bill':
-      /* final quickSale = SaleEntity(
+        final clients = ref
+            .read(clientProvider)
+            .maybeWhen(
+              data: (clients) => clients,
+              orElse: () => <ClientEntity>[],
+            );
+        ClientEntity? consumidorFinal;
+        for (final c in clients) {
+          if (c.name == 'Consumidor' && c.lastName == 'Final') {
+            consumidorFinal = c;
+            break;
+          }
+        }
+
+        if (consumidorFinal == null || consumidorFinal.id == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('No se encontró el cliente "Consumidor Final".'),
+            ),
+          );
+          return;
+        }
+
+        final quickSale = SaleEntity(
           paymentMethod: movement.paymentMethod,
           date: movement.date,
           finalAmount: movement.amount,
-          client: ,
-          items: [],
-        ); */
+          client: consumidorFinal,
+          items: [
+            SaleItemEntity(
+              quantity: 1,
+              unitPrice: movement.amount,
+              description: 'Movimiento MP',
+            ),
+          ],
+        );
+
+        context.go(
+          '/sales/detail/bill?mpMovementId=${movement.id}',
+          extra: quickSale,
+        );
       case 'link':
         showDialog(
           context: context,

@@ -12,7 +12,7 @@ class SaleRepositoryImpl implements SaleRepository {
   SaleRepositoryImpl(this.remoteDataSource, this.billRemoteDataSource);
 
   @override
-  Future<void> createSale(
+  Future<SaleEntity> createSale(
     SaleEntity sale, {
     int? materiaPrimaId,
     double? consumo,
@@ -34,11 +34,13 @@ class SaleRepositoryImpl implements SaleRepository {
           )
           .toList(),
     );
-    await remoteDataSource.createSaleRPC(
+    final newSaleId = await remoteDataSource.createSaleRPC(
       saleModel,
       materiaPrimaId: materiaPrimaId,
       consumo: consumo,
     );
+
+    return sale.copyWith(id: newSaleId);
   }
 
   @override

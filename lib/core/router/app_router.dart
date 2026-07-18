@@ -181,7 +181,14 @@ final goRouter = GoRouter(
                       path: 'bill',
                       builder: (context, state) {
                         final sale = state.extra as SaleEntity;
-                        return NewInvoiceScreen(sale: sale);
+                        final mpMovementId = int.tryParse(
+                          state.uri.queryParameters['mpMovementId'] ?? '',
+                        );
+
+                        return NewInvoiceScreen(
+                          sale: sale,
+                          mpMovementId: mpMovementId,
+                        );
                       },
                     ),
                   ],

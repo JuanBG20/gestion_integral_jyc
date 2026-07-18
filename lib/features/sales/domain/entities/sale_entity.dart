@@ -26,4 +26,26 @@ class SaleEntity {
   });
 
   bool get isInvoiced => bill != null && bill!.isSuccessful;
+
+  SaleEntity copyWith({
+    int? id,
+    PaymentMethod? paymentMethod,
+    DateTime? date,
+    double? finalAmount,
+    ClientEntity? client,
+    WorkEntity? work,
+    List<SaleItemEntity>? items,
+    BillEntity? bill,
+  }) {
+    return SaleEntity(
+      id: id ?? this.id,
+      paymentMethod: paymentMethod ?? this.paymentMethod,
+      date: date ?? this.date,
+      finalAmount: finalAmount ?? this.finalAmount,
+      client: client ?? this.client,
+      work: work ?? this.work,
+      items: items ?? this.items,
+      bill: bill ?? this.bill,
+    );
+  }
 }

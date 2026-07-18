@@ -11,13 +11,15 @@ import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_text_fiel
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_entity.dart';
+import 'package:gestion_integral_jyc/features/sales/presentation/providers/mp_movement_provider.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/providers/sale_provider.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/widgets/invoice_sale_summary_card.dart';
 
 class NewInvoiceScreen extends ConsumerStatefulWidget {
   final SaleEntity sale;
+  final int? mpMovementId;
 
-  const NewInvoiceScreen({super.key, required this.sale});
+  const NewInvoiceScreen({super.key, required this.sale, this.mpMovementId});
 
   @override
   ConsumerState<NewInvoiceScreen> createState() => _NewInvoiceScreenState();
@@ -124,10 +126,24 @@ class _NewInvoiceScreenState extends ConsumerState<NewInvoiceScreen> {
         _ => 3,
       };
 
+      int? currentSaleId = widget.sale.id;
+      if (currentSaleId == null) {
+        final savedSale = await ref
+            .read(saleProvider.notifier)
+            .createSale(widget.sale);
+        currentSaleId = savedSale.id;
+
+        if (widget.mpMovementId != null && currentSaleId != null) {
+          await ref
+              .read(mpMovementsProvider.notifier)
+              .linkToSale(widget.mpMovementId!, currentSaleId);
+        }
+      }
+
       await ref
           .read(saleProvider.notifier)
           .emitInvoice(
-            widget.sale.id!,
+            currentSaleId!,
             condicionIvaReceptorId: _ivaCondition.arcaId,
             concepto: concepto,
             issueDate: _issueDate,

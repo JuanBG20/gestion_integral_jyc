@@ -28,7 +28,8 @@ class SaleModel extends SaleEntity {
     if (json['venta_trabajo'] != null &&
         (json['venta_trabajo'] as List).isNotEmpty) {
       final workJson = json['venta_trabajo'][0]['trabajo'];
-      if (workJson != null) {
+
+      if (workJson != null && workJson is Map<String, dynamic>) {
         linkedWork = WorkModel.fromJson(workJson);
       }
     }
