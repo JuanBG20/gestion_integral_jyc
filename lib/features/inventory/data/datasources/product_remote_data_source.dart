@@ -39,6 +39,7 @@ class ProductRemoteDataSource {
               'salePrice': v.salePrice,
               'color': v.color,
               'size': v.size,
+              'measurementUnit': v.measurementUnit.dbValue,
               'recipe': v.manufacturingRecipe
                   .map(
                     (r) => {
@@ -75,6 +76,7 @@ class ProductRemoteDataSource {
             'salePrice': v.salePrice,
             'color': v.color,
             'size': v.size,
+            'measurementUnit': v.measurementUnit.dbValue,
             'recipe': v.manufacturingRecipe.map((r) {
               return {
                 'rawMaterialId': r.rawMaterial.id,

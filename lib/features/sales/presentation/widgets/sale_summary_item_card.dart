@@ -37,7 +37,7 @@ class SaleSummaryItemCard extends StatelessWidget {
                   style: context.textTheme.bodyMedium,
                 ),
 
-                Text("${item.quantity}u.", style: context.textTheme.bodySmall),
+                Text(item.quantityText, style: context.textTheme.bodySmall),
               ],
             ),
           ),

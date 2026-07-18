@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gestion_integral_jyc/core/enums/measurement_unit.dart';
 import 'package:gestion_integral_jyc/core/presentation/extensions/screen_size.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_dropdown.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_text_field.dart';
@@ -18,6 +19,7 @@ class VariantFormData {
   final double costPrice;
   final double salePrice;
   final List<MaterialRecipeEntity> recipe;
+  final MeasurementUnit measurementUnit;
 
   VariantFormData({
     required this.sku,
@@ -28,6 +30,7 @@ class VariantFormData {
     required this.salePrice,
     required this.recipe,
     this.id,
+    required this.measurementUnit,
   });
 }
 
@@ -57,6 +60,8 @@ class _VariantsTableSectionState extends ConsumerState<VariantsTableSection> {
   final _costController = TextEditingController();
   final _saleController = TextEditingController();
 
+  MeasurementUnit _selectedUnit = MeasurementUnit.unidad;
+
   bool _isAddingItem = false;
 
   @override
@@ -79,9 +84,17 @@ class _VariantsTableSectionState extends ConsumerState<VariantsTableSection> {
   }
 
   void _addVariant() {
-    /* if (_skuController.text.trim().isEmpty) return; */
-
     setState(() {
+      double rawCost =
+          double.tryParse(_costController.text.replaceAll(',', '.')) ?? 0.0;
+      double rawSale =
+          double.tryParse(_saleController.text.replaceAll(',', '.')) ?? 0.0;
+
+      final isGrams = _selectedUnit == MeasurementUnit.gramos;
+
+      final finalCost = isGrams ? rawCost / 1000 : rawCost;
+      final finalSale = isGrams ? rawSale / 1000 : rawSale;
+
       _variants.add(
         VariantFormData(
           sku: _skuController.text.trim(),
@@ -90,11 +103,10 @@ class _VariantsTableSectionState extends ConsumerState<VariantsTableSection> {
               ? '-'
               : _sizeController.text.trim(),
           stock: int.tryParse(_stockController.text) ?? 0,
-          costPrice:
-              double.tryParse(_costController.text.replaceAll(',', '.')) ?? 0.0,
-          salePrice:
-              double.tryParse(_saleController.text.replaceAll(',', '.')) ?? 0.0,
+          costPrice: finalCost,
+          salePrice: finalSale,
           recipe: List.from(_pendingRecipe),
+          measurementUnit: _selectedUnit,
         ),
       );
 
@@ -305,6 +317,12 @@ class _VariantsTableSectionState extends ConsumerState<VariantsTableSection> {
               final double thirdWidth = isWide
                   ? (constraints.maxWidth - 32) / 3
                   : constraints.maxWidth;
+              final double halfWidth = isWide
+                  ? (constraints.maxWidth - 16) / 2
+                  : constraints.maxWidth;
+
+              final isGrams = _selectedUnit == MeasurementUnit.gramos;
+              final unitSymbol = _selectedUnit.abbreviation;
 
               return Column(
                 children: [
@@ -320,6 +338,7 @@ class _VariantsTableSectionState extends ConsumerState<VariantsTableSection> {
                           hint: "PR-001-BCO",
                         ),
                       ),
+
                       SizedBox(
                         width: thirdWidth,
                         child: LabeledTextField(
@@ -328,6 +347,7 @@ class _VariantsTableSectionState extends ConsumerState<VariantsTableSection> {
                           hint: "Blanco",
                         ),
                       ),
+
                       SizedBox(
                         width: thirdWidth,
                         child: LabeledTextField(
@@ -336,29 +356,44 @@ class _VariantsTableSectionState extends ConsumerState<VariantsTableSection> {
                           hint: "40x40cm",
                         ),
                       ),
-                    ],
-                  ),
 
-                  const SizedBox(height: 16),
-
-                  Wrap(
-                    spacing: 16,
-                    runSpacing: 16,
-                    children: [
                       SizedBox(
-                        width: thirdWidth,
+                        width: halfWidth,
+                        child: LabeledDropdown<MeasurementUnit>(
+                          label: "Unidad de Medida",
+                          value: _selectedUnit,
+                          hint: "Seleccione una unidad...",
+                          items: MeasurementUnit.values
+                              .map(
+                                (u) => DropdownMenuItem(
+                                  value: u,
+                                  child: Text(u.label),
+                                ),
+                              )
+                              .toList(),
+                          onChanged: (val) => setState(
+                            () => _selectedUnit = val ?? MeasurementUnit.unidad,
+                          ),
+                        ),
+                      ),
+
+                      SizedBox(
+                        width: halfWidth,
                         child: LabeledTextField(
                           controller: _stockController,
-                          label: "Stock",
+                          label: "Stock ($unitSymbol)",
                           hint: "0",
                           inputType: TextInputType.number,
                         ),
                       ),
+
                       SizedBox(
-                        width: thirdWidth,
+                        width: halfWidth,
                         child: LabeledTextField(
                           controller: _costController,
-                          label: "Precio Costo (\$)",
+                          label: isGrams
+                              ? "Precio de Costo por Kg (\$)"
+                              : "Precio Costo (\$)",
                           hint: "0.00",
                           inputType: TextInputType.numberWithOptions(
                             decimal: true,
@@ -366,11 +401,14 @@ class _VariantsTableSectionState extends ConsumerState<VariantsTableSection> {
                           prefixIcon: Icon(Icons.attach_money),
                         ),
                       ),
+
                       SizedBox(
-                        width: thirdWidth,
+                        width: halfWidth,
                         child: LabeledTextField(
                           controller: _saleController,
-                          label: "Precio Venta (\$)",
+                          label: isGrams
+                              ? "Precio de Venta por Kg (\$)"
+                              : "Precio Venta (\$)",
                           hint: "0.00",
                           inputType: TextInputType.numberWithOptions(
                             decimal: true,
@@ -522,6 +560,17 @@ class _VariantsTableSectionState extends ConsumerState<VariantsTableSection> {
   }
 
   Widget _buildVariantCard(VariantFormData variant, int index) {
+    final isGrams = variant.measurementUnit == MeasurementUnit.gramos;
+    final unitSymbol = variant.measurementUnit.abbreviation;
+
+    final displaySalePrice = isGrams
+        ? variant.salePrice * 1000
+        : variant.salePrice;
+    final displayCostPrice = isGrams
+        ? variant.costPrice * 1000
+        : variant.costPrice;
+    final priceLabel = isGrams ? 'Kg' : 'u';
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
@@ -542,7 +591,7 @@ class _VariantsTableSectionState extends ConsumerState<VariantsTableSection> {
                   ),
                 ),
                 Text(
-                  '${variant.color.isNotEmpty ? variant.color : "-"} · ${variant.size} · Stock: ${variant.stock}',
+                  '${variant.color.isNotEmpty ? variant.color : "-"} · ${variant.size} · Stock: ${variant.stock} $unitSymbol',
                   style: context.textTheme.bodySmall,
                 ),
               ],
@@ -553,13 +602,13 @@ class _VariantsTableSectionState extends ConsumerState<VariantsTableSection> {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                "\$${variant.salePrice.toStringAsFixed(2)}",
+                "\$${displaySalePrice.toStringAsFixed(2)} / $priceLabel",
                 style: context.textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
               ),
               Text(
-                "Costo: \$${variant.costPrice.toStringAsFixed(2)}",
+                "Costo: \$${displayCostPrice.toStringAsFixed(2)} / $priceLabel",
                 style: context.textTheme.bodySmall,
               ),
             ],

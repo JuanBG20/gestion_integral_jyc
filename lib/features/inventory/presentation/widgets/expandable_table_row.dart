@@ -92,7 +92,7 @@ class ExpandableTableRow extends ConsumerWidget {
                   ].where((e) => e != null && e.isNotEmpty).join(' - '),
                   flex: 3,
                 ),
-                AppTableCell.text(variant.stock.toString(), flex: 1),
+                AppTableCell.text(variant.formattedStock, flex: 1),
                 AppTableCell.text("", flex: 3),
                 AppTableCell.text(
                   '\$${variant.costPrice.toStringAsFixed(2)}',

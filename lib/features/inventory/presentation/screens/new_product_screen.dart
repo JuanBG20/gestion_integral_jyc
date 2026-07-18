@@ -53,6 +53,7 @@ class _NewRawMaterialScreenState extends ConsumerState<NewProductScreen> {
           costPrice: variantEntity.costPrice,
           salePrice: variantEntity.salePrice,
           recipe: variantEntity.manufacturingRecipe,
+          measurementUnit: variantEntity.measurementUnit,
         );
       }).toList();
     }
@@ -99,6 +100,7 @@ class _NewRawMaterialScreenState extends ConsumerState<NewProductScreen> {
           size: v.size.isNotEmpty && v.size != '-' ? v.size : null,
           baseProduct: baseProduct,
           manufacturingRecipe: v.recipe,
+          measurementUnit: v.measurementUnit,
         );
       }).toList();
 

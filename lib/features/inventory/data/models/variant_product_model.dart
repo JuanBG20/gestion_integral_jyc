@@ -1,3 +1,4 @@
+import 'package:gestion_integral_jyc/core/enums/measurement_unit.dart';
 import 'package:gestion_integral_jyc/features/inventory/data/models/base_product_model.dart';
 import 'package:gestion_integral_jyc/features/inventory/data/models/material_recipe_model.dart';
 import 'package:gestion_integral_jyc/features/inventory/domain/entities/variant_product_entity.dart';
@@ -13,6 +14,7 @@ class VariantProductModel extends VariantProductEntity {
     super.size,
     required super.baseProduct,
     required super.manufacturingRecipe,
+    super.measurementUnit,
   });
 
   factory VariantProductModel.fromJson(
@@ -35,6 +37,7 @@ class VariantProductModel extends VariantProductEntity {
       size: json['tamano'],
       baseProduct: baseModel,
       manufacturingRecipe: recipes,
+      measurementUnit: MeasurementUnit.fromDB(json['unidad_medida']),
     );
   }
 
@@ -48,6 +51,7 @@ class VariantProductModel extends VariantProductEntity {
       'color': color,
       'tamano': size,
       'producto_base': baseProductId,
+      'unidad_medida': measurementUnit.dbValue,
     };
   }
 }

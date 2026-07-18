@@ -287,7 +287,7 @@ class ArcaInvoicePdfGenerator {
       data: items.map((item) {
         return [
           _itemLabel(item),
-          item.quantity.toString(),
+          item.quantityText,
           '\$${item.unitPrice.toStringAsFixed(2)}',
           '\$${item.subtotal.toStringAsFixed(2)}',
         ];

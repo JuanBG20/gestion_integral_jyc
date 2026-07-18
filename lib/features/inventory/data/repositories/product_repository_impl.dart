@@ -34,6 +34,7 @@ class ProductRepositoryImpl extends ProductRepository {
             size: v.size,
             baseProduct: baseModel,
             manufacturingRecipe: v.manufacturingRecipe,
+            measurementUnit: v.measurementUnit,
           ),
         )
         .toList();
@@ -98,6 +99,7 @@ class ProductRepositoryImpl extends ProductRepository {
             size: v.size,
             baseProduct: baseModel,
             manufacturingRecipe: v.manufacturingRecipe,
+            measurementUnit: v.measurementUnit,
           ),
         )
         .toList();

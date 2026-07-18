@@ -25,4 +25,7 @@ class SaleItemEntity implements ProductLineItemEntity {
   });
 
   double get subtotal => quantity * unitPrice;
+  String get quantityText => variantProduct != null
+      ? '$quantity${variantProduct?.measurementUnit.abbreviation}'
+      : '${quantity}u.';
 }

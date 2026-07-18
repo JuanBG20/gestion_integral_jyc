@@ -1,3 +1,4 @@
+import 'package:gestion_integral_jyc/core/enums/measurement_unit.dart';
 import 'package:gestion_integral_jyc/features/inventory/domain/entities/base_product_entity.dart';
 import 'package:gestion_integral_jyc/features/inventory/domain/entities/material_recipe_entity.dart';
 
@@ -11,6 +12,7 @@ class VariantProductEntity {
   final String? size;
   final BaseProductEntity baseProduct;
   final List<MaterialRecipeEntity> manufacturingRecipe;
+  final MeasurementUnit measurementUnit;
 
   VariantProductEntity({
     required this.sku,
@@ -22,5 +24,19 @@ class VariantProductEntity {
     required this.baseProduct,
     required this.manufacturingRecipe,
     this.id,
+    this.measurementUnit = MeasurementUnit.unidad,
   });
+
+  String get formattedStock => _formatQuantity(stock);
+
+  String _formatQuantity(int value) {
+    switch (measurementUnit) {
+      case MeasurementUnit.unidad:
+        return '$value u.';
+      case MeasurementUnit.gramos:
+        return '$value g';
+      case MeasurementUnit.cm2:
+        return '$value cm²';
+    }
+  }
 }
