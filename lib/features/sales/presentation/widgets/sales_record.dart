@@ -72,6 +72,7 @@ class SalesRecord extends ConsumerWidget {
                   trailingWidth: 0,
                 ),
                 rows: sales
+                    .take(5)
                     .map((venta) => SaleTableRow(sale: venta, trailingWidth: 0))
                     .toList(),
               );

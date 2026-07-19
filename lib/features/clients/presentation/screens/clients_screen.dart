@@ -18,6 +18,7 @@ import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/core/presentation/providers/auth_provider.dart';
 import 'package:gestion_integral_jyc/features/clients/presentation/providers/client_provider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ClientsScreen extends ConsumerWidget {
   const ClientsScreen({super.key});
@@ -192,37 +193,79 @@ class ClientsScreen extends ConsumerWidget {
       mainAxisSize: MainAxisSize.min,
 
       children: [
-        Row(
-          mainAxisSize: MainAxisSize.min,
+        InkWell(
+          mouseCursor: client.email != null ? SystemMouseCursors.click : null,
 
-          children: [
-            Icon(Icons.mail_outline, size: 16, color: AppColors.onBackground),
+          onTap: client.email != null
+              ? () async {
+                  final Uri emailLaunchUri = Uri(
+                    scheme: 'mailto',
+                    path: client.email,
+                  );
+                  if (await canLaunchUrl(emailLaunchUri)) {
+                    await launchUrl(emailLaunchUri);
+                  }
+                }
+              : null,
 
-            const SizedBox(width: 6),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
 
-            Text(
-              client.displayEmail,
-              style: context.textTheme.bodyMedium?.copyWith(
-                color: client.email != null
-                    ? AppColors.primary
-                    : AppColors.onBackground,
+            children: [
+              Icon(Icons.mail_outline, size: 16, color: AppColors.onBackground),
+
+              const SizedBox(width: 6),
+
+              Text(
+                client.displayEmail,
+                style: context.textTheme.bodyMedium?.copyWith(
+                  color: client.email != null
+                      ? AppColors.primary
+                      : AppColors.onBackground,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
 
         const SizedBox(height: 4),
 
-        Row(
-          mainAxisSize: MainAxisSize.min,
+        InkWell(
+          mouseCursor: client.phoneNumber != null
+              ? SystemMouseCursors.click
+              : null,
 
-          children: [
-            Icon(Icons.call_outlined, size: 16, color: AppColors.onBackground),
+          onTap: client.phoneNumber != null
+              ? () async {
+                  final phoneStr = client.phoneNumber!.replaceAll(
+                    RegExp(r'[^\d+]'),
+                    '',
+                  );
+                  final Uri whatsappUri = Uri.parse('https://wa.me/$phoneStr');
+                  if (await canLaunchUrl(whatsappUri)) {
+                    await launchUrl(
+                      whatsappUri,
+                      mode: LaunchMode.externalApplication,
+                    );
+                  }
+                }
+              : null,
 
-            const SizedBox(width: 6),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
 
-            Text(client.displayPhone, style: context.textTheme.bodyMedium),
-          ],
+            children: [
+              Icon(
+                Icons.call_outlined,
+                size: 16,
+                color: AppColors.onBackground,
+              ),
+
+              const SizedBox(width: 6),
+
+              Text(client.displayPhone, style: context.textTheme.bodyMedium),
+            ],
+          ),
         ),
       ],
     );
