@@ -5,6 +5,7 @@ import 'package:gestion_integral_jyc/core/domain/entities/client_entity.dart';
 import 'package:gestion_integral_jyc/core/enums/doc_type.dart';
 import 'package:gestion_integral_jyc/core/enums/provincia.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_dropdown.dart';
+import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_searchable_dropdown.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_text_field.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
@@ -272,15 +273,12 @@ class _NewClientScreenState extends ConsumerState<NewClientScreen> {
               SizedBox(
                 width: itemWidth,
 
-                child: LabeledDropdown(
+                child: LabeledSearchableDropdown<Provincia>(
                   label: "Provincia",
                   value: _selectedProvince,
+                  items: Provincia.values,
+                  itemLabel: (p) => p.label,
                   hint: "Selecciona una provincia...",
-                  items: Provincia.values
-                      .map(
-                        (p) => DropdownMenuItem(value: p, child: Text(p.label)),
-                      )
-                      .toList(),
                   onChanged: (val) => setState(() => _selectedProvince = val),
                 ),
               ),

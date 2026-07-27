@@ -13,7 +13,7 @@ class MpMovementRemoteDataSource {
           .from('movimiento_mp')
           .select('*, mp_venta(venta)')
           .order('fecha', ascending: false)
-          .limit(50);
+          .limit(25);
 
       return (response as List<dynamic>)
           .map((json) => MpMovementModel.fromJson(json as Map<String, dynamic>))

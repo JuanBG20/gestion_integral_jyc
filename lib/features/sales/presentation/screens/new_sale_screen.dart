@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gestion_integral_jyc/core/domain/entities/client_entity.dart';
 import 'package:gestion_integral_jyc/core/enums/payment_method.dart';
-import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_dropdown.dart';
+import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_searchable_dropdown.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
-import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/features/clients/presentation/providers/client_provider.dart';
 import 'package:gestion_integral_jyc/core/presentation/screens/form_screen_layout.dart';
 import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_entity.dart';
@@ -94,20 +93,11 @@ class _NewRawMaterialScreenState extends ConsumerState<NewSaleScreen> {
 
                 child: clientsState.when(
                   data: (clients) {
-                    return LabeledDropdown(
+                    return LabeledSearchableDropdown<ClientEntity>(
                       label: "Cliente",
                       value: _selectedClient,
-                      items: clients
-                          .map(
-                            (c) => DropdownMenuItem(
-                              value: c,
-                              child: Text(
-                                c.fullName,
-                                style: context.textTheme.bodyMedium,
-                              ),
-                            ),
-                          )
-                          .toList(),
+                      items: clients,
+                      itemLabel: (c) => c.fullName,
                       hint: "Seleccione un cliente",
                       onChanged: (val) => setState(() => _selectedClient = val),
                       validator: (value) => value == null ? 'Requerido' : null,

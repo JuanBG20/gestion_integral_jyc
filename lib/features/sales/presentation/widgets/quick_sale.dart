@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gestion_integral_jyc/core/domain/entities/client_entity.dart';
 import 'package:gestion_integral_jyc/core/enums/payment_method.dart';
-import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_dropdown.dart';
+import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_searchable_dropdown.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_text_field.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
@@ -140,20 +140,11 @@ class _QuickSaleState extends ConsumerState<QuickSale> {
 
           rawMaterialsState.when(
             data: (materials) {
-              return LabeledDropdown(
+              return LabeledSearchableDropdown<RawMaterialEntity>(
                 label: "Material",
                 value: _selectedMaterial,
-                items: materials
-                    .map(
-                      (mp) => DropdownMenuItem(
-                        value: mp,
-                        child: Text(
-                          mp.description,
-                          style: context.textTheme.bodyMedium,
-                        ),
-                      ),
-                    )
-                    .toList(),
+                items: materials,
+                itemLabel: (mp) => mp.description,
                 hint: "Seleccione una materia prima",
                 onChanged: (val) => setState(() => _selectedMaterial = val),
               );

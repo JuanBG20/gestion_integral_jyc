@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gestion_integral_jyc/core/enums/measurement_unit.dart';
 import 'package:gestion_integral_jyc/core/presentation/extensions/screen_size.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_dropdown.dart';
+import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_searchable_dropdown.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_text_field.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
@@ -190,21 +191,12 @@ class _VariantsTableSectionState extends ConsumerState<VariantsTableSection> {
 
                     rawMaterialsState.when(
                       data: (materials) {
-                        return LabeledDropdown<RawMaterialEntity>(
+                        return LabeledSearchableDropdown<RawMaterialEntity>(
                           label: "Materia Prima",
                           hint: "Seleccione una materia prima...",
                           value: dialogSelectedMaterial,
-                          items: materials
-                              .map(
-                                (m) => DropdownMenuItem(
-                                  value: m,
-                                  child: Text(
-                                    m.description,
-                                    style: context.textTheme.bodyMedium,
-                                  ),
-                                ),
-                              )
-                              .toList(),
+                          items: materials,
+                          itemLabel: (m) => m.description,
                           onChanged: (val) => setDialogState(
                             () => dialogSelectedMaterial = val,
                           ),

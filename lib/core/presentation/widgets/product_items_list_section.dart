@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gestion_integral_jyc/core/domain/entities/product_line_item_entity.dart';
 import 'package:gestion_integral_jyc/core/presentation/extensions/screen_size.dart';
-import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_dropdown.dart';
+import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_searchable_dropdown.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_text_field.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
@@ -279,22 +279,17 @@ class _ProductItemsListSectionState<T extends ProductLineItemEntity>
                       label: "Descripción",
                       hint: widget.genericDescriptionHint,
                     )
-                  : LabeledDropdown(
-                      value: _selectedVariant,
+                  : LabeledSearchableDropdown<VariantProductEntity>(
                       label: "Producto",
                       hint: "Seleccione un producto...",
-                      items: allVariants.map((v) {
+                      value: _selectedVariant,
+                      items: allVariants,
+                      itemLabel: (v) {
                         final title =
                             '${v.baseProduct.description} ${v.color ?? ''} ${v.size ?? ''}'
                                 .trim();
-                        return DropdownMenuItem(
-                          value: v,
-                          child: Text(
-                            '$title (${v.sku})',
-                            style: context.textTheme.bodyMedium,
-                          ),
-                        );
-                      }).toList(),
+                        return '$title (${v.sku})';
+                      },
                       onChanged: (val) {
                         setState(() {
                           _selectedVariant = val;

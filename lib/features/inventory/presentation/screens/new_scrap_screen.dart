@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_dropdown.dart';
+import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_searchable_dropdown.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_text_field.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
@@ -141,20 +141,11 @@ class _NewRawMaterialScreenState extends ConsumerState<NewScrapScreen> {
 
                 child: rawMaterialsState.when(
                   data: (materials) {
-                    return LabeledDropdown(
+                    return LabeledSearchableDropdown<RawMaterialEntity>(
                       label: "Material",
                       value: _selectedMaterial,
-                      items: materials
-                          .map(
-                            (m) => DropdownMenuItem(
-                              value: m,
-                              child: Text(
-                                '${m.description} (${m.sku})',
-                                style: context.textTheme.bodyMedium,
-                              ),
-                            ),
-                          )
-                          .toList(),
+                      items: materials,
+                      itemLabel: (m) => '${m.description} (${m.sku})',
                       hint: "Seleccione un material",
                       onChanged: (val) =>
                           setState(() => _selectedMaterial = val),
