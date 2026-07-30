@@ -6,7 +6,7 @@ class MpMovementRemoteDataSource {
 
   MpMovementRemoteDataSource(this.supabaseClient);
 
-  // Ultimos 50 movimientos
+  // Ultimos 25 movimientos
   Future<List<MpMovementModel>> getMovements() async {
     try {
       final response = await supabaseClient

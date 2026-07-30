@@ -29,31 +29,17 @@ class LabeledSearchableDropdown<T extends Object> extends StatefulWidget {
 
 class _LabeledSearchableDropdownState<T extends Object>
     extends State<LabeledSearchableDropdown<T>> {
-  late TextEditingController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = TextEditingController(
-      text: widget.value != null ? widget.itemLabel(widget.value as T) : '',
-    );
-  }
+  TextEditingController? _controller;
 
   @override
   void didUpdateWidget(covariant LabeledSearchableDropdown<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
     // Si el valor cambia desde afuera, sincronizamos el texto mostrado.
-    if (widget.value != oldWidget.value) {
-      _controller.text = widget.value != null
+    if (widget.value != oldWidget.value && _controller != null) {
+      _controller!.text = widget.value != null
           ? widget.itemLabel(widget.value as T)
           : '';
     }
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
   }
 
   @override
@@ -77,7 +63,11 @@ class _LabeledSearchableDropdownState<T extends Object>
           validator: widget.validator,
           builder: (state) {
             return Autocomplete<T>(
-              initialValue: TextEditingValue(text: _controller.text),
+              initialValue: TextEditingValue(
+                text: widget.value != null
+                    ? widget.itemLabel(widget.value as T)
+                    : '',
+              ),
               displayStringForOption: widget.itemLabel,
               optionsBuilder: (textValue) {
                 if (textValue.text.isEmpty) return widget.items;
@@ -131,6 +121,7 @@ class _LabeledSearchableDropdownState<T extends Object>
               fieldViewBuilder:
                   (context, controller, focusNode, onFieldSubmitted) {
                     _controller = controller;
+
                     if (controller.text.isEmpty && widget.value != null) {
                       controller.text = widget.itemLabel(widget.value as T);
                     }

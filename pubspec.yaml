@@ -28,6 +28,7 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^6.0.0
   flutter_launcher_icons: ^0.14.4
+  msix: ^3.18.0
 
 flutter:
   uses-material-design: true
@@ -41,3 +42,13 @@ flutter_launcher_icons:
   image_path: "assets/icons/logo.png"
   adaptive_icon_background: "#000000"
   adaptive_icon_foreground: "assets/icons/logo.png"
+
+msix_config:
+  display_name: "Gestión J&C Impresiones 3D"
+  publisher_display_name: Dédalo Studio
+  identity_name: ar.com.dedalostudio.jyc
+  msix_version: 1.0.0.0
+  logo_path: assets/icons/logo.png
+  capabilities: internetClient
+  logo_padding: 0
+  background_color: "#000000"
