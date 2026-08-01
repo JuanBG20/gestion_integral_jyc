@@ -4,6 +4,7 @@ import 'package:gestion_integral_jyc/core/presentation/extensions/screen_size.da
 import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_dropdown.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_text_field.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
+import 'package:gestion_integral_jyc/core/utils/price_calculator.dart';
 import 'package:gestion_integral_jyc/features/inventory/domain/entities/material_recipe_entity.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/widgets/recipe_dialog.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/widgets/variants_table_section.dart';
@@ -40,18 +41,19 @@ class _VariantFormEditorState extends State<VariantFormEditor> {
     super.initState();
     if (widget.initialVariant != null) {
       final variant = widget.initialVariant!;
-      final isGrams = variant.measurementUnit == MeasurementUnit.gramos;
 
       _skuController.text = variant.sku;
       _colorController.text = variant.color;
       _sizeController.text = variant.size == '-' ? '' : variant.size;
       _stockController.text = variant.stock.toString();
-      _costController.text =
-          (isGrams ? variant.costPrice * 1000 : variant.costPrice)
-              .toStringAsFixed(2);
-      _saleController.text =
-          (isGrams ? variant.salePrice * 1000 : variant.salePrice)
-              .toStringAsFixed(2);
+      _costController.text = PriceCalculator.toDisplayPrice(
+        variant.costPrice,
+        variant.measurementUnit,
+      ).toStringAsFixed(2);
+      _saleController.text = PriceCalculator.toDisplayPrice(
+        variant.salePrice,
+        variant.measurementUnit,
+      ).toStringAsFixed(2);
       _selectedUnit = variant.measurementUnit;
       _recipe = List.from(variant.recipe);
     }
@@ -74,9 +76,8 @@ class _VariantFormEditorState extends State<VariantFormEditor> {
     double rawSale =
         double.tryParse(_saleController.text.replaceAll(',', '.')) ?? 0.0;
 
-    final isGrams = _selectedUnit == MeasurementUnit.gramos;
-    final finalCost = isGrams ? rawCost / 1000 : rawCost;
-    final finalSale = isGrams ? rawSale / 1000 : rawSale;
+    final finalCost = PriceCalculator.toDatabasePrice(rawCost, _selectedUnit);
+    final finalSale = PriceCalculator.toDatabasePrice(rawSale, _selectedUnit);
 
     final variant = VariantFormData(
       id: widget.initialVariant?.id,

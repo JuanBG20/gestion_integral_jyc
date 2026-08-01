@@ -10,6 +10,7 @@ class RawMaterialModel extends RawMaterialEntity {
     required super.subcategory,
     required super.description,
     required super.minStock,
+    required super.unitPrice,
     super.measurementUnit,
   });
 
@@ -23,6 +24,7 @@ class RawMaterialModel extends RawMaterialEntity {
       description: json['descripcion'],
       minStock: (json['stock_minimo'] as num).toDouble(),
       measurementUnit: MeasurementUnit.fromDB(json['unidad_medida']),
+      unitPrice: json['precio_unitario'],
     );
   }
 
@@ -36,6 +38,7 @@ class RawMaterialModel extends RawMaterialEntity {
       'descripcion': description,
       'stock_minimo': minStock,
       'unidad_medida': measurementUnit.dbValue,
+      'precio_unitario': unitPrice,
     };
   }
 }

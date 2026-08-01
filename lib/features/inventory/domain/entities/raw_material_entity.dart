@@ -9,6 +9,7 @@ class RawMaterialEntity {
   final String description;
   final double minStock;
   final MeasurementUnit measurementUnit;
+  final double unitPrice;
 
   RawMaterialEntity({
     required this.sku,
@@ -19,6 +20,7 @@ class RawMaterialEntity {
     required this.minStock,
     this.id,
     this.measurementUnit = MeasurementUnit.unidad,
+    required this.unitPrice,
   });
 
   String get fullCategory => '$category > $subcategory';

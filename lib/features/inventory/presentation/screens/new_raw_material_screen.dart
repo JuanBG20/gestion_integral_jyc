@@ -5,6 +5,7 @@ import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_dropdown.
 import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_text_field.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
+import 'package:gestion_integral_jyc/core/utils/price_calculator.dart';
 import 'package:gestion_integral_jyc/features/inventory/domain/entities/raw_material_entity.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/providers/raw_material_provider.dart';
 import 'package:gestion_integral_jyc/core/presentation/screens/form_screen_layout.dart';
@@ -29,6 +30,7 @@ class _NewRawMaterialScreenState extends ConsumerState<NewRawMaterialScreen> {
   final _subcatController = TextEditingController();
   final _stockController = TextEditingController();
   final _minStockController = TextEditingController();
+  final _costController = TextEditingController();
 
   MeasurementUnit _selectedUnit = MeasurementUnit.unidad;
 
@@ -47,6 +49,12 @@ class _NewRawMaterialScreenState extends ConsumerState<NewRawMaterialScreen> {
       _stockController.text = material.stock.toString();
       _minStockController.text = material.minStock.toString();
       _selectedUnit = material.measurementUnit;
+
+      final displayCost = PriceCalculator.toDisplayPrice(
+        material.unitPrice,
+        material.measurementUnit,
+      );
+      _costController.text = displayCost.toStringAsFixed(2);
     }
   }
 
@@ -58,11 +66,16 @@ class _NewRawMaterialScreenState extends ConsumerState<NewRawMaterialScreen> {
     _subcatController.dispose();
     _stockController.dispose();
     _minStockController.dispose();
+    _costController.dispose();
     super.dispose();
   }
 
   void _saveMaterial() {
     if (_formKey.currentState!.validate()) {
+      double rawCost =
+          double.tryParse(_costController.text.replaceAll(',', '.')) ?? 0;
+      final dbCost = PriceCalculator.toDatabasePrice(rawCost, _selectedUnit);
+
       final material = RawMaterialEntity(
         id: widget.rawMaterialToEdit?.id,
         description: _descController.text.trim(),
@@ -72,6 +85,7 @@ class _NewRawMaterialScreenState extends ConsumerState<NewRawMaterialScreen> {
         stock: double.tryParse(_stockController.text.trim()) ?? 0,
         minStock: double.tryParse(_minStockController.text.trim()) ?? 0,
         measurementUnit: _selectedUnit,
+        unitPrice: dbCost,
       );
 
       final notifier = ref.read(rawMaterialProvider.notifier);
@@ -204,6 +218,19 @@ class _NewRawMaterialScreenState extends ConsumerState<NewRawMaterialScreen> {
                   onChanged: (val) => setState(
                     () => _selectedUnit = val ?? MeasurementUnit.unidad,
                   ),
+                ),
+              ),
+
+              SizedBox(
+                width: itemWidth,
+                child: LabeledTextField(
+                  controller: _costController,
+                  label: _selectedUnit == MeasurementUnit.gramos
+                      ? "Precio de Costo por Kg (\$)"
+                      : "Precio Costo (\$)",
+                  hint: "0.00",
+                  inputType: TextInputType.numberWithOptions(decimal: true),
+                  prefixIcon: Icon(Icons.attach_money),
                 ),
               ),
             ],

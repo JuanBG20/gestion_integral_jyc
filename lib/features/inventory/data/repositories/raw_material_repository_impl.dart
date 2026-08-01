@@ -18,6 +18,7 @@ class RawMaterialRepositoryImpl implements RawMaterialRepository {
       description: material.description,
       minStock: material.minStock,
       measurementUnit: material.measurementUnit,
+      unitPrice: material.unitPrice,
     );
     await remoteDataSource.insertRawMaterial(model);
   }
@@ -43,6 +44,7 @@ class RawMaterialRepositoryImpl implements RawMaterialRepository {
       description: material.description,
       minStock: material.minStock,
       measurementUnit: material.measurementUnit,
+      unitPrice: material.unitPrice,
     );
     await remoteDataSource.updateRawMaterial(model);
   }
