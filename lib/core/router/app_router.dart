@@ -13,6 +13,7 @@ import 'package:gestion_integral_jyc/features/inventory/presentation/screens/inv
 import 'package:gestion_integral_jyc/features/inventory/presentation/screens/new_product_screen.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/screens/new_raw_material_screen.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/screens/new_scrap_screen.dart';
+import 'package:gestion_integral_jyc/features/inventory/presentation/screens/price_update_preview_screen.dart';
 import 'package:gestion_integral_jyc/features/production/domain/entities/work_entity.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/screens/all_works_screen.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/screens/new_work_screen.dart';
@@ -119,6 +120,11 @@ final goRouter = GoRouter(
                     final scrap = state.extra as ScrapEntity;
                     return NewScrapScreen(scrapToEdit: scrap);
                   },
+                ),
+
+                GoRoute(
+                  path: 'price-preview',
+                  builder: (context, state) => const PriceUpdatePreviewScreen(),
                 ),
               ],
             ),

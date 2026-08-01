@@ -25,9 +25,28 @@ class InventoryScreen extends ConsumerWidget {
             backgroundColor: AppColors.surface,
 
             floatingActionButton: context.isMobileLayout
-                ? FloatingActionButton(
-                    onPressed: () => _newItemNavigation(tabContext),
-                    child: const Icon(Icons.add),
+                ? Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+
+                    children: [
+                      if (isAdmin) ...[
+                        FloatingActionButton.small(
+                          heroTag: "btn_small",
+                          onPressed: () =>
+                              context.go('inventory/price-preview'),
+                          child: const Icon(Icons.price_check),
+                        ),
+
+                        const SizedBox(height: 8),
+                      ],
+
+                      FloatingActionButton(
+                        heroTag: "btn_main",
+                        onPressed: () => _newItemNavigation(tabContext),
+                        child: const Icon(Icons.add),
+                      ),
+                    ],
                   )
                 : null,
 
@@ -45,6 +64,11 @@ class InventoryScreen extends ConsumerWidget {
                         "Gestión de productos terminados, materia prima y retazos.",
                     buttonLabel: "Nuevo Item",
                     onPressed: () => _newItemNavigation(tabContext),
+                    hasSecondaryButton: isAdmin,
+                    secondaryButtonLabel: "Actualizar Precios",
+                    secondaryButtonIcon: Icons.price_check,
+                    onPressedSecundary: () =>
+                        context.go('inventory/price-preview'),
                   ),
 
                   const SizedBox(height: 8),
