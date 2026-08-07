@@ -37,7 +37,7 @@ class ArcaDataModel extends ArcaDataEntity {
     return ArcaDataModel(
       cae: arca['cae']?.toString() ?? '',
       caeVencimiento: parseAfipDate(arca['caeFchVto']?.toString()),
-      fechaComprobante: parseAfipDate(arca['CbteFch']?.toString()),
+      fechaComprobante: parseAfipDate(detalle['CbteFch']?.toString()),
       impTotal: (json['impTotal'] as num?)?.toDouble() ?? 0.0,
       ptoVta: (feCabResp['PtoVta'] as num?)?.toInt() ?? 0,
       cbteTipo: (feCabResp['CbteTipo'] as num?)?.toInt() ?? 0,

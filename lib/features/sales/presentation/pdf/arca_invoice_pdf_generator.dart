@@ -56,6 +56,7 @@ class ArcaInvoicePdfGenerator {
 
   static String _buildQrUrl(SaleEntity sale, BillEntity bill) {
     final data = bill.arcaData;
+
     final qrDataMap = {
       "ver": 1,
       "fecha": DateFormat('yyyy-MM-dd').format(data.fechaComprobante),
