@@ -1,3 +1,4 @@
+import 'package:gestion_integral_jyc/core/enums/payment_method.dart';
 import 'package:gestion_integral_jyc/features/sales/data/datasources/bill_remote_data_source.dart';
 import 'package:gestion_integral_jyc/features/sales/data/datasources/sale_remote_data_source.dart';
 import 'package:gestion_integral_jyc/features/sales/data/models/sale_item_model.dart';
@@ -33,6 +34,7 @@ class SaleRepositoryImpl implements SaleRepository {
             ),
           )
           .toList(),
+      isPaid: sale.isPaid,
     );
     final newSaleId = await remoteDataSource.createSaleRPC(
       saleModel,
@@ -61,5 +63,10 @@ class SaleRepositoryImpl implements SaleRepository {
       concepto: concepto,
       issueDate: issueDate,
     );
+  }
+
+  @override
+  Future<void> markSaleAsPaid(int saleId, PaymentMethod paymentMethod) async {
+    await remoteDataSource.markSaleAsPaid(saleId, paymentMethod);
   }
 }

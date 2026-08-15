@@ -82,6 +82,7 @@ class _QuickSaleState extends ConsumerState<QuickSale> {
             description: productDesc,
           ),
         ],
+        isPaid: true,
       );
 
       // 2. Guardar la venta en Supabase

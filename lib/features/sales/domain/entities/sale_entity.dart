@@ -6,16 +6,17 @@ import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_item_en
 
 class SaleEntity {
   final int? id;
-  final PaymentMethod paymentMethod;
+  final PaymentMethod? paymentMethod;
   final DateTime date;
   final double finalAmount;
   final ClientEntity client;
   final WorkEntity? work;
   final List<SaleItemEntity> items;
   final BillEntity? bill;
+  final bool isPaid;
 
   SaleEntity({
-    required this.paymentMethod,
+    this.paymentMethod,
     required this.date,
     required this.finalAmount,
     required this.client,
@@ -23,6 +24,7 @@ class SaleEntity {
     required this.items,
     this.bill,
     this.id,
+    required this.isPaid,
   });
 
   bool get isInvoiced => bill != null && bill!.isSuccessful;
@@ -36,6 +38,7 @@ class SaleEntity {
     WorkEntity? work,
     List<SaleItemEntity>? items,
     BillEntity? bill,
+    bool? isPaid,
   }) {
     return SaleEntity(
       id: id ?? this.id,
@@ -46,6 +49,7 @@ class SaleEntity {
       work: work ?? this.work,
       items: items ?? this.items,
       bill: bill ?? this.bill,
+      isPaid: isPaid ?? this.isPaid,
     );
   }
 }

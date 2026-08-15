@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gestion_integral_jyc/core/enums/payment_method.dart';
 import 'package:gestion_integral_jyc/core/presentation/extensions/date_formatting.dart';
 import 'package:gestion_integral_jyc/core/presentation/extensions/screen_size.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/items_card_layout.dart';
@@ -10,6 +11,7 @@ import 'package:gestion_integral_jyc/features/production/presentation/widgets/su
 import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_entity.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/pdf/arca_invoice_pdf_generator.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/providers/sale_provider.dart';
+import 'package:gestion_integral_jyc/features/sales/presentation/widgets/payment_method_selector.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/widgets/sale_client_info_card.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/widgets/sale_summary_item_card.dart';
 import 'package:go_router/go_router.dart';
@@ -96,7 +98,7 @@ class SaleDetailsScreen extends ConsumerWidget {
                       const SizedBox(width: 24),
                       Expanded(
                         flex: 1,
-                        child: _buildRightColumn(context, currentSale),
+                        child: _buildRightColumn(context, ref, currentSale),
                       ),
                     ],
                   );
@@ -105,7 +107,7 @@ class SaleDetailsScreen extends ConsumerWidget {
                     children: [
                       _buildLeftColumn(context, currentSale),
                       const SizedBox(height: 24),
-                      _buildRightColumn(context, currentSale),
+                      _buildRightColumn(context, ref, currentSale),
                     ],
                   );
                 }
@@ -134,7 +136,11 @@ class SaleDetailsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildRightColumn(BuildContext context, SaleEntity sale) {
+  Widget _buildRightColumn(
+    BuildContext context,
+    WidgetRef ref,
+    SaleEntity sale,
+  ) {
     final double totalAmount = sale.items.fold(
       0,
       (sum, item) => sum + item.subtotal,
@@ -161,10 +167,11 @@ class SaleDetailsScreen extends ConsumerWidget {
 
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
             children: [
               Text("Método de Pago", style: context.textTheme.bodyMedium),
               Text(
-                sale.paymentMethod.dbValue,
+                sale.paymentMethod?.dbValue ?? 'PENDIENTE',
                 style: context.textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
@@ -173,9 +180,21 @@ class SaleDetailsScreen extends ConsumerWidget {
           ),
         ),
 
-        const SizedBox(height: 16),
+        if (!sale.isPaid) ...[
+          const SizedBox(height: 16),
 
-        _buildInvoiceCard(context, sale),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () => _showCollectSaleDialog(context, ref, sale),
+              child: Text("Cobrar Venta"),
+            ),
+          ),
+        ] else ...[
+          const SizedBox(height: 16),
+
+          _buildInvoiceCard(context, sale),
+        ],
       ],
     );
   }
@@ -277,6 +296,72 @@ class SaleDetailsScreen extends ConsumerWidget {
           ],
         ],
       ),
+    );
+  }
+
+  void _showCollectSaleDialog(
+    BuildContext context,
+    WidgetRef ref,
+    SaleEntity sale,
+  ) {
+    PaymentMethod selectedMethod = PaymentMethod.efectivo;
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: AppColors.background,
+          title: Text('Cobrar Venta', style: context.textTheme.titleMedium),
+          content: SizedBox(
+            width: MediaQuery.of(context).size.width,
+
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+
+                children: [
+                  Text(
+                    "Seleccione el método de pago con el que el cliente saldó la cuenta:",
+                    style: context.textTheme.bodyMedium,
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  PaymentMethodSelector(
+                    onMethodChanged: (method) {
+                      selectedMethod = method;
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancelar'),
+            ),
+
+            FilledButton(
+              onPressed: () {
+                if (sale.id != null) {
+                  ref
+                      .read(saleProvider.notifier)
+                      .markSaleAsPaid(sale.id!, selectedMethod);
+                  Navigator.pop(context);
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Venta cobrada exitosamente')),
+                  );
+                }
+              },
+
+              child: const Text('Confirmar Cobro'),
+            ),
+          ],
+        );
+      },
     );
   }
 }

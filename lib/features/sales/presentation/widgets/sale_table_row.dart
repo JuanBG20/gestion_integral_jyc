@@ -32,7 +32,7 @@ class SaleTableRow extends StatelessWidget {
                   icon: Icons.visibility_outlined,
                 ),
 
-                if (!sale.isInvoiced)
+                if (!sale.isInvoiced && sale.isPaid)
                   AppActionMenuItem(value: 'bill', label: 'Facturar'),
               ],
               onSelected: (value) => _handleSaleAction(context, value),
@@ -60,7 +60,7 @@ class SaleTableRow extends StatelessWidget {
           style: context.textTheme.bodySmall,
         ),
         AppTableCell.text(
-          sale.paymentMethod.dbValue,
+          sale.paymentMethod?.dbValue ?? 'PENDIENTE',
           flex: 2,
           style: context.textTheme.bodySmall,
         ),

@@ -52,7 +52,7 @@ class _NewInvoiceScreenState extends ConsumerState<NewInvoiceScreen> {
     _docNumberController = TextEditingController(text: client.docNumber ?? '');
     _addressController = TextEditingController(text: client.formattedAddress);
     _paymentWayController = TextEditingController(
-      text: widget.sale.paymentMethod.dbValue,
+      text: widget.sale.paymentMethod!.dbValue,
     );
 
     _ivaCondition = widget.sale.client.docType == DocType.cuit

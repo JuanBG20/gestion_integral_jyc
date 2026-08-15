@@ -247,6 +247,7 @@ class MpMovements extends ConsumerWidget {
               description: 'Movimiento MP',
             ),
           ],
+          isPaid: true,
         );
 
         context.go(

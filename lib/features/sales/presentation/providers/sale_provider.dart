@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:gestion_integral_jyc/core/enums/payment_method.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/providers/product_provider.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/providers/raw_material_provider.dart';
 import 'package:gestion_integral_jyc/features/sales/data/datasources/bill_remote_data_source.dart';
@@ -95,5 +96,30 @@ class SaleNotifier extends StateNotifier<AsyncValue<List<SaleEntity>>> {
       issueDate: issueDate,
     );
     await fetchSales();
+  }
+
+  Future<void> markSaleAsPaid(int saleId, PaymentMethod paymentMethod) async {
+    try {
+      // 1. Optimistic Update (Opcional, pero da mejor UX)
+      if (state is AsyncData) {
+        final currentSales = state.value!;
+        final newSales = currentSales.map((s) {
+          if (s.id == saleId) {
+            return s.copyWith(isPaid: true, paymentMethod: paymentMethod);
+          }
+          return s;
+        }).toList();
+        state = AsyncValue.data(newSales);
+      }
+
+      // 2. Llamada real a la BD
+      await repository.markSaleAsPaid(saleId, paymentMethod);
+
+      // 3. Re-sync por seguridad
+      await fetchSales();
+    } catch (e) {
+      await fetchSales(); // Rollback en caso de error
+      throw Exception('Error al registrar el pago: $e');
+    }
   }
 }

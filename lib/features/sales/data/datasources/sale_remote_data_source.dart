@@ -1,3 +1,4 @@
+import 'package:gestion_integral_jyc/core/enums/payment_method.dart';
 import 'package:gestion_integral_jyc/features/sales/data/models/sale_item_model.dart';
 import 'package:gestion_integral_jyc/features/sales/data/models/sale_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -51,7 +52,8 @@ class SaleRemoteDataSource {
   }) async {
     final payload = {
       'p_cliente': sale.client.id,
-      'p_metodo_pago': sale.paymentMethod.dbValue,
+      'p_metodo_pago': sale.paymentMethod?.dbValue,
+      'p_esta_pagado': sale.isPaid,
       'p_monto_total': sale.finalAmount,
       'p_id_trabajo': sale.work?.id,
       'p_items': sale.items
@@ -67,5 +69,12 @@ class SaleRemoteDataSource {
     );
 
     return (response as num).toInt();
+  }
+
+  Future<void> markSaleAsPaid(int saleId, PaymentMethod paymentMethod) async {
+    await supabaseClient
+        .from('venta')
+        .update({'esta_pagado': true, 'metodo_pago': paymentMethod.dbValue})
+        .eq('idventa', saleId);
   }
 }

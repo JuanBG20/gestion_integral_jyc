@@ -242,7 +242,7 @@ class ArcaInvoicePdfGenerator {
                   style: const pw.TextStyle(fontSize: 9),
                 ),
                 pw.Text(
-                  'Condición de venta: ${sale.paymentMethod.dbValue}',
+                  'Condición de venta: ${sale.paymentMethod!.dbValue}',
                   style: const pw.TextStyle(fontSize: 9),
                 ),
               ],

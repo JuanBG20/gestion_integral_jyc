@@ -111,6 +111,7 @@ class ProductionQuickActions extends ConsumerWidget {
     );
   }
 
+  // TODO: Arreglar el ancho del dialog
   void _showAddPaymentDialog(
     BuildContext context,
     WidgetRef ref,

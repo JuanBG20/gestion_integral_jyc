@@ -9,11 +9,13 @@ import 'package:gestion_integral_jyc/features/sales/presentation/widgets/sale_su
 class SummarySaleCard extends StatelessWidget {
   final List<SaleItemEntity> currentItems;
   final ValueChanged<PaymentMethod> onPaymentMethodChange;
+  final bool showPaymentMethods;
 
   const SummarySaleCard({
     super.key,
     required this.currentItems,
     required this.onPaymentMethodChange,
+    this.showPaymentMethods = true,
   });
 
   double get _totalAmount =>
@@ -95,9 +97,11 @@ class SummarySaleCard extends StatelessWidget {
             ],
           ),
 
-          const SizedBox(height: 16),
+          if (showPaymentMethods) ...[
+            const SizedBox(height: 16),
 
-          PaymentMethodSelector(onMethodChanged: onPaymentMethodChange),
+            PaymentMethodSelector(onMethodChanged: onPaymentMethodChange),
+          ],
         ],
       ),
     );

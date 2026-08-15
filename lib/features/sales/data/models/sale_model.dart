@@ -8,13 +8,14 @@ import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_entity.
 class SaleModel extends SaleEntity {
   SaleModel({
     super.id,
-    required super.paymentMethod,
+    super.paymentMethod,
     required super.date,
     required super.finalAmount,
     required super.client,
     super.work,
     required super.items,
     super.bill,
+    required super.isPaid,
   });
 
   factory SaleModel.fromJson(Map<String, dynamic> json) {
@@ -49,13 +50,16 @@ class SaleModel extends SaleEntity {
 
     return SaleModel(
       id: json['idventa'],
-      paymentMethod: PaymentMethod.fromDB(json['metodo_pago']),
+      paymentMethod: json['metodo_pago'] != null
+          ? PaymentMethod.fromDB(json['metodo_pago'])
+          : null,
       date: DateTime.parse(json['fecha']),
       finalAmount: (json['monto_total'] as num).toDouble(),
       client: ClientModel.fromJson(json['cliente']),
       work: linkedWork,
       items: itemsList,
       bill: bill,
+      isPaid: json['esta_pagado'],
     );
   }
 }

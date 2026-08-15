@@ -4,6 +4,7 @@ import 'package:gestion_integral_jyc/core/domain/entities/client_entity.dart';
 import 'package:gestion_integral_jyc/core/enums/payment_method.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_searchable_dropdown.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
+import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/features/clients/presentation/providers/client_provider.dart';
 import 'package:gestion_integral_jyc/core/presentation/screens/form_screen_layout.dart';
 import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_entity.dart';
@@ -27,6 +28,8 @@ class _NewRawMaterialScreenState extends ConsumerState<NewSaleScreen> {
   List<SaleItemEntity> _currentItems = [];
   PaymentMethod _selectedMethod = PaymentMethod.efectivo;
 
+  bool _isPaidInFull = true;
+
   double get _totalAmount =>
       _currentItems.fold(0, (sum, item) => sum + item.subtotal);
 
@@ -49,8 +52,9 @@ class _NewRawMaterialScreenState extends ConsumerState<NewSaleScreen> {
         client: _selectedClient!,
         date: DateTime.now(),
         finalAmount: _totalAmount,
-        paymentMethod: _selectedMethod,
+        paymentMethod: _isPaidInFull ? _selectedMethod : null,
         items: _currentItems,
+        isPaid: _isPaidInFull,
       );
 
       ref
@@ -108,6 +112,57 @@ class _NewRawMaterialScreenState extends ConsumerState<NewSaleScreen> {
                 ),
               ),
 
+              SizedBox(
+                width: constraints.maxWidth,
+
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: AppColors.background,
+                    border: Border.all(color: AppColors.outline),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+
+                        children: [
+                          Text(
+                            "¿Venta cobrada?",
+                            style: context.textTheme.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+
+                          const SizedBox(height: 4),
+
+                          Text(
+                            _isPaidInFull
+                                ? "Sí. El cliente abonó el monto total."
+                                : "No. Anotar en cuenta corriente (Pago Pendiente).",
+                            style: context.textTheme.bodySmall,
+                          ),
+                        ],
+                      ),
+
+                      Switch(
+                        value: _isPaidInFull,
+                        onChanged: (value) {
+                          setState(() {
+                            _isPaidInFull = value;
+                          });
+                        },
+                        activeThumbColor: AppColors.primary,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
               Divider(color: AppColors.outline),
 
               SizedBox(
@@ -131,6 +186,7 @@ class _NewRawMaterialScreenState extends ConsumerState<NewSaleScreen> {
             _selectedMethod = method;
           });
         },
+        showPaymentMethods: _isPaidInFull,
       ),
 
       onReturn: () {
