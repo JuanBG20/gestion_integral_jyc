@@ -135,14 +135,20 @@ class SaleDetailsScreen extends ConsumerWidget {
   }
 
   Widget _buildRightColumn(BuildContext context, SaleEntity sale) {
-    final double subtotal = sale.items.fold(
+    final double totalAmount = sale.items.fold(
       0,
       (sum, item) => sum + item.subtotal,
     );
+    final double totalPaid = sale.work?.totalPaid ?? 0;
+    final double totalOutstanding = totalAmount - totalPaid;
 
     return Column(
       children: [
-        SummaryProductsCard(subtotal: subtotal),
+        SummaryProductsCard(
+          totalAmount: totalAmount,
+          totalPaid: totalPaid,
+          totalOutstanding: totalOutstanding,
+        ),
 
         Container(
           margin: const EdgeInsets.only(top: 12),

@@ -85,6 +85,7 @@ class _NewRawMaterialScreenState extends ConsumerState<NewWorkScreen> {
             widget.workToEdit?.actualState ??
             WorkState.recibido, // Estado inicial por defecto
         items: _currentItems,
+        partialPayments: widget.workToEdit?.partialPayments ?? [],
       );
 
       final notifier = ref.read(workProvider.notifier);

@@ -1,5 +1,6 @@
 import 'package:gestion_integral_jyc/core/enums/work_state.dart';
 import 'package:gestion_integral_jyc/features/clients/data/models/client_model.dart';
+import 'package:gestion_integral_jyc/features/production/data/models/partial_payment_model.dart';
 import 'package:gestion_integral_jyc/features/production/data/models/work_item_model.dart';
 import 'package:gestion_integral_jyc/features/production/domain/entities/work_entity.dart';
 
@@ -11,6 +12,7 @@ class WorkModel extends WorkEntity {
     required super.client,
     required super.actualState,
     required super.items,
+    required super.partialPayments,
   });
 
   factory WorkModel.fromJson(Map<String, dynamic> json) {
@@ -36,6 +38,12 @@ class WorkModel extends WorkEntity {
             .toList() ??
         [];
 
+    final partialPaymentsList =
+        (json['pago_parcial'] as List?)
+            ?.map((itemJson) => PartialPaymentModel.fromJson(itemJson))
+            .toList() ??
+        [];
+
     return WorkModel(
       id: json['idtrabajo'],
       creationDate: DateTime.parse(json['fecha_creacion']),
@@ -45,6 +53,7 @@ class WorkModel extends WorkEntity {
       client: ClientModel.fromJson(json['cliente']),
       actualState: currentState,
       items: itemsList,
+      partialPayments: partialPaymentsList,
     );
   }
 }

@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gestion_integral_jyc/core/enums/payment_method.dart';
 import 'package:gestion_integral_jyc/core/enums/work_state.dart';
+import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_text_field.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/quick_action_button.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/quick_actions_layout.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
+import 'package:gestion_integral_jyc/features/production/domain/entities/partial_payment_entity.dart';
 import 'package:gestion_integral_jyc/features/production/domain/entities/work_entity.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/providers/work_provider.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/widgets/budget_pdf_generator.dart';
+import 'package:gestion_integral_jyc/features/sales/presentation/widgets/payment_method_selector.dart';
 import 'package:go_router/go_router.dart';
 
 class ProductionQuickActions extends ConsumerWidget {
@@ -29,6 +33,12 @@ class ProductionQuickActions extends ConsumerWidget {
           label: 'Emitir Presupuesto',
           icon: Icons.print_outlined,
           onPressed: () => BudgetPdfGenerator.generateAndPreviewBudget(work),
+        ),
+
+        QuickActionButton(
+          label: 'Añadir Seña',
+          icon: Icons.attach_money,
+          onPressed: () => _showAddPaymentDialog(context, ref, work),
         ),
 
         QuickActionButton(
@@ -94,6 +104,85 @@ class ProductionQuickActions extends ConsumerWidget {
             TextButton(
               onPressed: () => Navigator.pop(context),
               child: const Text('Cancelar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showAddPaymentDialog(
+    BuildContext context,
+    WidgetRef ref,
+    WorkEntity work,
+  ) {
+    final amountController = TextEditingController();
+    PaymentMethod selectedMethod = PaymentMethod.efectivo;
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: AppColors.background,
+          title: Text('Añadir Seña', style: context.textTheme.titleMedium),
+          content: SizedBox(
+            width: MediaQuery.of(context).size.width,
+
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+
+              children: [
+                LabeledTextField(
+                  controller: amountController,
+                  label: 'Monto',
+                  hint: '5000',
+                  inputType: TextInputType.numberWithOptions(decimal: true),
+                  prefixIcon: const Icon(Icons.attach_money),
+                ),
+
+                const SizedBox(height: 24),
+
+                PaymentMethodSelector(
+                  onMethodChanged: (method) {
+                    selectedMethod = method;
+                  },
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancelar'),
+            ),
+
+            ElevatedButton(
+              onPressed: () {
+                final amountText = amountController.text.replaceAll(',', '.');
+                final amount = double.tryParse(amountText);
+
+                if (amount != null && amount > 0 && work.id != null) {
+                  final newPayment = PartialPaymentEntity(
+                    amount: amount,
+                    date: DateTime.now(),
+                    paymentMethod: selectedMethod,
+                    workId: work.id!,
+                  );
+
+                  ref
+                      .read(workProvider.notifier)
+                      .registerPartialPayment(newPayment);
+                  Navigator.pop(context);
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Por favor, ingresá un monto válido'),
+                    ),
+                  );
+                }
+              },
+              child: const Text('Guardar'),
             ),
           ],
         );

@@ -1,3 +1,4 @@
+import 'package:gestion_integral_jyc/features/production/data/models/partial_payment_model.dart';
 import 'package:gestion_integral_jyc/features/production/data/models/work_item_model.dart';
 import 'package:gestion_integral_jyc/features/production/data/models/work_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -21,7 +22,8 @@ class WorkRemoteDataSource {
           *,
           producto_base (*)
         )
-      )
+      ),
+      pago_parcial (*)
     ''');
 
     return (response as List).map((json) => WorkModel.fromJson(json)).toList();
@@ -33,6 +35,14 @@ class WorkRemoteDataSource {
       'p_fecha_limite': work.deadline?.toIso8601String(),
       'p_items': work.items
           .map((item) => (item as WorkItemModel).toJson())
+          .toList(),
+      'p_pagos_parciales': work.partialPayments
+          .map(
+            (pago) => {
+              'monto': pago.amount,
+              'metodo_pago': pago.paymentMethod.name.toUpperCase(),
+            },
+          )
           .toList(),
     };
 
@@ -78,5 +88,9 @@ class WorkRemoteDataSource {
         .from('contiene_trabajo')
         .update({'hecho': isDone})
         .eq('idcontiene_trabajo', itemId);
+  }
+
+  Future<void> insertPartialPayment(PartialPaymentModel payment) async {
+    await supabaseClient.from('pago_parcial').insert(payment.toJson());
   }
 }

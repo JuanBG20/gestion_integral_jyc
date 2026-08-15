@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/legacy.dart';
 import 'package:gestion_integral_jyc/core/enums/work_state.dart';
 import 'package:gestion_integral_jyc/features/production/data/datasources/work_remote_data_source.dart';
 import 'package:gestion_integral_jyc/features/production/data/repositories/work_repository_impl.dart';
+import 'package:gestion_integral_jyc/features/production/domain/entities/partial_payment_entity.dart';
 import 'package:gestion_integral_jyc/features/production/domain/entities/work_entity.dart';
 import 'package:gestion_integral_jyc/features/production/domain/repositories/work_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -68,6 +69,7 @@ class WorkNotifier extends StateNotifier<AsyncValue<List<WorkEntity>>> {
               deadline: w.deadline,
               client: w.client,
               items: w.items,
+              partialPayments: w.partialPayments,
               actualState: newState, // Estado optimista
             );
           }
@@ -90,6 +92,15 @@ class WorkNotifier extends StateNotifier<AsyncValue<List<WorkEntity>>> {
       await fetchWorks(); // Recargamos para reflejar cambios en toda la app
     } catch (e) {
       throw Exception('Error al actualizar el ítem: $e');
+    }
+  }
+
+  Future<void> registerPartialPayment(PartialPaymentEntity payment) async {
+    try {
+      await repository.addPartialPayment(payment);
+      await fetchWorks();
+    } catch (e) {
+      throw Exception('Error al registrar la seña: $e');
     }
   }
 }

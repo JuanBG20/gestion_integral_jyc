@@ -199,14 +199,13 @@ class WorkDetailsScreen extends ConsumerWidget {
     WidgetRef ref,
     WorkEntity work,
   ) {
-    final double subtotal = work.items.fold(
-      0,
-      (sum, item) => sum + item.subtotal,
-    );
-
     return Column(
       children: [
-        SummaryProductsCard(subtotal: subtotal),
+        SummaryProductsCard(
+          totalAmount: work.totalAmount,
+          totalPaid: work.totalPaid,
+          totalOutstanding: work.totalOutstanding,
+        ),
 
         const SizedBox(height: 16),
 
