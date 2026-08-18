@@ -148,6 +148,8 @@ class SaleDetailsScreen extends ConsumerWidget {
     final double totalPaid = sale.work?.totalPaid ?? 0;
     final double totalOutstanding = totalAmount - totalPaid;
 
+    PaymentMethod selectedMethod = PaymentMethod.efectivo;
+
     return Column(
       children: [
         SummaryProductsCard(
@@ -181,13 +183,56 @@ class SaleDetailsScreen extends ConsumerWidget {
         ),
 
         if (!sale.isPaid) ...[
-          const SizedBox(height: 16),
+          Container(
+            margin: const EdgeInsets.only(top: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+            decoration: BoxDecoration(
+              color: AppColors.background,
+              border: Border.all(color: AppColors.outline),
+              borderRadius: BorderRadius.circular(4),
+            ),
 
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () => _showCollectSaleDialog(context, ref, sale),
-              child: Text("Cobrar Venta"),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+
+              children: [
+                Text("Cobrar Venta", style: context.textTheme.titleMedium),
+
+                const SizedBox(height: 8),
+                Divider(color: AppColors.outline),
+                const SizedBox(height: 8),
+
+                PaymentMethodSelector(
+                  onMethodChanged: (method) {
+                    selectedMethod = method;
+                  },
+                ),
+
+                const SizedBox(height: 16),
+
+                SizedBox(
+                  width: double.infinity,
+
+                  child: ElevatedButton(
+                    onPressed: () {
+                      if (sale.id != null) {
+                        ref
+                            .read(saleProvider.notifier)
+                            .markSaleAsPaid(sale.id!, selectedMethod);
+                        Navigator.pop(context);
+
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Venta cobrada exitosamente'),
+                          ),
+                        );
+                      }
+                    },
+
+                    child: const Text('Confirmar Cobro'),
+                  ),
+                ),
+              ],
             ),
           ),
         ] else ...[
@@ -296,72 +341,6 @@ class SaleDetailsScreen extends ConsumerWidget {
           ],
         ],
       ),
-    );
-  }
-
-  void _showCollectSaleDialog(
-    BuildContext context,
-    WidgetRef ref,
-    SaleEntity sale,
-  ) {
-    PaymentMethod selectedMethod = PaymentMethod.efectivo;
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          backgroundColor: AppColors.background,
-          title: Text('Cobrar Venta', style: context.textTheme.titleMedium),
-          content: SizedBox(
-            width: MediaQuery.of(context).size.width,
-
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-
-                children: [
-                  Text(
-                    "Seleccione el método de pago con el que el cliente saldó la cuenta:",
-                    style: context.textTheme.bodyMedium,
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  PaymentMethodSelector(
-                    onMethodChanged: (method) {
-                      selectedMethod = method;
-                    },
-                  ),
-                ],
-              ),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancelar'),
-            ),
-
-            FilledButton(
-              onPressed: () {
-                if (sale.id != null) {
-                  ref
-                      .read(saleProvider.notifier)
-                      .markSaleAsPaid(sale.id!, selectedMethod);
-                  Navigator.pop(context);
-
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Venta cobrada exitosamente')),
-                  );
-                }
-              },
-
-              child: const Text('Confirmar Cobro'),
-            ),
-          ],
-        );
-      },
     );
   }
 }

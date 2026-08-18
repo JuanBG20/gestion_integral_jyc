@@ -73,6 +73,10 @@ class ProductionSummaryTable extends ConsumerWidget {
                     stateCounts[work.actualState]! + 1;
               }
 
+              final areAllFinished = allWorks.every(
+                (work) => work.actualState == WorkState.finalizado,
+              );
+
               return Column(
                 children: [
                   ClipRRect(
@@ -80,22 +84,41 @@ class ProductionSummaryTable extends ConsumerWidget {
                     child: SizedBox(
                       height: 25,
                       child: Row(
-                        children: stateCounts.entries.map((entry) {
-                          final state = entry.key;
-                          final count = entry.value;
+                        children: areAllFinished
+                            ? [
+                                Expanded(
+                                  child: Tooltip(
+                                    message:
+                                        '${WorkState.finalizado.dbValue}: ${allWorks.length}',
+                                    child: Container(
+                                      color: _getStateColor(
+                                        WorkState.finalizado,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ]
+                            : stateCounts.entries
+                                  .where(
+                                    (entry) =>
+                                        entry.key != WorkState.finalizado &&
+                                        entry.value > 0,
+                                  )
+                                  .map((entry) {
+                                    final state = entry.key;
+                                    final count = entry.value;
 
-                          if (state == WorkState.finalizado || count == 0) {
-                            return const SizedBox.shrink();
-                          }
-
-                          return Expanded(
-                            flex: count,
-                            child: Tooltip(
-                              message: '${state.dbValue}: $count',
-                              child: Container(color: _getStateColor(state)),
-                            ),
-                          );
-                        }).toList(),
+                                    return Expanded(
+                                      flex: count,
+                                      child: Tooltip(
+                                        message: '${state.dbValue}: $count',
+                                        child: Container(
+                                          color: _getStateColor(state),
+                                        ),
+                                      ),
+                                    );
+                                  })
+                                  .toList(),
                       ),
                     ),
                   ),

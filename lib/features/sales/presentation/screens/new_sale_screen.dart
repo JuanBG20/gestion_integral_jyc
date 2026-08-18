@@ -141,7 +141,9 @@ class _NewRawMaterialScreenState extends ConsumerState<NewSaleScreen> {
                           const SizedBox(height: 4),
 
                           Text(
-                            _isPaidInFull
+                            _selectedClient?.fullName == 'Consumidor Final'
+                                ? "Debe seleccionar un cliente registrado para marcar el pago como pendiente."
+                                : _isPaidInFull
                                 ? "Sí. El cliente abonó el monto total."
                                 : "No. Anotar en cuenta corriente (Pago Pendiente).",
                             style: context.textTheme.bodySmall,
@@ -150,12 +152,17 @@ class _NewRawMaterialScreenState extends ConsumerState<NewSaleScreen> {
                       ),
 
                       Switch(
-                        value: _isPaidInFull,
-                        onChanged: (value) {
-                          setState(() {
-                            _isPaidInFull = value;
-                          });
-                        },
+                        value: _selectedClient?.fullName == 'Consumidor Final'
+                            ? false
+                            : _isPaidInFull,
+                        onChanged:
+                            _selectedClient?.fullName == 'Consumidor Final'
+                            ? null
+                            : (value) {
+                                setState(() {
+                                  _isPaidInFull = value;
+                                });
+                              },
                         activeThumbColor: AppColors.primary,
                       ),
                     ],
