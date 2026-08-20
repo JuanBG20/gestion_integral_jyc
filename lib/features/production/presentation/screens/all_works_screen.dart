@@ -15,7 +15,7 @@ import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/features/production/domain/entities/work_entity.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/providers/work_provider.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/providers/work_sort_option_provider.dart';
-import 'package:gestion_integral_jyc/features/production/presentation/screens/work_filters.dart';
+import 'package:gestion_integral_jyc/features/production/presentation/widgets/work_filters.dart';
 import 'package:go_router/go_router.dart';
 
 class AllWorksScreen extends ConsumerWidget {

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gestion_integral_jyc/core/enums/work_sort_option.dart';
 import 'package:gestion_integral_jyc/core/enums/work_state.dart';
-import 'package:gestion_integral_jyc/core/presentation/extensions/screen_size.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_dropdown.dart';
+import 'package:gestion_integral_jyc/core/presentation/widgets/responsive_filter_bar.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/providers/work_sort_option_provider.dart';
 
 class WorkFilters extends ConsumerWidget {
@@ -18,35 +18,7 @@ class WorkFilters extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        if (constraints.isMobileLayout) {
-          return Column(
-            children: [
-              // Filtro por Estado
-              SizedBox(width: double.infinity, child: _buildFilter(ref)),
-
-              const SizedBox(height: 16),
-
-              // Ordenamiento
-              SizedBox(width: double.infinity, child: _buildSorted(ref)),
-            ],
-          );
-        }
-
-        return Row(
-          children: [
-            // Filtro por Estado
-            Expanded(child: _buildFilter(ref)),
-
-            const SizedBox(width: 16),
-
-            // Ordenamiento
-            Expanded(child: _buildSorted(ref)),
-          ],
-        );
-      },
-    );
+    return ResponsiveFilterBar(filters: [_buildFilter(ref), _buildSorted(ref)]);
   }
 
   Widget _buildFilter(WidgetRef ref) {

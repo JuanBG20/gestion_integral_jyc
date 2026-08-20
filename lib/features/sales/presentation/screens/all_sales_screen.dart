@@ -7,7 +7,9 @@ import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_h
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_shell.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/pagination_footer.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
+import 'package:gestion_integral_jyc/features/sales/presentation/providers/sale_filter_providers.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/providers/sale_provider.dart';
+import 'package:gestion_integral_jyc/features/sales/presentation/widgets/sale_filters.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/widgets/sale_table_row.dart';
 import 'package:go_router/go_router.dart';
 
@@ -27,6 +29,9 @@ class AllSalesScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final salesState = ref.watch(saleProvider);
 
+    final selectedState = ref.watch(saleStateFilterProvider);
+    final selectedMethod = ref.watch(salePaymentMethodFilterProvider);
+
     return Scaffold(
       backgroundColor: AppColors.surface,
 
@@ -41,6 +46,8 @@ class AllSalesScreen extends ConsumerWidget {
         padding: const EdgeInsets.all(24),
 
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+
           children: [
             ScreenHeader(
               title: "Ventas y Facturación",
@@ -49,13 +56,48 @@ class AllSalesScreen extends ConsumerWidget {
               buttonLabel: "Nueva Venta",
               onPressed: () => context.go('/sales/new'),
             ),
-            const SizedBox(height: 32),
+
+            const SizedBox(height: 24),
+
+            SaleFilters(
+              selectedState: selectedState,
+              selectedMethod: selectedMethod,
+            ),
+
+            const SizedBox(height: 24),
 
             salesState.when(
               data: (sales) {
                 if (sales.isEmpty) {
                   return const Center(
                     child: Text("No hay ventas registradas."),
+                  );
+                }
+
+                var processedSales = sales.where((sale) {
+                  // Filtro por Estado
+                  if (selectedState != null) {
+                    if (selectedState == 'withoutPayment' && sale.isPaid) {
+                      return false;
+                    }
+
+                    if (selectedState == 'withoutBill' && sale.isInvoiced) {
+                      return false;
+                    }
+                  }
+
+                  // Filtro por Método de Pago
+                  if (selectedMethod != null &&
+                      sale.paymentMethod != selectedMethod) {
+                    return false;
+                  }
+
+                  return true;
+                }).toList();
+
+                if (processedSales.isEmpty) {
+                  return const Center(
+                    child: Text("No se encontraron ventas con estos filtros."),
                   );
                 }
 
@@ -72,7 +114,7 @@ class AllSalesScreen extends ConsumerWidget {
                         ),
                         trailingWidth: 40,
                       ),
-                      rows: sales
+                      rows: processedSales
                           .map(
                             (sale) =>
                                 SaleTableRow(sale: sale, trailingWidth: 40),
@@ -82,7 +124,7 @@ class AllSalesScreen extends ConsumerWidget {
 
                     PaginationFooter(
                       total: sales.length,
-                      shown: sales.length,
+                      shown: processedSales.length,
                       label: 'ventas',
                     ),
                   ],
