@@ -13,6 +13,7 @@ import 'package:gestion_integral_jyc/features/production/domain/entities/work_en
 import 'package:gestion_integral_jyc/features/production/presentation/providers/work_provider.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/widgets/item_tile.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/widgets/production_quick_actions.dart';
+import 'package:gestion_integral_jyc/features/production/presentation/widgets/status_badge.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/widgets/summary_products_card.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/widgets/payment_method_selector.dart';
 import 'package:go_router/go_router.dart';
@@ -143,24 +144,7 @@ class WorkDetailsScreen extends ConsumerWidget {
 
                   const SizedBox(height: 4),
 
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-
-                    child: Text(
-                      work.actualState.dbValue,
-                      style: context.textTheme.bodySmall?.copyWith(
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
+                  StatusBadge(status: work.actualState.dbValue),
                 ],
               ),
 

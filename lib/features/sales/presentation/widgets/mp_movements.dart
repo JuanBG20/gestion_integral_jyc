@@ -75,14 +75,14 @@ class MpMovements extends ConsumerWidget {
           ),
         ),
 
-        const SizedBox(width: 8), */
+        const SizedBox(width: 8), 
         IconButton(
           icon: const Icon(Icons.refresh, size: 20),
           onPressed: () {
             ref.read(mpMovementsProvider.notifier).fetchMovements();
           },
           tooltip: 'Actualizar movimientos',
-        ),
+        ),*/
       ],
     );
   }

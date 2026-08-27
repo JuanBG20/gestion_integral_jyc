@@ -15,7 +15,7 @@ import 'package:gestion_integral_jyc/features/inventory/presentation/screens/new
 import 'package:gestion_integral_jyc/features/inventory/presentation/screens/new_scrap_screen.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/screens/price_update_preview_screen.dart';
 import 'package:gestion_integral_jyc/features/production/domain/entities/work_entity.dart';
-import 'package:gestion_integral_jyc/features/production/presentation/screens/all_works_screen.dart';
+import 'package:gestion_integral_jyc/features/production/presentation/screens/all_works_screen_wrapper.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/screens/new_work_screen.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/screens/work_adaptative_screen.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/screens/work_details_screen.dart';
@@ -156,7 +156,7 @@ final goRouter = GoRouter(
                 ),
                 GoRoute(
                   path: 'all',
-                  builder: (context, state) => const AllWorksScreen(),
+                  builder: (context, state) => const AllWorksScreenWrapper(),
                 ),
               ],
             ),
