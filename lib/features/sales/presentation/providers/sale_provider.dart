@@ -6,6 +6,7 @@ import 'package:gestion_integral_jyc/features/inventory/presentation/providers/r
 import 'package:gestion_integral_jyc/features/sales/data/datasources/bill_remote_data_source.dart';
 import 'package:gestion_integral_jyc/features/sales/data/datasources/sale_remote_data_source.dart';
 import 'package:gestion_integral_jyc/features/sales/data/repositories/sale_repository_impl.dart';
+import 'package:gestion_integral_jyc/features/sales/domain/entities/discount_entity.dart';
 import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_entity.dart';
 import 'package:gestion_integral_jyc/features/sales/domain/repositories/sale_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -98,14 +99,28 @@ class SaleNotifier extends StateNotifier<AsyncValue<List<SaleEntity>>> {
     await fetchSales();
   }
 
-  Future<void> markSaleAsPaid(int saleId, PaymentMethod paymentMethod) async {
+  Future<void> markSaleAsPaid(
+    int saleId,
+    PaymentMethod paymentMethod, {
+    List<DiscountEntity> additionalDiscounts = const [],
+  }) async {
     try {
       // 1. Optimistic Update (Opcional, pero da mejor UX)
       if (state is AsyncData) {
         final currentSales = state.value!;
         final newSales = currentSales.map((s) {
           if (s.id == saleId) {
-            return s.copyWith(isPaid: true, paymentMethod: paymentMethod);
+            final newDiscountsAmount = additionalDiscounts.fold(
+              0.0,
+              (sum, d) => sum + d.amount,
+            );
+
+            return s.copyWith(
+              isPaid: true,
+              paymentMethod: paymentMethod,
+              discounts: [...s.discounts, ...additionalDiscounts],
+              finalAmount: s.finalAmount - newDiscountsAmount,
+            );
           }
           return s;
         }).toList();
@@ -113,7 +128,11 @@ class SaleNotifier extends StateNotifier<AsyncValue<List<SaleEntity>>> {
       }
 
       // 2. Llamada real a la BD
-      await repository.markSaleAsPaid(saleId, paymentMethod);
+      await repository.markSaleAsPaid(
+        saleId,
+        paymentMethod,
+        additionalDiscounts: additionalDiscounts,
+      );
 
       // 3. Re-sync por seguridad
       await fetchSales();

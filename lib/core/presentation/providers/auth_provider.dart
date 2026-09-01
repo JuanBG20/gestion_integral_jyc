@@ -91,3 +91,8 @@ final isAdminProvider = Provider<bool>((ref) {
   final authState = ref.watch(authProvider);
   return authState.activeRole == Role.administrador;
 });
+
+final isRootProvider = Provider<bool>((ref) {
+  final authState = ref.watch(authProvider);
+  return authState.user?.isRoot ?? false;
+});

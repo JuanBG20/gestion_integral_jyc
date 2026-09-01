@@ -2,6 +2,7 @@ import 'package:gestion_integral_jyc/core/enums/payment_method.dart';
 import 'package:gestion_integral_jyc/features/clients/data/models/client_model.dart';
 import 'package:gestion_integral_jyc/features/production/data/models/work_model.dart';
 import 'package:gestion_integral_jyc/features/sales/data/models/bill_model.dart';
+import 'package:gestion_integral_jyc/features/sales/data/models/discount_model.dart';
 import 'package:gestion_integral_jyc/features/sales/data/models/sale_item_model.dart';
 import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_entity.dart';
 
@@ -16,12 +17,20 @@ class SaleModel extends SaleEntity {
     required super.items,
     super.bill,
     required super.isPaid,
+    required super.subtotal,
+    required super.discounts,
   });
 
   factory SaleModel.fromJson(Map<String, dynamic> json) {
     final itemsList =
         (json['contiene_venta'] as List?)
             ?.map((itemJson) => SaleItemModel.fromJson(itemJson))
+            .toList() ??
+        [];
+
+    final discountsList =
+        (json['venta_descuento'] as List?)
+            ?.map((discountJson) => DiscountModel.fromJson(discountJson))
             .toList() ??
         [];
 
@@ -55,9 +64,11 @@ class SaleModel extends SaleEntity {
           : null,
       date: DateTime.parse(json['fecha']),
       finalAmount: (json['monto_total'] as num).toDouble(),
+      subtotal: (json['subtotal'] as num).toDouble(),
       client: ClientModel.fromJson(json['cliente']),
       work: linkedWork,
       items: itemsList,
+      discounts: discountsList,
       bill: bill,
       isPaid: json['esta_pagado'],
     );

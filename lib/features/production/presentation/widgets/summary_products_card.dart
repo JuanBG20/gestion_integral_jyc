@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
+import 'package:gestion_integral_jyc/features/sales/domain/entities/discount_entity.dart';
 
 class SummaryProductsCard extends StatelessWidget {
+  final double subtotal;
+  final List<DiscountEntity>? discounts;
   final double totalAmount;
   final double totalPaid;
   final double totalOutstanding;
@@ -12,6 +15,8 @@ class SummaryProductsCard extends StatelessWidget {
     required this.totalAmount,
     required this.totalPaid,
     required this.totalOutstanding,
+    required this.subtotal,
+    this.discounts = const [],
   });
 
   @override
@@ -38,10 +43,61 @@ class SummaryProductsCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
             children: [
-              Text("Total Productos", style: context.textTheme.bodyMedium),
-              Text("\$$totalAmount", style: context.textTheme.bodyMedium),
+              Text("Subtotal", style: context.textTheme.bodyMedium),
+              Text(
+                "\$${subtotal.toStringAsFixed(2)}",
+                style: context.textTheme.bodyMedium,
+              ),
             ],
           ),
+
+          if (discounts != null && discounts!.isNotEmpty) ...[
+            const SizedBox(height: 4),
+
+            ...discounts!.map(
+              (d) => Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+                children: [
+                  Text(
+                    "Desc. ${d.reason}",
+                    style: context.textTheme.bodyMedium?.copyWith(
+                      color: Colors.red,
+                    ),
+                  ),
+
+                  Text(
+                    "- \$${d.amount.toStringAsFixed(2)}",
+                    style: context.textTheme.bodyMedium?.copyWith(
+                      color: Colors.red,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 4),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+              children: [
+                Text(
+                  "Total con descuento",
+                  style: context.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+
+                Text(
+                  "\$${totalAmount.toStringAsFixed(2)}",
+                  style: context.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ],
 
           if (totalPaid != 0.0) ...[
             const SizedBox(height: 8),
@@ -74,7 +130,7 @@ class SummaryProductsCard extends StatelessWidget {
                   alignment: Alignment.centerRight,
 
                   child: Text(
-                    "\$$totalOutstanding",
+                    "\$${totalOutstanding.toStringAsFixed(2)}",
                     style: context.textTheme.titleLarge,
                   ),
                 ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gestion_integral_jyc/core/enums/work_state.dart';
 import 'package:gestion_integral_jyc/core/presentation/extensions/screen_size.dart';
+import 'package:gestion_integral_jyc/core/presentation/providers/auth_provider.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/features/dashboard/presentation/widgets/production_summary_table.dart';
@@ -92,6 +93,7 @@ class DashboardScreen extends ConsumerWidget {
                         flex: 2,
                         child: _buildLeftColumn(
                           context,
+                          ref,
                           ventasHoy,
                           ordenesActivas.length,
                           disenosPendientes,
@@ -108,6 +110,7 @@ class DashboardScreen extends ConsumerWidget {
                     children: [
                       _buildLeftColumn(
                         context,
+                        ref,
                         ventasHoy,
                         ordenesActivas.length,
                         disenosPendientes,
@@ -131,12 +134,15 @@ class DashboardScreen extends ConsumerWidget {
 
   Widget _buildLeftColumn(
     BuildContext context,
+    WidgetRef ref,
     double ventasHoy,
     int totalActivas,
     int disenosPendientes,
     int alertasStock,
     int facturasPendientes,
   ) {
+    final isRoot = ref.watch(isRootProvider);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
 
@@ -181,14 +187,15 @@ class DashboardScreen extends ConsumerWidget {
                   iconColor: AppColors.error,
                 ),
 
-                SummaryCard(
-                  width: cardWidth,
-                  title: 'FACTURAS PENDIENTES',
-                  value: facturasPendientes.toString(),
-                  subtitle: 'Listas para facturar',
-                  icon: Icons.receipt_long_outlined,
-                  iconColor: Colors.yellow[800]!,
-                ),
+                if (isRoot)
+                  SummaryCard(
+                    width: cardWidth,
+                    title: 'FACTURAS PENDIENTES',
+                    value: facturasPendientes.toString(),
+                    subtitle: 'Listas para facturar',
+                    icon: Icons.receipt_long_outlined,
+                    iconColor: Colors.yellow[800]!,
+                  ),
               ],
             );
           },

@@ -12,6 +12,7 @@ import 'package:gestion_integral_jyc/features/inventory/presentation/providers/r
 import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_entity.dart';
 import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_item_entity.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/providers/sale_provider.dart';
+import 'package:gestion_integral_jyc/features/sales/presentation/utils/discount_calculator.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/widgets/payment_method_selector.dart';
 
 class QuickSale extends ConsumerStatefulWidget {
@@ -51,11 +52,11 @@ class _QuickSaleState extends ConsumerState<QuickSale> {
 
   Future<void> _registerQuickSale() async {
     final productDesc = _productController.text.trim();
-    final amount =
+    final baseAmount =
         double.tryParse(_amountController.text.replaceAll(',', '.')) ?? 0.0;
     final consumo = int.tryParse(_consumoController.text) ?? 0;
 
-    if (productDesc.isEmpty || amount <= 0) {
+    if (productDesc.isEmpty || baseAmount <= 0) {
       _showError('Ingrese un producto y un monto válido');
       return;
     }
@@ -70,15 +71,24 @@ class _QuickSaleState extends ConsumerState<QuickSale> {
         return;
       }
 
+      final discounts = DiscountCalculator.calculatePaymenthMethodDiscounts(
+        method: _selectedMethod,
+        subtotal: baseAmount,
+      );
+      final discountsAmount = discounts.fold(0.0, (sum, d) => sum + d.amount);
+      final finalAmount = baseAmount - discountsAmount;
+
       final newSale = SaleEntity(
         client: consumidorFinal,
         paymentMethod: _selectedMethod,
         date: DateTime.now(),
-        finalAmount: amount,
+        subtotal: baseAmount,
+        finalAmount: finalAmount,
+        discounts: discounts,
         items: [
           SaleItemEntity(
             quantity: 1,
-            unitPrice: amount,
+            unitPrice: baseAmount,
             description: productDesc,
           ),
         ],

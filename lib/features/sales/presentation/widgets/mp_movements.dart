@@ -239,6 +239,7 @@ class MpMovements extends ConsumerWidget {
           paymentMethod: movement.paymentMethod,
           date: movement.date,
           finalAmount: movement.amount,
+          subtotal: movement.amount,
           client: consumidorFinal,
           items: [
             SaleItemEntity(
@@ -247,6 +248,7 @@ class MpMovements extends ConsumerWidget {
               description: 'Movimiento MP',
             ),
           ],
+          discounts: [],
           isPaid: true,
         );
 

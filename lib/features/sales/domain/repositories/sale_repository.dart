@@ -1,4 +1,5 @@
 import 'package:gestion_integral_jyc/core/enums/payment_method.dart';
+import 'package:gestion_integral_jyc/features/sales/domain/entities/discount_entity.dart';
 import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_entity.dart';
 
 abstract class SaleRepository {
@@ -14,5 +15,9 @@ abstract class SaleRepository {
     required DateTime issueDate,
     int concepto = 1,
   });
-  Future<void> markSaleAsPaid(int saleId, PaymentMethod paymentMethod);
+  Future<void> markSaleAsPaid(
+    int saleId,
+    PaymentMethod paymentMethod, {
+    List<DiscountEntity> additionalDiscounts = const [],
+  });
 }

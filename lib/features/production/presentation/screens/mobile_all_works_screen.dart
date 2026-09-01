@@ -11,12 +11,14 @@ class MobileAllWorksScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return ListView.separated(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+
       itemBuilder: (context, index) {
         return WorkCard(work: works[index]);
       },
       separatorBuilder: (context, index) => const SizedBox(height: 16),
       itemCount: works.length,
-      shrinkWrap: true,
     );
   }
 }

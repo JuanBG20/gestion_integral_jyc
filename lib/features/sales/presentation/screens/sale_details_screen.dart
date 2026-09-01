@@ -3,35 +3,45 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gestion_integral_jyc/core/enums/payment_method.dart';
 import 'package:gestion_integral_jyc/core/presentation/extensions/date_formatting.dart';
 import 'package:gestion_integral_jyc/core/presentation/extensions/screen_size.dart';
+import 'package:gestion_integral_jyc/core/presentation/providers/auth_provider.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/items_card_layout.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/quick_action_button.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/widgets/summary_products_card.dart';
+import 'package:gestion_integral_jyc/features/sales/domain/entities/discount_entity.dart';
 import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_entity.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/pdf/arca_invoice_pdf_generator.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/providers/sale_provider.dart';
+import 'package:gestion_integral_jyc/features/sales/presentation/utils/discount_calculator.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/widgets/payment_method_selector.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/widgets/sale_client_info_card.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/widgets/sale_summary_item_card.dart';
 import 'package:go_router/go_router.dart';
 
-class SaleDetailsScreen extends ConsumerWidget {
+class SaleDetailsScreen extends ConsumerStatefulWidget {
   final SaleEntity sale;
 
   const SaleDetailsScreen({super.key, required this.sale});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SaleDetailsScreen> createState() => _SaleDetailsScreenState();
+}
+
+class _SaleDetailsScreenState extends ConsumerState<SaleDetailsScreen> {
+  PaymentMethod _selectedMethod = PaymentMethod.efectivo;
+
+  @override
+  Widget build(BuildContext context) {
     final salesAsync = ref.watch(saleProvider);
     final currentSale = salesAsync.maybeWhen(
       data: (sales) {
         for (final s in sales) {
-          if (s.id == sale.id) return s;
+          if (s.id == widget.sale.id) return s;
         }
-        return sale;
+        return widget.sale;
       },
-      orElse: () => sale,
+      orElse: () => widget.sale,
     );
 
     return Scaffold(
@@ -141,21 +151,34 @@ class SaleDetailsScreen extends ConsumerWidget {
     WidgetRef ref,
     SaleEntity sale,
   ) {
-    final double totalAmount = sale.items.fold(
-      0,
-      (sum, item) => sum + item.subtotal,
-    );
-    final double totalPaid = sale.work?.totalPaid ?? 0;
-    final double totalOutstanding = totalAmount - totalPaid;
+    final isRoot = ref.watch(isRootProvider);
 
-    PaymentMethod selectedMethod = PaymentMethod.efectivo;
+    final double totalPaid = sale.work?.totalPaid ?? 0;
+    List<DiscountEntity> additionalDiscounts = [];
+    if (!sale.isPaid) {
+      additionalDiscounts = DiscountCalculator.calculatePaymenthMethodDiscounts(
+        method: _selectedMethod,
+        subtotal: sale.subtotal,
+      );
+    }
+
+    final allDiscounts = [...sale.discounts, ...additionalDiscounts];
+    final totalDiscountsAmount = allDiscounts.fold(
+      0.0,
+      (sum, d) => sum + d.amount,
+    );
+
+    final projectedFinalAmount = sale.subtotal - totalDiscountsAmount;
+    final projectedOutstanding = projectedFinalAmount - totalPaid;
 
     return Column(
       children: [
         SummaryProductsCard(
-          totalAmount: totalAmount,
+          totalAmount: projectedFinalAmount,
           totalPaid: totalPaid,
-          totalOutstanding: totalOutstanding,
+          totalOutstanding: projectedOutstanding,
+          subtotal: sale.subtotal,
+          discounts: allDiscounts,
         ),
 
         Container(
@@ -204,7 +227,9 @@ class SaleDetailsScreen extends ConsumerWidget {
 
                 PaymentMethodSelector(
                   onMethodChanged: (method) {
-                    selectedMethod = method;
+                    setState(() {
+                      _selectedMethod = method;
+                    });
                   },
                 ),
 
@@ -218,7 +243,11 @@ class SaleDetailsScreen extends ConsumerWidget {
                       if (sale.id != null) {
                         ref
                             .read(saleProvider.notifier)
-                            .markSaleAsPaid(sale.id!, selectedMethod);
+                            .markSaleAsPaid(
+                              sale.id!,
+                              _selectedMethod,
+                              additionalDiscounts: additionalDiscounts,
+                            );
                         Navigator.pop(context);
 
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -235,7 +264,7 @@ class SaleDetailsScreen extends ConsumerWidget {
               ],
             ),
           ),
-        ] else ...[
+        ] else if (isRoot) ...[
           const SizedBox(height: 16),
 
           _buildInvoiceCard(context, sale),
@@ -258,6 +287,7 @@ class SaleDetailsScreen extends ConsumerWidget {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+
         children: [
           Text("Facturación ARCA", style: context.textTheme.titleMedium),
 
@@ -267,10 +297,13 @@ class SaleDetailsScreen extends ConsumerWidget {
             Row(
               children: [
                 const Icon(Icons.check_circle, color: Colors.green, size: 20),
+
                 const SizedBox(width: 8),
+
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+
                     children: [
                       Text(
                         "Factura emitida",
@@ -278,6 +311,7 @@ class SaleDetailsScreen extends ConsumerWidget {
                           fontWeight: FontWeight.w600,
                         ),
                       ),
+
                       Text(
                         "CAE: ${bill?.arcaData.cae}",
                         style: context.textTheme.bodySmall,

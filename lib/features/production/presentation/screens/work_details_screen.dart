@@ -193,6 +193,7 @@ class WorkDetailsScreen extends ConsumerWidget {
     return Column(
       children: [
         SummaryProductsCard(
+          subtotal: work.totalAmount,
           totalAmount: work.totalAmount,
           totalPaid: work.totalPaid,
           totalOutstanding: work.totalOutstanding,

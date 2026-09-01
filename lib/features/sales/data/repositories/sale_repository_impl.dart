@@ -1,8 +1,10 @@
 import 'package:gestion_integral_jyc/core/enums/payment_method.dart';
 import 'package:gestion_integral_jyc/features/sales/data/datasources/bill_remote_data_source.dart';
 import 'package:gestion_integral_jyc/features/sales/data/datasources/sale_remote_data_source.dart';
+import 'package:gestion_integral_jyc/features/sales/data/models/discount_model.dart';
 import 'package:gestion_integral_jyc/features/sales/data/models/sale_item_model.dart';
 import 'package:gestion_integral_jyc/features/sales/data/models/sale_model.dart';
+import 'package:gestion_integral_jyc/features/sales/domain/entities/discount_entity.dart';
 import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_entity.dart';
 import 'package:gestion_integral_jyc/features/sales/domain/repositories/sale_repository.dart';
 
@@ -22,6 +24,7 @@ class SaleRepositoryImpl implements SaleRepository {
       paymentMethod: sale.paymentMethod,
       date: sale.date,
       finalAmount: sale.finalAmount,
+      subtotal: sale.subtotal,
       client: sale.client,
       work: sale.work,
       items: sale.items
@@ -32,6 +35,11 @@ class SaleRepositoryImpl implements SaleRepository {
               unitPrice: i.unitPrice,
               description: i.description,
             ),
+          )
+          .toList(),
+      discounts: sale.discounts
+          .map(
+            (d) => DiscountModel(id: d.id, reason: d.reason, amount: d.amount),
           )
           .toList(),
       isPaid: sale.isPaid,
@@ -66,7 +74,15 @@ class SaleRepositoryImpl implements SaleRepository {
   }
 
   @override
-  Future<void> markSaleAsPaid(int saleId, PaymentMethod paymentMethod) async {
-    await remoteDataSource.markSaleAsPaid(saleId, paymentMethod);
+  Future<void> markSaleAsPaid(
+    int saleId,
+    PaymentMethod paymentMethod, {
+    List<DiscountEntity> additionalDiscounts = const [],
+  }) async {
+    await remoteDataSource.markSaleAsPaid(
+      saleId,
+      paymentMethod,
+      additionalDiscounts: additionalDiscounts,
+    );
   }
 }

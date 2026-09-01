@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gestion_integral_jyc/core/presentation/extensions/screen_size.dart';
+import 'package:gestion_integral_jyc/core/presentation/providers/auth_provider.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/screen_header.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/widgets/mp_movements.dart';
@@ -7,11 +9,11 @@ import 'package:gestion_integral_jyc/features/sales/presentation/widgets/quick_s
 import 'package:gestion_integral_jyc/features/sales/presentation/widgets/sales_record.dart';
 import 'package:go_router/go_router.dart';
 
-class SalesScreen extends StatelessWidget {
+class SalesScreen extends ConsumerWidget {
   const SalesScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: AppColors.surface,
 
@@ -44,7 +46,7 @@ class SalesScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
 
                     children: [
-                      Expanded(flex: 6, child: _buildLeftColumn(context)),
+                      Expanded(flex: 6, child: _buildLeftColumn(context, ref)),
 
                       const SizedBox(width: 24),
 
@@ -54,7 +56,7 @@ class SalesScreen extends StatelessWidget {
                 } else {
                   return Column(
                     children: [
-                      _buildLeftColumn(context),
+                      _buildLeftColumn(context, ref),
                       const SizedBox(height: 24),
                       QuickSale(),
                     ],
@@ -68,9 +70,15 @@ class SalesScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildLeftColumn(BuildContext context) {
+  Widget _buildLeftColumn(BuildContext context, WidgetRef ref) {
+    final isRoot = ref.watch(isRootProvider);
+
     return Column(
-      children: [SalesRecord(), const SizedBox(height: 16), MpMovements()],
+      children: [
+        SalesRecord(),
+
+        if (isRoot) ...[const SizedBox(height: 16), MpMovements()],
+      ],
     );
   }
 }

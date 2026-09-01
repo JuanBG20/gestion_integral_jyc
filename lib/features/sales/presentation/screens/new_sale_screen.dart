@@ -7,9 +7,11 @@ import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/features/clients/presentation/providers/client_provider.dart';
 import 'package:gestion_integral_jyc/core/presentation/screens/form_screen_layout.dart';
+import 'package:gestion_integral_jyc/features/sales/domain/entities/discount_entity.dart';
 import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_entity.dart';
 import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_item_entity.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/providers/sale_provider.dart';
+import 'package:gestion_integral_jyc/features/sales/presentation/utils/discount_calculator.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/widgets/sale_items_list_section.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/widgets/summary_sale_card.dart';
 import 'package:go_router/go_router.dart';
@@ -30,8 +32,21 @@ class _NewRawMaterialScreenState extends ConsumerState<NewSaleScreen> {
 
   bool _isPaidInFull = true;
 
-  double get _totalAmount =>
+  double get _subtotalAmount =>
       _currentItems.fold(0, (sum, item) => sum + item.subtotal);
+
+  List<DiscountEntity> get _currentDiscounts {
+    if (!_isPaidInFull) return [];
+    return DiscountCalculator.calculatePaymenthMethodDiscounts(
+      method: _selectedMethod,
+      subtotal: _subtotalAmount,
+    );
+  }
+
+  double get _discountsAmount =>
+      _currentDiscounts.fold(0, (sum, discount) => sum + discount.amount);
+
+  double get _totalAmount => _subtotalAmount - _discountsAmount;
 
   void _saveSale() {
     if (_formKey.currentState!.validate()) {
@@ -52,8 +67,10 @@ class _NewRawMaterialScreenState extends ConsumerState<NewSaleScreen> {
         client: _selectedClient!,
         date: DateTime.now(),
         finalAmount: _totalAmount,
+        subtotal: _subtotalAmount,
         paymentMethod: _isPaidInFull ? _selectedMethod : null,
         items: _currentItems,
+        discounts: _currentDiscounts,
         isPaid: _isPaidInFull,
       );
 
@@ -153,7 +170,7 @@ class _NewRawMaterialScreenState extends ConsumerState<NewSaleScreen> {
 
                       Switch(
                         value: _selectedClient?.fullName == 'Consumidor Final'
-                            ? false
+                            ? true
                             : _isPaidInFull,
                         onChanged:
                             _selectedClient?.fullName == 'Consumidor Final'
@@ -188,6 +205,7 @@ class _NewRawMaterialScreenState extends ConsumerState<NewSaleScreen> {
       ),
       sidePanel: SummarySaleCard(
         currentItems: _currentItems,
+        currentDiscounts: _currentDiscounts,
         onPaymentMethodChange: (method) {
           setState(() {
             _selectedMethod = method;

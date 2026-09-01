@@ -17,5 +17,7 @@ class UserEntity {
 
   String get fullName => '$name $lastName';
 
+  bool get isRoot => idAuth == '06ab61f7-6679-410c-a087-3f617635189d';
+
   bool hasRole(Role role) => roles.contains(role);
 }
