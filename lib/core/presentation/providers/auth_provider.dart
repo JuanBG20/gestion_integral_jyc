@@ -42,7 +42,18 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
       await _loadUserProfile(response.user!.id);
     } on AuthException catch (e) {
-      state = state.copyWith(isLoading: false, errorMessage: e.message);
+      if (e.message.contains('Email not confirmed')) {
+        state = state.copyWith(
+          isLoading: false,
+          errorMessage: 'Tenés que verificar tu correo antes de entrar.',
+          needsEmailConfirmation: true,
+        );
+      } else {
+        state = state.copyWith(
+          isLoading: false,
+          errorMessage: 'Error de inicio de sesión: ${e.message}',
+        );
+      }
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
@@ -78,6 +89,48 @@ class AuthNotifier extends StateNotifier<AuthState> {
   void switchRole(Role role) {
     if (state.user != null && state.user!.hasRole(role)) {
       state = state.copyWith(activeRole: role);
+    }
+  }
+
+  Future<void> signUp(
+    String email,
+    String password,
+    String name,
+    String lastname,
+  ) async {
+    state = state.copyWith(
+      isLoading: true,
+      errorMessage: null,
+      needsEmailConfirmation: false,
+    );
+
+    try {
+      final response = await _supabase.auth.signUp(
+        email: email,
+        password: password,
+        data: {'nombre': name, 'apellido': lastname},
+      );
+
+      final newUser = response.user;
+      if (newUser == null) throw Exception('No se pudo crear la cuenta');
+
+      if (response.session == null) {
+        state = state.copyWith(
+          isLoading: false,
+          needsEmailConfirmation: true,
+          errorMessage: null,
+        );
+        return;
+      }
+
+      await _loadUserProfile(newUser.id);
+    } on AuthException catch (e) {
+      state = state.copyWith(isLoading: false, errorMessage: e.message);
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Error al registrarse: $e',
+      );
     }
   }
 

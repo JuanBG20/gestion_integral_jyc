@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:gestion_integral_jyc/core/domain/entities/client_entity.dart';
 import 'package:gestion_integral_jyc/features/auth/presentation/screens/login_screen.dart';
+import 'package:gestion_integral_jyc/features/auth/presentation/screens/register_screen.dart';
 import 'package:gestion_integral_jyc/features/clients/presentation/screens/clients_screen.dart';
 import 'package:gestion_integral_jyc/core/presentation/screens/layout.dart';
 import 'package:gestion_integral_jyc/features/clients/presentation/screens/new_client_screen.dart';
@@ -54,14 +55,20 @@ final goRouter = GoRouter(
   ),
   redirect: (context, state) {
     final isLoggedIn = Supabase.instance.client.auth.currentSession != null;
-    final isLoggingIn = state.matchedLocation == '/login';
+    final isAuthRoute =
+        state.matchedLocation == '/login' ||
+        state.matchedLocation == '/register';
 
-    if (!isLoggedIn && !isLoggingIn) return '/login';
-    if (isLoggedIn && isLoggingIn) return '/dashboard';
+    if (!isLoggedIn && !isAuthRoute) return '/login';
+    if (isLoggedIn && isAuthRoute) return '/dashboard';
     return null;
   },
   routes: [
     GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
+    GoRoute(
+      path: '/register',
+      builder: (context, state) => const RegisterScreen(),
+    ),
     GoRoute(
       path: '/scanner',
       builder: (context, state) => const ScannerScreen(),

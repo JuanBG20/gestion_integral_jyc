@@ -6,12 +6,14 @@ class AuthState {
   final Role? activeRole;
   final bool isLoading;
   final String? errorMessage;
+  final bool needsEmailConfirmation;
 
   const AuthState({
     this.user,
     this.activeRole,
     this.isLoading = false,
     this.errorMessage,
+    this.needsEmailConfirmation = false,
   });
 
   bool get isAuthenticated => user != null;
@@ -23,12 +25,15 @@ class AuthState {
     Role? activeRole,
     bool? isLoading,
     String? errorMessage,
+    bool? needsEmailConfirmation,
   }) {
     return AuthState(
       user: user ?? this.user,
       activeRole: activeRole ?? this.activeRole,
       isLoading: isLoading ?? this.isLoading,
       errorMessage: errorMessage,
+      needsEmailConfirmation:
+          needsEmailConfirmation ?? this.needsEmailConfirmation,
     );
   }
 }

@@ -14,7 +14,7 @@ import 'package:gestion_integral_jyc/features/production/presentation/providers/
 import 'package:gestion_integral_jyc/features/production/presentation/widgets/item_tile.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/widgets/production_quick_actions.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/widgets/status_badge.dart';
-import 'package:gestion_integral_jyc/features/production/presentation/widgets/summary_products_card.dart';
+import 'package:gestion_integral_jyc/core/presentation/widgets/summary_products_card.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/widgets/payment_method_selector.dart';
 import 'package:go_router/go_router.dart';
 

@@ -8,7 +8,7 @@ import 'package:gestion_integral_jyc/core/presentation/widgets/items_card_layout
 import 'package:gestion_integral_jyc/core/presentation/widgets/quick_action_button.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
-import 'package:gestion_integral_jyc/features/production/presentation/widgets/summary_products_card.dart';
+import 'package:gestion_integral_jyc/core/presentation/widgets/summary_products_card.dart';
 import 'package:gestion_integral_jyc/features/sales/domain/entities/discount_entity.dart';
 import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_entity.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/pdf/arca_invoice_pdf_generator.dart';

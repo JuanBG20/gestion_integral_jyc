@@ -1,4 +1,4 @@
-package com.example.gestion_integral_jyc
+package ar.com.dedalostudio.gestionjyc
 
 import io.flutter.embedding.android.FlutterActivity
 
