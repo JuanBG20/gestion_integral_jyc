@@ -1,0 +1,11 @@
+{
+  "servers": {
+    "lance": {
+      "type": "http",
+      "url": "https://api.lance.app/mcp",
+      "headers": {
+        "Authorization": "Bearer lance_sk_UDVhUllkzmrkVbrMlulpNclI5D8WIKSgt6WnUHBu"
+      }
+    }
+  }
+}

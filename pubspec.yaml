@@ -1,7 +1,7 @@
 name: gestion_integral_jyc
 description: "A new Flutter project."
 publish_to: "none"
-version: 1.2.1+5
+version: 1.3.0+6
 
 environment:
   sdk: ^3.11.5
@@ -48,7 +48,7 @@ msix_config:
   display_name: "Gestión J&C Impresiones 3D"
   publisher_display_name: Dédalo Studio
   identity_name: ar.com.dedalostudio.jyc
-  msix_version: 1.2.1.0
+  msix_version: 1.3.0.0
   logo_path: assets/icons/logo.png
   capabilities: internetClient
   logo_padding: 0
