@@ -39,14 +39,20 @@ class WorkCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
 
-                    children: [
-                      Text('TRB-${work.id ?? ''}'),
+                      children: [
+                        Text('TRB-${work.id ?? ''}'),
 
-                      Text(work.client.fullName),
-                    ],
+                        Text(
+                          work.client.fullName,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
                   ),
 
                   AppActionMenu(

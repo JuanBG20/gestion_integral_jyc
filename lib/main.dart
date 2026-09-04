@@ -4,6 +4,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gestion_integral_jyc/core/router/app_router.dart';
 import 'package:gestion_integral_jyc/core/theme/app_theme.dart';
+import 'package:gestion_integral_jyc/features/subscriptions/data/repositories/subscription_repository_impl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() async {
@@ -17,6 +18,12 @@ void main() async {
     authOptions: const FlutterAuthClientOptions(
       authFlowType: AuthFlowType.pkce,
     ),
+  );
+
+  final subscriptionRepo = SubscriptionRepositoryImpl();
+  await subscriptionRepo.init(
+    dotenv.env['RC_APPLE_KEY'] ?? '',
+    dotenv.env['RC_GOOGLE_KEY'] ?? '',
   );
 
   runApp(const ProviderScope(child: MainApp()));
