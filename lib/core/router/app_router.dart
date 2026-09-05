@@ -21,7 +21,7 @@ import 'package:gestion_integral_jyc/features/production/presentation/screens/ne
 import 'package:gestion_integral_jyc/features/production/presentation/screens/work_adaptative_screen.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/screens/work_details_screen.dart';
 import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_entity.dart';
-import 'package:gestion_integral_jyc/features/sales/presentation/screens/all_sales_screen.dart';
+import 'package:gestion_integral_jyc/features/sales/presentation/screens/all_sales_screen_wrapper.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/screens/new_invoice_screen.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/screens/new_sale_screen.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/screens/sale_details_screen.dart';
@@ -181,7 +181,7 @@ final goRouter = GoRouter(
                 ),
                 GoRoute(
                   path: 'all',
-                  builder: (context, state) => const AllSalesScreen(),
+                  builder: (context, state) => const AllSalesScreenWrapper(),
                 ),
                 GoRoute(
                   path: 'detail',

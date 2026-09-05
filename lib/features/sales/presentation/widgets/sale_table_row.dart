@@ -6,7 +6,7 @@ import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_r
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_entity.dart';
-import 'package:go_router/go_router.dart';
+import 'package:gestion_integral_jyc/features/sales/presentation/utils/sale_action_handler.dart';
 
 class SaleTableRow extends StatelessWidget {
   final SaleEntity sale;
@@ -35,7 +35,8 @@ class SaleTableRow extends StatelessWidget {
                 if (!sale.isInvoiced && sale.isPaid)
                   AppActionMenuItem(value: 'bill', label: 'Facturar'),
               ],
-              onSelected: (value) => _handleSaleAction(context, value),
+              onSelected: (value) =>
+                  handleSaleSharedAction(context, value, sale),
             )
           : null,
 
@@ -103,14 +104,5 @@ class SaleTableRow extends StatelessWidget {
     }
 
     return Icon(Icons.description_outlined, color: AppColors.primary);
-  }
-
-  void _handleSaleAction(BuildContext context, String action) {
-    switch (action) {
-      case 'detail':
-        context.go('/sales/detail', extra: sale);
-      case 'bill':
-        context.go('/sales/detail/bill', extra: sale);
-    }
   }
 }
