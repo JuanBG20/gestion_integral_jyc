@@ -3,6 +3,7 @@ import 'package:gestion_integral_jyc/core/presentation/extensions/date_formattin
 import 'package:gestion_integral_jyc/core/presentation/extensions/deadline_extensions.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/app_action_menu.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
+import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/features/production/domain/entities/work_entity.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/utils/work_actions_extension.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/widgets/status_badge.dart';
@@ -44,7 +45,10 @@ class WorkCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
 
                       children: [
-                        Text('TRB-${work.id ?? ''}'),
+                        Text(
+                          'TRB-${work.id ?? ''}',
+                          style: context.textTheme.titleMedium,
+                        ),
 
                         Text(
                           work.client.fullName,

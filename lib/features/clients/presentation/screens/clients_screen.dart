@@ -3,10 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gestion_integral_jyc/core/domain/entities/client_entity.dart';
 import 'package:gestion_integral_jyc/core/presentation/extensions/address_formatting.dart';
 import 'package:gestion_integral_jyc/core/presentation/extensions/client_formatting.dart';
-import 'package:gestion_integral_jyc/core/presentation/extensions/screen_size.dart';
-import 'package:gestion_integral_jyc/core/presentation/providers/search_provider.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/app_action_menu.dart';
-import 'package:gestion_integral_jyc/core/presentation/widgets/screen_header.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_cell.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_column.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_header.dart';
@@ -15,13 +12,18 @@ import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_s
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/pagination_footer.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
-import 'package:gestion_integral_jyc/core/presentation/providers/auth_provider.dart';
-import 'package:gestion_integral_jyc/features/clients/presentation/providers/client_provider.dart';
-import 'package:go_router/go_router.dart';
+import 'package:gestion_integral_jyc/features/clients/presentation/utils/client_action_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ClientsScreen extends ConsumerWidget {
-  const ClientsScreen({super.key});
+  final List<ClientEntity> clients;
+  final bool isAdmin;
+
+  const ClientsScreen({
+    super.key,
+    required this.clients,
+    required this.isAdmin,
+  });
 
   static const _clientColumns = [
     AppTableColumn(label: "NOMBRE", flex: 3),
@@ -33,102 +35,30 @@ class ClientsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final searchQuery = ref.watch(searchQueryProvider).toLowerCase();
-    final clientsState = ref.watch(clientProvider);
-    final isAdmin = ref.watch(isAdminProvider);
-
-    return Scaffold(
-      backgroundColor: AppColors.surface,
-
-      floatingActionButton: context.isMobileLayout
-          ? FloatingActionButton(
-              onPressed: () => context.go('/clients/new'),
-              child: const Icon(Icons.add),
-            )
-          : null,
-
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-
-          children: [
-            ScreenHeader(
-              title: "Gestión de Clientes",
-              subtitle: "Directorio y perfiles de facturación.",
-              buttonLabel: "Nuevo Cliente",
-              onPressed: () => context.go('/clients/new'),
-            ),
-
-            const SizedBox(height: 32),
-
-            clientsState.when(
-              data: (clients) {
-                if (clients.isEmpty) {
-                  return const Center(
-                    child: Text("No hay clientes registrados."),
-                  );
-                }
-
-                final filteredClients = clients.where((client) {
-                  final nameMatch = client.name.toLowerCase().contains(
-                    searchQuery,
-                  );
-                  final dniMatch =
-                      client.docNumber?.contains(searchQuery) ?? false;
-                  final emailMatch =
-                      client.email?.toLowerCase().contains(searchQuery) ??
-                      false;
-
-                  return nameMatch || emailMatch || dniMatch;
-                }).toList();
-
-                if (filteredClients.isEmpty) {
-                  return const Center(
-                    child: Text("No se encontraron clientes."),
-                  );
-                }
-
-                return Column(
-                  children: [
-                    AppTableShell(
-                      shrinkWrap: true,
-                      minWidth: 1200,
-                      header: const AppTableHeader(
-                        columns: _clientColumns,
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 20,
-                        ),
-                        trailingWidth: 100,
-                      ),
-                      rows: filteredClients
-                          .map(
-                            (c) => _buildClientRow(
-                              context,
-                              ref,
-                              client: c,
-                              isAdmin: isAdmin,
-                            ),
-                          )
-                          .toList(),
-                    ),
-
-                    PaginationFooter(
-                      total: filteredClients.length,
-                      shown: filteredClients.length,
-                      label: 'clientes',
-                    ),
-                  ],
-                );
-              },
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (error, stack) => Center(child: Text('Error: $error')),
-            ),
-          ],
+    return Column(
+      children: [
+        AppTableShell(
+          shrinkWrap: true,
+          minWidth: 1200,
+          header: const AppTableHeader(
+            columns: _clientColumns,
+            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+            trailingWidth: 100,
+          ),
+          rows: clients
+              .map(
+                (c) =>
+                    _buildClientRow(context, ref, client: c, isAdmin: isAdmin),
+              )
+              .toList(),
         ),
-      ),
+
+        PaginationFooter(
+          total: clients.length,
+          shown: clients.length,
+          label: 'clientes',
+        ),
+      ],
     );
   }
 
@@ -154,7 +84,7 @@ class ClientsScreen extends ConsumerWidget {
               ),
           ],
           onSelected: (value) =>
-              _handleClientAction(context, ref, client, value),
+              handleClientSharedAction(context, ref, client, value),
         ),
       ),
       cells: [
@@ -300,21 +230,5 @@ class ClientsScreen extends ConsumerWidget {
         Icon(Icons.info_outline, size: 16, color: AppColors.onBackground),
       ],
     );
-  }
-
-  void _handleClientAction(
-    BuildContext context,
-    WidgetRef ref,
-    ClientEntity client,
-    String action,
-  ) {
-    switch (action) {
-      case 'delete':
-        if (client.id != null) {
-          ref.read(clientProvider.notifier).removeClient(client.id!);
-        }
-      case 'edit':
-        context.go('/clients/edit', extra: client);
-    }
   }
 }

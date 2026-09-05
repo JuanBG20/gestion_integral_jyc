@@ -2,7 +2,7 @@ import 'package:gestion_integral_jyc/core/domain/entities/client_entity.dart';
 
 extension ClientDocumentFormatting on ClientEntity {
   String get formattedDocument {
-    if (docType == null || docNumber == null) return "-";
+    if (docType == null || docNumber == null) return "No especificado";
     return '${docType!.dbValue} $docNumber';
   }
 }
