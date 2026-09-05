@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gestion_integral_jyc/core/enums/work_sort_option.dart';
 import 'package:gestion_integral_jyc/core/presentation/extensions/screen_size.dart';
+import 'package:gestion_integral_jyc/core/presentation/widgets/app_mobile_list.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/screen_header.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
+import 'package:gestion_integral_jyc/features/production/domain/entities/work_entity.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/providers/work_provider.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/providers/work_sort_option_provider.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/screens/all_works_screen.dart';
-import 'package:gestion_integral_jyc/features/production/presentation/screens/mobile_all_works_screen.dart';
+import 'package:gestion_integral_jyc/features/production/presentation/widgets/work_card.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/widgets/work_filters.dart';
 import 'package:go_router/go_router.dart';
 
@@ -97,7 +99,10 @@ class AllWorksScreenWrapper extends ConsumerWidget {
                 }
 
                 return context.isMobileLayout
-                    ? MobileAllWorksScreen(works: processedWorks)
+                    ? AppMobileList<WorkEntity>(
+                        items: processedWorks,
+                        itemBuilder: (context, work) => WorkCard(work: work),
+                      )
                     : AllWorksScreen(works: processedWorks);
               },
               loading: () => const Center(child: CircularProgressIndicator()),

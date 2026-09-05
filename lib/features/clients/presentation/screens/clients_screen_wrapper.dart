@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gestion_integral_jyc/core/domain/entities/client_entity.dart';
 import 'package:gestion_integral_jyc/core/presentation/extensions/screen_size.dart';
 import 'package:gestion_integral_jyc/core/presentation/providers/auth_provider.dart';
 import 'package:gestion_integral_jyc/core/presentation/providers/search_provider.dart';
+import 'package:gestion_integral_jyc/core/presentation/widgets/app_mobile_list.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/screen_header.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/features/clients/presentation/providers/client_provider.dart';
 import 'package:gestion_integral_jyc/features/clients/presentation/screens/clients_screen.dart';
-import 'package:gestion_integral_jyc/features/clients/presentation/screens/mobile_clients_screen.dart';
+import 'package:gestion_integral_jyc/features/clients/presentation/widgets/client_card.dart';
 import 'package:go_router/go_router.dart';
 
 class ClientsScreenWrapper extends ConsumerWidget {
@@ -74,9 +76,10 @@ class ClientsScreenWrapper extends ConsumerWidget {
                 }
 
                 return context.isMobileLayout
-                    ? MobileClientsScreen(
-                        clients: filteredClients,
-                        isAdmin: isAdmin,
+                    ? AppMobileList<ClientEntity>(
+                        items: filteredClients,
+                        itemBuilder: (context, client) =>
+                            ClientCard(client: client, isAdmin: isAdmin),
                       )
                     : ClientsScreen(clients: filteredClients, isAdmin: isAdmin);
               },
