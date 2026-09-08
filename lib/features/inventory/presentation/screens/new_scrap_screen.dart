@@ -9,8 +9,8 @@ import 'package:gestion_integral_jyc/features/inventory/domain/entities/scrap_en
 import 'package:gestion_integral_jyc/features/inventory/presentation/providers/raw_material_provider.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/providers/scrap_provider.dart';
 import 'package:gestion_integral_jyc/core/presentation/screens/form_screen_layout.dart';
-import 'package:gestion_integral_jyc/features/inventory/presentation/widgets/proportion_preview.dart';
-import 'package:gestion_integral_jyc/features/inventory/presentation/widgets/scrap_policy_message.dart';
+import 'package:gestion_integral_jyc/features/inventory/presentation/widgets/scraps/proportion_preview.dart';
+import 'package:gestion_integral_jyc/features/inventory/presentation/widgets/scraps/scrap_policy_message.dart';
 import 'package:go_router/go_router.dart';
 
 class NewScrapScreen extends ConsumerStatefulWidget {

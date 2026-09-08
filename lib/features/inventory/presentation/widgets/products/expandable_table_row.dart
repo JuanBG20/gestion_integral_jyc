@@ -4,13 +4,8 @@ import 'package:gestion_integral_jyc/core/presentation/widgets/app_action_menu.d
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_cell.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_row.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
-import 'package:gestion_integral_jyc/features/inventory/domain/entities/base_product_entity.dart';
-import 'package:gestion_integral_jyc/features/inventory/domain/entities/variant_product_entity.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/models/product_group_ui.dart';
-import 'package:gestion_integral_jyc/features/inventory/presentation/providers/product_provider.dart';
-import 'package:gestion_integral_jyc/features/inventory/presentation/providers/raw_material_provider.dart';
-import 'package:gestion_integral_jyc/features/inventory/presentation/widgets/stock_dialog.dart';
-import 'package:go_router/go_router.dart';
+import 'package:gestion_integral_jyc/features/inventory/presentation/utils/product_action_handler.dart';
 
 class ExpandableTableRow extends ConsumerWidget {
   final ProductGroupUi product;
@@ -41,7 +36,8 @@ class ExpandableTableRow extends ConsumerWidget {
               isDestructive: true,
             ),
         ],
-        onSelected: (value) => _handleBaseAction(context, ref, base, value),
+        onSelected: (value) =>
+            handleBaseProductSharedAction(context, ref, product, value),
       ),
 
       title: Row(
@@ -79,8 +75,13 @@ class ExpandableTableRow extends ConsumerWidget {
                       isDestructive: true,
                     ),
                 ],
-                onSelected: (value) =>
-                    _handleProductAction(context, ref, variant, value),
+                onSelected: (value) => handleVariantProductSharedAction(
+                  context,
+                  ref,
+                  variant,
+                  value,
+                  isAdmin,
+                ),
               ),
 
               cells: [
@@ -107,60 +108,5 @@ class ExpandableTableRow extends ConsumerWidget {
           )
           .toList(),
     );
-  }
-
-  void _handleProductAction(
-    BuildContext context,
-    WidgetRef ref,
-    VariantProductEntity variant,
-    String action,
-  ) {
-    final base = variant.baseProduct;
-
-    switch (action) {
-      case 'update':
-        showStockDialog(
-          context: context,
-          title:
-              'Stock: ${base.description} (${variant.color ?? variant.size ?? variant.sku})',
-          isProduct: true,
-          isAdmin: isAdmin,
-          onConfirm: (delta, deductMp) async {
-            if (variant.id != null) {
-              await ref
-                  .read(inventoryProductsProvider.notifier)
-                  .updateStock(variant.id!, delta, deductMp);
-
-              if (delta > 0 && deductMp) {
-                ref.read(rawMaterialProvider.notifier).fetchRawMaterials();
-              }
-            }
-          },
-        );
-      case 'delete':
-        if (variant.id != null) {
-          ref
-              .read(inventoryProductsProvider.notifier)
-              .removeVariant(variant.id!);
-        }
-    }
-  }
-
-  void _handleBaseAction(
-    BuildContext context,
-    WidgetRef ref,
-    BaseProductEntity base,
-    String action,
-  ) {
-    switch (action) {
-      case 'edit':
-        context.go('/inventory/edit-product', extra: product);
-      case 'delete':
-        if (base.id != null) {
-          ref
-              .read(inventoryProductsProvider.notifier)
-              .removeProductWithVariants(base.id!);
-        }
-    }
   }
 }

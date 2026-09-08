@@ -3,8 +3,8 @@ import 'package:gestion_integral_jyc/core/enums/measurement_unit.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/features/inventory/domain/entities/material_recipe_entity.dart';
-import 'package:gestion_integral_jyc/features/inventory/presentation/widgets/variant_card.dart';
-import 'package:gestion_integral_jyc/features/inventory/presentation/widgets/variant_form_editor.dart';
+import 'package:gestion_integral_jyc/features/inventory/presentation/widgets/products/variant_card.dart';
+import 'package:gestion_integral_jyc/features/inventory/presentation/widgets/products/variant_form_editor.dart';
 
 class VariantFormData {
   final int? id;

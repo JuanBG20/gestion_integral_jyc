@@ -9,11 +9,11 @@ class AppCardShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Ink(
-      decoration: BoxDecoration(
-        color: Colors.white,
+    return Material(
+      color: Colors.white,
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: AppColors.outline),
+        side: BorderSide(color: AppColors.outline),
       ),
 
       child: InkWell(

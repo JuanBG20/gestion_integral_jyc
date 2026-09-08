@@ -7,7 +7,7 @@ import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/utils/price_calculator.dart';
 import 'package:gestion_integral_jyc/features/inventory/domain/entities/material_recipe_entity.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/widgets/recipe_dialog.dart';
-import 'package:gestion_integral_jyc/features/inventory/presentation/widgets/variants_table_section.dart';
+import 'package:gestion_integral_jyc/features/inventory/presentation/widgets/products/variants_table_section.dart';
 
 class VariantFormEditor extends StatefulWidget {
   final VariantFormData? initialVariant;

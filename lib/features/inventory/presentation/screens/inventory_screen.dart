@@ -4,9 +4,9 @@ import 'package:gestion_integral_jyc/core/presentation/extensions/screen_size.da
 import 'package:gestion_integral_jyc/core/presentation/widgets/screen_header.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/presentation/providers/auth_provider.dart';
-import 'package:gestion_integral_jyc/features/inventory/presentation/widgets/products_tab.dart';
-import 'package:gestion_integral_jyc/features/inventory/presentation/widgets/raw_materials_tab.dart';
-import 'package:gestion_integral_jyc/features/inventory/presentation/widgets/scraps_tab.dart';
+import 'package:gestion_integral_jyc/features/inventory/presentation/widgets/products/products_tab_wrapper.dart';
+import 'package:gestion_integral_jyc/features/inventory/presentation/widgets/raw_materials/raw_materials_tab_wrapper.dart';
+import 'package:gestion_integral_jyc/features/inventory/presentation/widgets/scraps/scraps_tab_wrapper.dart';
 import 'package:go_router/go_router.dart';
 
 class InventoryScreen extends ConsumerWidget {
@@ -50,52 +50,66 @@ class InventoryScreen extends ConsumerWidget {
                   )
                 : null,
 
-            body: Padding(
-              padding: const EdgeInsets.all(24),
+            body: NestedScrollView(
+              headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+                return [
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                        left: 24,
+                        right: 24,
+                        top: 24,
+                        bottom: 8,
+                      ),
 
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-
-                children: [
-                  ScreenHeader(
-                    title: "Inventario",
-                    subtitle:
-                        "Gestión de productos terminados, materia prima y retazos.",
-                    buttonLabel: "Nuevo Item",
-                    onPressed: () => _newItemNavigation(tabContext),
-                    hasSecondaryButton: isAdmin,
-                    secondaryButtonLabel: "Actualizar Precios",
-                    secondaryButtonIcon: Icons.price_check,
-                    onPressedSecundary: () =>
-                        context.go('inventory/price-preview'),
-                  ),
-
-                  const SizedBox(height: 8),
-
-                  TabBar(
-                    isScrollable: true,
-                    tabAlignment: TabAlignment.start,
-                    dividerColor: AppColors.outline,
-
-                    tabs: const [
-                      Tab(text: "Materia Prima"),
-                      Tab(text: "Productos"),
-                      Tab(text: "Retazos"),
-                    ],
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  Expanded(
-                    child: TabBarView(
-                      children: [
-                        RawMaterialsTab(isAdmin: isAdmin),
-                        ProductsTab(isAdmin: isAdmin),
-                        ScrapsTab(isAdmin: isAdmin),
-                      ],
+                      child: ScreenHeader(
+                        title: "Inventario",
+                        subtitle:
+                            "Gestión de productos terminados, materia prima y retazos.",
+                        buttonLabel: "Nuevo Item",
+                        onPressed: () => _newItemNavigation(tabContext),
+                        hasSecondaryButton: isAdmin,
+                        secondaryButtonLabel: "Actualizar Precios",
+                        secondaryButtonIcon: Icons.price_check,
+                        onPressedSecundary: () =>
+                            context.go('inventory/price-preview'),
+                      ),
                     ),
                   ),
+
+                  SliverAppBar(
+                    pinned: true,
+                    backgroundColor: AppColors.surface,
+                    forceElevated: innerBoxIsScrolled,
+                    automaticallyImplyLeading: false,
+                    toolbarHeight: 0,
+
+                    bottom: PreferredSize(
+                      preferredSize: const Size.fromHeight(48),
+
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+
+                        child: TabBar(
+                          isScrollable: true,
+                          tabAlignment: TabAlignment.start,
+                          dividerColor: AppColors.outline,
+                          tabs: const [
+                            Tab(text: "Materia Prima"),
+                            Tab(text: "Productos"),
+                            Tab(text: "Retazos"),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ];
+              },
+              body: TabBarView(
+                children: [
+                  RawMaterialsTabWrapper(isAdmin: isAdmin),
+                  ProductsTabWrapper(isAdmin: isAdmin),
+                  ScrapsTabWrapper(isAdmin: isAdmin),
                 ],
               ),
             ),
