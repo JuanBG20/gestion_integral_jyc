@@ -77,7 +77,7 @@ class AuthLayout extends StatelessWidget {
 
               const SizedBox(height: 32),
 
-              Text("v1.3.0", style: context.textTheme.bodySmall),
+              Text("v1.4.0", style: context.textTheme.bodySmall),
               Text(
                 "© 2026 J&C Impresiones 3D. Todos los derechos reservados.",
                 style: context.textTheme.bodySmall,
