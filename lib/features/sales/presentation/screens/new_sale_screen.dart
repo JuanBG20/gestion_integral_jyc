@@ -144,29 +144,33 @@ class _NewRawMaterialScreenState extends ConsumerState<NewSaleScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
                     children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
 
-                        children: [
-                          Text(
-                            "¿Venta cobrada?",
-                            style: context.textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
+                          children: [
+                            Text(
+                              "¿Venta cobrada?",
+                              style: context.textTheme.bodyMedium?.copyWith(
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
-                          ),
 
-                          const SizedBox(height: 4),
+                            const SizedBox(height: 4),
 
-                          Text(
-                            _selectedClient?.fullName == 'Consumidor Final'
-                                ? "Debe seleccionar un cliente registrado para marcar el pago como pendiente."
-                                : _isPaidInFull
-                                ? "Sí. El cliente abonó el monto total."
-                                : "No. Anotar en cuenta corriente (Pago Pendiente).",
-                            style: context.textTheme.bodySmall,
-                          ),
-                        ],
+                            Text(
+                              _selectedClient?.fullName == 'Consumidor Final'
+                                  ? "Debe seleccionar un cliente registrado para marcar el pago como pendiente."
+                                  : _isPaidInFull
+                                  ? "Sí. El cliente abonó el monto total."
+                                  : "No. Anotar en cuenta corriente (Pago Pendiente).",
+                              style: context.textTheme.bodySmall,
+                            ),
+                          ],
+                        ),
                       ),
+
+                      const SizedBox(width: 8),
 
                       Switch(
                         value: _selectedClient?.fullName == 'Consumidor Final'

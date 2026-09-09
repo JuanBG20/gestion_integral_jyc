@@ -16,6 +16,12 @@ final productRepositoryProvider = Provider<ProductRepository>((ref) {
   return ProductRepositoryImpl(ref.read(productDataSourceProvider));
 });
 
+final flattenedVariantsProvider = Provider<List<VariantProductEntity>>((ref) {
+  final inventoryState = ref.watch(inventoryProductsProvider);
+  if (inventoryState is! AsyncData) return [];
+  return [for (final group in inventoryState.value!) ...group.variants];
+});
+
 final inventoryProductsProvider =
     StateNotifierProvider<
       InventoryProductsNotifier,

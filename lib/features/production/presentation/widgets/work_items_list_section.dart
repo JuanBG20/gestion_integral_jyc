@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gestion_integral_jyc/core/presentation/widgets/product_items_list_section.dart';
+import 'package:gestion_integral_jyc/core/presentation/widgets/product_items_list/product_items_list_section.dart';
 import 'package:gestion_integral_jyc/features/production/domain/entities/work_item_entity.dart';
 
 class WorkItemsListSection extends StatelessWidget {

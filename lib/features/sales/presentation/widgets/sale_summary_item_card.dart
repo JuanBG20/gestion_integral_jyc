@@ -42,6 +42,8 @@ class SaleSummaryItemCard extends StatelessWidget {
             ),
           ),
 
+          const SizedBox(width: 8),
+
           Text(
             "\$${item.subtotal.toStringAsFixed(2)}",
             style: context.textTheme.bodyMedium,
