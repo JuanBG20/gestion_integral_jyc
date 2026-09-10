@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gestion_integral_jyc/core/presentation/extensions/screen_size.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_column.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_header.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_shell.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/providers/sale_provider.dart';
+import 'package:gestion_integral_jyc/features/sales/presentation/widgets/sale_card.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/widgets/sale_table_row.dart';
 import 'package:go_router/go_router.dart';
 
@@ -63,19 +65,38 @@ class SalesRecord extends ConsumerWidget {
                 );
               }
 
-              return AppTableShell(
-                shrinkWrap: true,
-                minWidth: 600,
-                header: const AppTableHeader(
-                  columns: _salesColumns,
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-                  trailingWidth: 0,
-                ),
-                rows: sales
-                    .take(5)
-                    .map((venta) => SaleTableRow(sale: venta, trailingWidth: 0))
-                    .toList(),
-              );
+              final topSales = sales.take(5).toList();
+
+              return context.isMobileLayout
+                  ? Column(
+                      children: topSales
+                          .map(
+                            (sale) => Padding(
+                              padding: const EdgeInsets.only(bottom: 8),
+
+                              child: SaleCard(sale: sale),
+                            ),
+                          )
+                          .toList(),
+                    )
+                  : AppTableShell(
+                      shrinkWrap: true,
+                      minWidth: 600,
+                      header: const AppTableHeader(
+                        columns: _salesColumns,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 24,
+                        ),
+                        trailingWidth: 0,
+                      ),
+                      rows: topSales
+                          .map(
+                            (sale) =>
+                                SaleTableRow(sale: sale, trailingWidth: 0),
+                          )
+                          .toList(),
+                    );
             },
             loading: () => const Padding(
               padding: EdgeInsets.all(24.0),

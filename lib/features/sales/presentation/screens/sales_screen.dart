@@ -14,6 +14,8 @@ class SalesScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isRoot = ref.watch(isRootProvider);
+
     return Scaffold(
       backgroundColor: AppColors.surface,
 
@@ -24,55 +26,121 @@ class SalesScreen extends ConsumerWidget {
             )
           : null,
 
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          if (constraints.isDesktopLayout) {
+            return SingleChildScrollView(
+              padding: const EdgeInsets.all(24),
 
-        child: Column(
-          children: [
-            ScreenHeader(
-              title: "Ventas y Facturación",
-              subtitle:
-                  "Registra ventas, controla las transacciones y emite facturas.",
-              buttonLabel: "Nueva Venta",
-              onPressed: () => context.go('/sales/new'),
-            ),
+              child: Column(
+                children: [
+                  ScreenHeader(
+                    title: "Ventas y Facturación",
+                    subtitle:
+                        "Registra ventas, controla las transacciones y emite facturas.",
+                    buttonLabel: "Nueva Venta",
+                    onPressed: () => context.go('/sales/new'),
+                  ),
 
-            const SizedBox(height: 32),
+                  const SizedBox(height: 32),
 
-            LayoutBuilder(
-              builder: (context, constraints) {
-                if (constraints.isDesktopLayout) {
-                  return Row(
+                  Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
 
                     children: [
-                      Expanded(flex: 6, child: _buildLeftColumn(context, ref)),
+                      Expanded(flex: 6, child: _buildLeftColumn(isRoot)),
 
                       const SizedBox(width: 24),
 
                       Expanded(flex: 4, child: QuickSale()),
                     ],
-                  );
-                } else {
-                  return Column(
-                    children: [
-                      _buildLeftColumn(context, ref),
-                      const SizedBox(height: 24),
-                      QuickSale(),
-                    ],
-                  );
-                }
-              },
-            ),
-          ],
-        ),
+                  ),
+                ],
+              ),
+            );
+          } else {
+            return DefaultTabController(
+              length: isRoot ? 3 : 2,
+
+              child: NestedScrollView(
+                headerSliverBuilder:
+                    (BuildContext context, bool innerBoxIsScrolled) {
+                      return [
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: const EdgeInsetsGeometry.only(
+                              left: 24,
+                              right: 24,
+                              top: 24,
+                              bottom: 8,
+                            ),
+
+                            child: ScreenHeader(
+                              title: "Ventas y Facturación",
+                              subtitle:
+                                  "Registra ventas, controla las transacciones y emite facturas.",
+                              buttonLabel: "Nueva Venta",
+                              onPressed: () => context.go('/sales/new'),
+                            ),
+                          ),
+                        ),
+
+                        SliverAppBar(
+                          pinned: true,
+                          backgroundColor: AppColors.surface,
+                          forceElevated: innerBoxIsScrolled,
+                          automaticallyImplyLeading: false,
+                          toolbarHeight: 0,
+                          bottom: PreferredSize(
+                            preferredSize: const Size.fromHeight(48),
+
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                              ),
+
+                              child: TabBar(
+                                isScrollable: true,
+                                tabAlignment: TabAlignment.start,
+                                dividerColor: AppColors.outline,
+
+                                tabs: [
+                                  const Tab(text: "Venta Rápida"),
+                                  const Tab(text: "Registro"),
+                                  if (isRoot) const Tab(text: "Movimientos MP"),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ];
+                    },
+                body: TabBarView(
+                  children: [
+                    const SingleChildScrollView(
+                      padding: EdgeInsets.all(24),
+                      child: QuickSale(),
+                    ),
+                    const SingleChildScrollView(
+                      padding: EdgeInsets.all(24),
+                      child: SalesRecord(),
+                    ),
+                    if (isRoot)
+                      const SingleChildScrollView(
+                        padding: EdgeInsets.all(24),
+                        child: MpMovements(),
+                      ),
+                  ],
+                ),
+              ),
+            );
+          }
+        },
       ),
     );
   }
 
-  Widget _buildLeftColumn(BuildContext context, WidgetRef ref) {
-    final isRoot = ref.watch(isRootProvider);
-
+  Widget _buildLeftColumn(bool isRoot) {
     return Column(
       children: [
         SalesRecord(),

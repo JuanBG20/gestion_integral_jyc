@@ -35,7 +35,10 @@ class SaleCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
 
                 children: [
-                  Text('VTA-${sale.id ?? ''}'),
+                  Text(
+                    'VTA-${sale.id ?? ''}',
+                    style: context.textTheme.titleMedium,
+                  ),
 
                   Text(sale.date.ddMMyyyy, style: context.textTheme.bodyLarge),
                 ],
@@ -61,9 +64,13 @@ class SaleCard extends StatelessWidget {
 
         const SizedBox(height: 8),
 
-        Text(sale.client.fullName, style: context.textTheme.titleMedium),
+        Text(
+          sale.client.fullName,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
 
-        const SizedBox(height: 4),
+        const SizedBox(height: 8),
 
         SaleStatusBadge(status: status),
 
@@ -87,7 +94,7 @@ class SaleCard extends StatelessWidget {
 
                 child: Text(
                   "\$${sale.finalAmount.toStringAsFixed(2)}",
-                  style: context.textTheme.titleLarge,
+                  style: context.textTheme.titleMedium,
                 ),
               ),
             ),

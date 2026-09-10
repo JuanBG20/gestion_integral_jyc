@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gestion_integral_jyc/core/enums/work_state.dart';
 import 'package:gestion_integral_jyc/core/presentation/extensions/date_formatting.dart';
 import 'package:gestion_integral_jyc/core/presentation/extensions/deadline_extensions.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/app_action_menu.dart';
@@ -47,7 +48,13 @@ class AllWorksScreen extends ConsumerWidget {
               cells: [
                 AppTableCell.text('TRB-${w.id ?? ''}', flex: 2),
                 AppTableCell.text(w.client.fullName, flex: 3),
-                AppTableCell.text(w.actualState.dbValue, flex: 2),
+                AppTableCell.text(
+                  w.actualState.dbValue,
+                  flex: 2,
+                  style: w.actualState == WorkState.finalizado
+                      ? TextStyle(color: Colors.green[700])
+                      : null,
+                ),
                 AppTableCell.text(w.creationDate.ddMMyyyy, flex: 2),
                 AppTableCell.text(
                   w.deadline != null ? w.deadline!.ddMMyyyy : '-',
