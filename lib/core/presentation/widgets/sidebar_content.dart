@@ -57,13 +57,17 @@ class SidebarContent extends ConsumerWidget {
                       if (context.isMobileLayout) const SizedBox(height: 20),
 
                       Text(
-                        "J&C Impresiones 3D",
+                        "Gestión J&C",
                         style: context.textTheme.titleMedium,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
 
                       Text(
                         "Software de Gestión Empresarial",
                         style: context.textTheme.bodySmall,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),

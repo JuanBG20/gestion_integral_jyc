@@ -41,7 +41,16 @@ class SalesRecord extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
             children: [
-              Text("Registro de Ventas", style: context.textTheme.titleMedium),
+              Expanded(
+                child: Text(
+                  "Registro de Ventas",
+                  style: context.textTheme.titleMedium,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+
+              const SizedBox(width: 8),
 
               TextButton.icon(
                 onPressed: () {

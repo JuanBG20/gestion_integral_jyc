@@ -136,9 +136,13 @@ class _VariantsTableSectionState extends State<VariantsTableSection> {
 
                   const SizedBox(width: 8),
 
-                  Text(
-                    "Click para agregar otra variante...",
-                    style: context.textTheme.bodyMedium,
+                  Expanded(
+                    child: Text(
+                      "Click para agregar otra variante...",
+                      style: context.textTheme.bodyMedium,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ],
               ),

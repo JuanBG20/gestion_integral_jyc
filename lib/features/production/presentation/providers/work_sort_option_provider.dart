@@ -7,3 +7,5 @@ final workStateFilterProvider = StateProvider<WorkState?>((ref) => null);
 final workSortOptionProvider = StateProvider<WorkSortOption>(
   (ref) => WorkSortOption.creationDesc,
 );
+
+final hideCompletedProvider = StateProvider<bool>((ref) => false);

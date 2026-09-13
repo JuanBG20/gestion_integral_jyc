@@ -4,6 +4,8 @@ import 'package:gestion_integral_jyc/core/enums/work_sort_option.dart';
 import 'package:gestion_integral_jyc/core/enums/work_state.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_dropdown.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/responsive_filter_bar.dart';
+import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
+import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/providers/work_sort_option_provider.dart';
 
 class WorkFilters extends ConsumerWidget {
@@ -18,7 +20,15 @@ class WorkFilters extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return ResponsiveFilterBar(filters: [_buildFilter(ref), _buildSorted(ref)]);
+    final hideCompleted = ref.watch(hideCompletedProvider);
+
+    return ResponsiveFilterBar(
+      filters: [
+        _buildFilter(ref),
+        _buildSorted(ref),
+        _buildHideCompletedToggle(context, ref, hideCompleted),
+      ],
+    );
   }
 
   Widget _buildFilter(WidgetRef ref) {
@@ -60,6 +70,55 @@ class WorkFilters extends ConsumerWidget {
           ref.read(workSortOptionProvider.notifier).state = sort;
         }
       },
+    );
+  }
+
+  Widget _buildHideCompletedToggle(
+    BuildContext context,
+    WidgetRef ref,
+    bool hideCompleted,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 20),
+
+      child: SwitchListTile(
+        value: hideCompleted,
+        onChanged: (value) {
+          ref.read(hideCompletedProvider.notifier).state = value;
+        },
+
+        tileColor: AppColors.background,
+        shape: RoundedRectangleBorder(
+          side: BorderSide(color: AppColors.outline),
+        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 3),
+
+        title: Text(
+          "Ocultar Finalizados",
+          style: context.textTheme.bodySmall?.copyWith(
+            color: Colors.black,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+
+      /* FilterChip(
+        label: const Text('Ocultar finalizados'),
+        selected: hideCompleted,
+        /* labelStyle: TextStyle(
+          color: hideCompleted ? Colors.white : Colors.grey[400],
+          fontWeight: hideCompleted ? FontWeight.bold : FontWeight.normal,
+        ), */
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+          side: BorderSide(
+            color: hideCompleted ? Colors.transparent : Colors.grey[800]!,
+          ),
+        ),
+        onSelected: (bool value) {
+          ref.read(hideCompletedProvider.notifier).state = value;
+        },
+      ), */
     );
   }
 }

@@ -42,10 +42,17 @@ class ProductionSummaryTable extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
             children: [
-              Text(
-                "Resumen de Producción",
-                style: context.textTheme.titleMedium,
+              Expanded(
+                child: Text(
+                  "Resumen de Producción",
+                  style: context.textTheme.titleMedium,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
+
+              const SizedBox(width: 8),
+
               TextButton(
                 onPressed: () => context.go('/work'),
                 child: Text("Ver Todo"),

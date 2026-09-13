@@ -57,11 +57,16 @@ class AuthLayout extends StatelessWidget {
 
                     SizedBox(height: 16),
 
-                    Text(title, style: context.textTheme.titleLarge),
+                    Text(
+                      title,
+                      style: context.textTheme.titleLarge,
+                      textAlign: TextAlign.center,
+                    ),
 
                     Text(
                       "Software de Gestión Empresarial",
                       style: context.textTheme.bodyLarge,
+                      textAlign: TextAlign.center,
                     ),
 
                     const SizedBox(height: 24),
@@ -77,9 +82,9 @@ class AuthLayout extends StatelessWidget {
 
               const SizedBox(height: 32),
 
-              Text("v1.4.0", style: context.textTheme.bodySmall),
+              Text("v1.4.2", style: context.textTheme.bodySmall),
               Text(
-                "© 2026 J&C Impresiones 3D. Todos los derechos reservados.",
+                "© 2026 Dédalo Studio. Todos los derechos reservados.",
                 style: context.textTheme.bodySmall,
                 textAlign: TextAlign.center,
               ),

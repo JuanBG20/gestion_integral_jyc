@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gestion_integral_jyc/core/enums/work_sort_option.dart';
+import 'package:gestion_integral_jyc/core/enums/work_state.dart';
 import 'package:gestion_integral_jyc/core/presentation/extensions/screen_size.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/app_mobile_list.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/screen_header.dart';
@@ -22,6 +23,7 @@ class AllWorksScreenWrapper extends ConsumerWidget {
 
     final selectedState = ref.watch(workStateFilterProvider);
     final currentSort = ref.watch(workSortOptionProvider);
+    final hideCompleted = ref.watch(hideCompletedProvider);
 
     return Scaffold(
       backgroundColor: AppColors.surface,
@@ -62,6 +64,11 @@ class AllWorksScreenWrapper extends ConsumerWidget {
                 }
 
                 var processedWorks = works.where((w) {
+                  // Filtro Ocultar Finalizados
+                  if (hideCompleted && w.actualState == WorkState.finalizado) {
+                    return false;
+                  }
+
                   // Filtro de Estado
                   if (selectedState != null && w.actualState != selectedState) {
                     return false;

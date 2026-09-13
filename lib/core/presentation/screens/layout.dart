@@ -43,7 +43,7 @@ class _LayoutState extends ConsumerState<Layout> {
           : null,
 
       appBar: context.isMobileLayout
-          ? AppBar(title: const Text("J&C Impresiones 3D"))
+          ? AppBar(title: const Text("Gestión J&C"))
           : null,
 
       body: SafeArea(

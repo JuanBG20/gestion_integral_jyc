@@ -47,7 +47,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final authState = ref.watch(authProvider);
 
     return AuthLayout(
-      title: "J&C Impresiones 3D",
+      title: "Gestión J&C",
       form: LoginForm(
         emailController: _emailController,
         passwordController: _passwordController,

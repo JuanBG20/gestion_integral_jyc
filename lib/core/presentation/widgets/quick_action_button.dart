@@ -20,7 +20,15 @@ class QuickActionButton extends StatelessWidget {
       label: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
 
-        children: [Icon(icon, size: 20), const SizedBox(width: 8), Text(label)],
+        children: [
+          Icon(icon, size: 20),
+
+          const SizedBox(width: 8),
+
+          Expanded(
+            child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
+          ),
+        ],
       ),
       icon: Icon(
         Icons.arrow_forward_ios,
