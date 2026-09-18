@@ -6,6 +6,7 @@ import 'package:gestion_integral_jyc/features/auth/presentation/screens/register
 import 'package:gestion_integral_jyc/core/presentation/screens/layout.dart';
 import 'package:gestion_integral_jyc/features/clients/presentation/screens/clients_screen_wrapper.dart';
 import 'package:gestion_integral_jyc/features/clients/presentation/screens/new_client_screen.dart';
+import 'package:gestion_integral_jyc/features/config/presentation/screens/config_screen.dart';
 import 'package:gestion_integral_jyc/features/dashboard/presentation/screens/dashboard_screen.dart';
 import 'package:gestion_integral_jyc/features/inventory/domain/entities/raw_material_entity.dart';
 import 'package:gestion_integral_jyc/features/inventory/domain/entities/scrap_entity.dart';
@@ -27,6 +28,7 @@ import 'package:gestion_integral_jyc/features/sales/presentation/screens/new_sal
 import 'package:gestion_integral_jyc/features/sales/presentation/screens/sale_details_screen.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/screens/sales_screen.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/screens/scanner_screen.dart';
+import 'package:gestion_integral_jyc/features/subscriptions/presentation/screens/windows_paywall_screen.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -226,6 +228,28 @@ final goRouter = GoRouter(
                     final client = state.extra as ClientEntity;
                     return NewClientScreen(clientToEdit: client);
                   },
+                ),
+              ],
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/config',
+              builder: (context, state) => const ConfigScreen(),
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/subscriptions',
+              builder: (context, state) => const Placeholder(),
+              routes: [
+                GoRoute(
+                  path: 'windows',
+                  builder: (context, state) => const WindowsPaywallScreen(),
                 ),
               ],
             ),

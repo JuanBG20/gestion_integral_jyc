@@ -17,4 +17,8 @@ class UserRemoteDataSource {
 
     return UserModel.fromJson(response);
   }
+
+  Future<void> deleteAccount() async {
+    await supabaseClient.rpc('delete_user');
+  }
 }

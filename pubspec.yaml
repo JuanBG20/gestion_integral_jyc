@@ -1,7 +1,7 @@
 name: gestion_integral_jyc
 description: "A new Flutter project."
 publish_to: "none"
-version: 1.4.2+9
+version: 1.4.3+10
 
 environment:
   sdk: ^3.11.5
@@ -24,6 +24,7 @@ dependencies:
   url_launcher: ^6.3.2
   purchases_flutter: ^10.11.0
   purchases_ui_flutter: ^10.11.0
+  qr_flutter: ^4.1.0
 
 dev_dependencies:
   flutter_test:
@@ -41,7 +42,8 @@ flutter:
 
 flutter_launcher_icons:
   android: true
-  ios: false
+  ios: true
+  remove_alpha_ios: true
   image_path: "assets/icons/logo.png"
   adaptive_icon_background: "#000000"
   adaptive_icon_foreground: "assets/icons/logo.png"
@@ -50,7 +52,7 @@ msix_config:
   display_name: "Gestión J&C Impresiones 3D"
   publisher_display_name: Dédalo Studio
   identity_name: ar.com.dedalostudio.jyc
-  msix_version: 1.4.2.0
+  msix_version: 1.4.3.0
   logo_path: assets/icons/logo.png
   capabilities: internetClient
   logo_padding: 0

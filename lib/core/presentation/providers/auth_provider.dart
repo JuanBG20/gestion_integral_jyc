@@ -138,6 +138,20 @@ class AuthNotifier extends StateNotifier<AuthState> {
     await _supabase.auth.signOut();
     state = const AuthState.initial();
   }
+
+  Future<void> deleteAccount() async {
+    state = state.copyWith(isLoading: true, errorMessage: null);
+
+    try {
+      await userDataSource.deleteAccount();
+      await signOut();
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Error al eliminar la cuenta: $e',
+      );
+    }
+  }
 }
 
 final isAdminProvider = Provider<bool>((ref) {

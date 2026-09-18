@@ -121,6 +121,14 @@ class SidebarContent extends ConsumerWidget {
           isExpanded: isExpanded,
         ),
 
+        SidebarItem(
+          icon: Icons.settings_outlined,
+          title: "Configuración",
+          onTap: () => _goToBranch(ref, 5),
+          isActive: navigationShell.currentIndex == 5,
+          isExpanded: isExpanded,
+        ),
+
         if (isMobile)
           SidebarItem(
             icon: Icons.qr_code_scanner,
@@ -130,12 +138,6 @@ class SidebarContent extends ConsumerWidget {
             isExpanded: isExpanded,
           ),
 
-        /* _buildSidebarItem(
-                    icon: Icons.settings_outlined,
-                    title: "Configuración",
-                    onTap: () {},
-                    isExpanded: isExpanded,
-                  ), */
         Spacer(),
 
         PremiumCard(isExpanded: isExpanded),
