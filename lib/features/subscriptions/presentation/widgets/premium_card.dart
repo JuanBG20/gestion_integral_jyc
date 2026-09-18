@@ -1,8 +1,12 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/features/subscriptions/presentation/providers/subscription_provider.dart';
+import 'package:go_router/go_router.dart';
 
 class PremiumCard extends ConsumerWidget {
   final bool isExpanded;
@@ -23,8 +27,17 @@ class PremiumCard extends ConsumerWidget {
               child: IconButton(
                 onPressed: isPremium
                     ? null
-                    : () =>
-                          ref.read(subscriptionProvider.notifier).openPaywall(),
+                    : () {
+                        final bool isMobileNative =
+                            !kIsWeb && (Platform.isAndroid || Platform.isIOS);
+
+                        if (!isMobileNative) {
+                          context.go('/subscriptions/windows');
+                          return;
+                        }
+
+                        ref.read(subscriptionProvider.notifier).openPaywall();
+                      },
                 icon: Icon(
                   isPremium ? Icons.verified : Icons.workspace_premium,
                   color: isPremium ? Colors.amber[700] : AppColors.primary,
@@ -88,6 +101,14 @@ class PremiumCard extends ConsumerWidget {
                 overflow: TextOverflow.ellipsis,
               ),
               onPressed: () {
+                final bool isMobileNative =
+                    !kIsWeb && (Platform.isAndroid || Platform.isIOS);
+
+                if (!isMobileNative) {
+                  context.go('/subscriptions/windows');
+                  return;
+                }
+
                 ref.read(subscriptionProvider.notifier).openPaywall();
               },
             ),
