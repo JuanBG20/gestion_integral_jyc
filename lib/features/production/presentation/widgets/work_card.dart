@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gestion_integral_jyc/core/enums/work_state.dart';
 import 'package:gestion_integral_jyc/core/presentation/extensions/date_formatting.dart';
 import 'package:gestion_integral_jyc/core/presentation/extensions/deadline_extensions.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/app_action_menu.dart';
@@ -81,8 +82,10 @@ class WorkCard extends StatelessWidget {
                 Text("FECHA LÍMITE"),
                 Text(
                   work.deadline != null ? work.deadline!.ddMMyyyy : '-',
-                  style: work.deadline != null
-                      ? TextStyle(color: work.deadline!.deadlineColor)
+                  style: work.actualState != WorkState.finalizado
+                      ? work.deadline != null
+                            ? TextStyle(color: work.deadline!.deadlineColor)
+                            : null
                       : null,
                 ),
               ],

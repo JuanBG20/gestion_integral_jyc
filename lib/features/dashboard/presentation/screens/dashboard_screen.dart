@@ -11,6 +11,7 @@ import 'package:gestion_integral_jyc/features/dashboard/presentation/widgets/sum
 import 'package:gestion_integral_jyc/features/inventory/presentation/providers/raw_material_provider.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/providers/work_provider.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/providers/sale_provider.dart';
+import 'package:go_router/go_router.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -165,6 +166,7 @@ class DashboardScreen extends ConsumerWidget {
                   subtitle: 'Actualizado hoy',
                   icon: Icons.trending_up,
                   iconColor: Colors.green,
+                  onTap: () => context.go('/sales'),
                 ),
 
                 SummaryCard(
@@ -174,6 +176,7 @@ class DashboardScreen extends ConsumerWidget {
                   subtitle: '$disenosPendientes con diseño pendiente',
                   icon: Icons.precision_manufacturing_outlined,
                   iconColor: Colors.deepPurple,
+                  onTap: () => context.go('/work'),
                 ),
 
                 SummaryCard(
@@ -185,6 +188,7 @@ class DashboardScreen extends ConsumerWidget {
                       : 'Stock en niveles óptimos',
                   icon: Icons.report_problem_outlined,
                   iconColor: AppColors.error,
+                  onTap: () => context.go('/inventory'),
                 ),
 
                 if (isRoot)
@@ -195,6 +199,7 @@ class DashboardScreen extends ConsumerWidget {
                     subtitle: 'Listas para facturar',
                     icon: Icons.receipt_long_outlined,
                     iconColor: Colors.yellow[800]!,
+                    onTap: () => context.go('/sales'),
                   ),
               ],
             );

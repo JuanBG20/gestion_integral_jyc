@@ -75,6 +75,13 @@ class AllSalesScreenWrapper extends ConsumerWidget {
                     if (selectedState == 'withoutBill' && sale.isInvoiced) {
                       return false;
                     }
+
+                    if (selectedState == 'hideMP') {
+                      final isMpMovement = sale.items.any(
+                        (item) => item.description == 'Movimiento MP',
+                      );
+                      if (isMpMovement) return false;
+                    }
                   }
 
                   // Filtro por Método de Pago

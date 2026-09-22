@@ -9,6 +9,7 @@ class SummaryCard extends StatelessWidget {
   final String subtitle;
   final IconData icon;
   final Color iconColor;
+  final VoidCallback? onTap;
 
   const SummaryCard({
     super.key,
@@ -18,51 +19,59 @@ class SummaryCard extends StatelessWidget {
     required this.subtitle,
     required this.icon,
     required this.iconColor,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: width,
-
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
+    return Material(
+      color: Colors.white,
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: AppColors.outline),
+        side: const BorderSide(color: AppColors.outline),
       ),
 
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(4),
 
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: Container(
+          width: width,
+          padding: const EdgeInsets.all(16),
+
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
 
             children: [
-              Expanded(
-                child: Text(
-                  title,
-                  style: context.textTheme.bodySmall?.copyWith(
-                    color: AppColors.onBackground,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 1.2,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+                children: [
+                  Expanded(
+                    child: Text(
+                      title,
+                      style: context.textTheme.bodySmall?.copyWith(
+                        color: AppColors.onBackground,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 1.2,
+                      ),
+                    ),
                   ),
-                ),
+
+                  Icon(icon, color: iconColor, size: 20),
+                ],
               ),
 
-              Icon(icon, color: iconColor, size: 20),
+              const SizedBox(height: 16),
+
+              Text(value, style: context.textTheme.titleLarge),
+
+              const SizedBox(height: 16),
+
+              Text(subtitle, style: context.textTheme.bodySmall),
             ],
           ),
-
-          const SizedBox(height: 16),
-
-          Text(value, style: context.textTheme.titleLarge),
-
-          const SizedBox(height: 16),
-
-          Text(subtitle, style: context.textTheme.bodySmall),
-        ],
+        ),
       ),
     );
   }
