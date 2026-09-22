@@ -64,6 +64,7 @@ class _PriceUpdatePreviewScreenState
               secondaryButtonLabel: "Cancelar",
               secondaryButtonIcon: Icons.close,
               onPressedSecundary: () => context.pop(),
+              hasButtons: true,
             ),
 
             const SizedBox(height: 24),

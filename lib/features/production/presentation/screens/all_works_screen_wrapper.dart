@@ -10,6 +10,7 @@ import 'package:gestion_integral_jyc/features/production/domain/entities/work_en
 import 'package:gestion_integral_jyc/features/production/presentation/providers/work_provider.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/providers/work_sort_option_provider.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/screens/all_works_screen.dart';
+import 'package:gestion_integral_jyc/features/production/presentation/utils/work_limit_gate.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/widgets/work_card.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/widgets/work_filters.dart';
 import 'package:go_router/go_router.dart';
@@ -25,12 +26,15 @@ class AllWorksScreenWrapper extends ConsumerWidget {
     final currentSort = ref.watch(workSortOptionProvider);
     final hideCompleted = ref.watch(hideCompletedProvider);
 
+    void goToNewWork() =>
+        WorkLimitGate.guardNewWork(context, ref, () => context.go('/work/new'));
+
     return Scaffold(
       backgroundColor: AppColors.surface,
 
       floatingActionButton: context.isMobileLayout
           ? FloatingActionButton(
-              onPressed: () => context.go('/work/new'),
+              onPressed: goToNewWork,
               child: const Icon(Icons.add),
             )
           : null,
@@ -46,7 +50,8 @@ class AllWorksScreenWrapper extends ConsumerWidget {
               title: "Órdenes de Trabajo",
               subtitle: "Gestión de trabajos en proceso.",
               buttonLabel: "Nuevo Trabajo",
-              onPressed: () => context.go('/work/new'),
+              onPressed: goToNewWork,
+              hasButtons: true,
             ),
 
             const SizedBox(height: 24),

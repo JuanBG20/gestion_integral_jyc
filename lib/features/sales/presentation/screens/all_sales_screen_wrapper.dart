@@ -45,6 +45,7 @@ class AllSalesScreenWrapper extends ConsumerWidget {
                   "Registra ventas, controla las transacciones y emite facturas.",
               buttonLabel: "Nueva Venta",
               onPressed: () => context.go('/sales/new'),
+              hasButtons: true,
             ),
 
             const SizedBox(height: 24),

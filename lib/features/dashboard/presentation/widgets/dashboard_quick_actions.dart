@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/quick_action_button.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/quick_actions_layout.dart';
+import 'package:gestion_integral_jyc/features/production/presentation/utils/work_limit_gate.dart';
+import 'package:gestion_integral_jyc/features/subscriptions/presentation/utils/premium_gate.dart';
 import 'package:go_router/go_router.dart';
 
-class DashboardQuickActions extends StatelessWidget {
+class DashboardQuickActions extends ConsumerWidget {
   const DashboardQuickActions({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return QuickActionsLayout(
       quickActions: [
         QuickActionButton(
@@ -19,7 +22,11 @@ class DashboardQuickActions extends StatelessWidget {
         QuickActionButton(
           label: 'Nueva Órden de Trabajo',
           icon: Icons.add_box_outlined,
-          onPressed: () => context.go('/work/new'),
+          onPressed: () => WorkLimitGate.guardNewWork(
+            context,
+            ref,
+            () => context.go('/work/new'),
+          ),
         ),
 
         QuickActionButton(
@@ -31,7 +38,11 @@ class DashboardQuickActions extends StatelessWidget {
         QuickActionButton(
           label: 'Registar Retazo',
           icon: Icons.content_cut_outlined,
-          onPressed: () => context.go('/inventory/new-scrap'),
+          onPressed: () => PremiumGate.guard(
+            context,
+            ref,
+            () => context.go('/inventory/new-scrap'),
+          ),
         ),
       ],
     );

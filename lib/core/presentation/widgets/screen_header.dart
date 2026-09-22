@@ -5,8 +5,9 @@ import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 class ScreenHeader extends StatelessWidget {
   final String title;
   final String subtitle;
-  final String buttonLabel;
-  final VoidCallback onPressed;
+  final bool hasButtons;
+  final String? buttonLabel;
+  final VoidCallback? onPressed;
   final bool hasSecondaryButton;
   final String? secondaryButtonLabel;
   final IconData? secondaryButtonIcon;
@@ -16,12 +17,13 @@ class ScreenHeader extends StatelessWidget {
     super.key,
     required this.title,
     required this.subtitle,
-    required this.buttonLabel,
-    required this.onPressed,
+    this.buttonLabel,
+    this.onPressed,
     this.hasSecondaryButton = false,
     this.onPressedSecundary,
     this.secondaryButtonLabel,
     this.secondaryButtonIcon,
+    required this.hasButtons,
   });
 
   @override
@@ -58,25 +60,26 @@ class ScreenHeader extends StatelessWidget {
 
         const SizedBox(width: 16),
 
-        Row(
-          children: [
-            if (hasSecondaryButton) ...[
-              OutlinedButton.icon(
-                onPressed: onPressedSecundary,
-                label: Text(secondaryButtonLabel ?? ''),
-                icon: Icon(secondaryButtonIcon),
+        if (hasButtons)
+          Row(
+            children: [
+              if (hasSecondaryButton) ...[
+                OutlinedButton.icon(
+                  onPressed: onPressedSecundary,
+                  label: Text(secondaryButtonLabel ?? ''),
+                  icon: Icon(secondaryButtonIcon),
+                ),
+
+                const SizedBox(width: 16),
+              ],
+
+              ElevatedButton.icon(
+                onPressed: onPressed,
+                label: Text(buttonLabel ?? ''),
+                icon: Icon(Icons.add),
               ),
-
-              const SizedBox(width: 16),
             ],
-
-            ElevatedButton.icon(
-              onPressed: onPressed,
-              label: Text(buttonLabel),
-              icon: Icon(Icons.add),
-            ),
-          ],
-        ),
+          ),
       ],
     );
   }

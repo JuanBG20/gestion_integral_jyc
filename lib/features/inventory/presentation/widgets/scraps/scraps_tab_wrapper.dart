@@ -7,6 +7,8 @@ import 'package:gestion_integral_jyc/features/inventory/domain/entities/scrap_en
 import 'package:gestion_integral_jyc/features/inventory/presentation/providers/scrap_provider.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/widgets/scraps/scrap_card.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/widgets/scraps/scraps_tab.dart';
+import 'package:gestion_integral_jyc/features/subscriptions/presentation/providers/subscription_provider.dart';
+import 'package:gestion_integral_jyc/features/subscriptions/presentation/widgets/premium_locked_feature.dart';
 
 class ScrapsTabWrapper extends ConsumerWidget {
   final bool isAdmin;
@@ -15,6 +17,18 @@ class ScrapsTabWrapper extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isPremium = ref.watch(subscriptionProvider).asData?.value ?? false;
+
+    if (!isPremium) {
+      return const PremiumLockedFeature(
+        icon: Icons.layers_outlined,
+        title: 'Gestión de Retazos',
+        description:
+            'Llevá el control de tus recortes y sobrantes de material.'
+            'Disponible en el plan Premium',
+      );
+    }
+
     final searchQuery = ref.watch(searchQueryProvider).toLowerCase();
     final scrapsState = ref.watch(scrapProvider);
 

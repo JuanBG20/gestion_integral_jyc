@@ -7,6 +7,8 @@ import 'package:gestion_integral_jyc/core/presentation/providers/search_provider
 import 'package:gestion_integral_jyc/core/presentation/widgets/sidebar_item.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
+import 'package:gestion_integral_jyc/features/subscriptions/presentation/providers/subscription_provider.dart';
+import 'package:gestion_integral_jyc/features/subscriptions/presentation/utils/premium_gate.dart';
 import 'package:gestion_integral_jyc/features/subscriptions/presentation/widgets/premium_card.dart';
 import 'package:go_router/go_router.dart';
 
@@ -130,12 +132,24 @@ class SidebarContent extends ConsumerWidget {
         ),
 
         if (isMobile)
-          SidebarItem(
-            icon: Icons.qr_code_scanner,
-            title: "Escáner",
-            onTap: () => context.push('/scanner'),
-            isActive: false,
-            isExpanded: isExpanded,
+          Consumer(
+            builder: (context, ref, _) {
+              final isPremium =
+                  ref.watch(subscriptionProvider).asData?.value ?? false;
+
+              return SidebarItem(
+                icon: Icons.qr_code_scanner,
+                title: "Escáner",
+                isLocked: !isPremium,
+                onTap: () => PremiumGate.guard(
+                  context,
+                  ref,
+                  () => context.push('/scanner'),
+                ),
+                isActive: false,
+                isExpanded: isExpanded,
+              );
+            },
           ),
 
         Spacer(),

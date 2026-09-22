@@ -68,8 +68,7 @@ class ConfigScreen extends ConsumerWidget {
             ScreenHeader(
               title: "Configuración",
               subtitle: "Gestioná tus preferencias.",
-              buttonLabel: '',
-              onPressed: () {},
+              hasButtons: false,
             ),
 
             const SizedBox(height: 24),

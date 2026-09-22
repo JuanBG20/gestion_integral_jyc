@@ -7,6 +7,8 @@ import 'package:gestion_integral_jyc/core/presentation/providers/auth_provider.d
 import 'package:gestion_integral_jyc/features/inventory/presentation/widgets/products/products_tab_wrapper.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/widgets/raw_materials/raw_materials_tab_wrapper.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/widgets/scraps/scraps_tab_wrapper.dart';
+import 'package:gestion_integral_jyc/features/subscriptions/presentation/providers/subscription_provider.dart';
+import 'package:gestion_integral_jyc/features/subscriptions/presentation/utils/premium_gate.dart';
 import 'package:go_router/go_router.dart';
 
 class InventoryScreen extends ConsumerWidget {
@@ -15,6 +17,7 @@ class InventoryScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isAdmin = ref.watch(isAdminProvider);
+    final isPremium = ref.watch(subscriptionProvider).asData?.value ?? false;
 
     return DefaultTabController(
       length: 3,
@@ -43,7 +46,7 @@ class InventoryScreen extends ConsumerWidget {
 
                       FloatingActionButton(
                         heroTag: "btn_main",
-                        onPressed: () => _newItemNavigation(tabContext),
+                        onPressed: () => _newItemNavigation(tabContext, ref),
                         child: const Icon(Icons.add),
                       ),
                     ],
@@ -67,12 +70,13 @@ class InventoryScreen extends ConsumerWidget {
                         subtitle:
                             "Gestión de productos terminados, materia prima y retazos.",
                         buttonLabel: "Nuevo Item",
-                        onPressed: () => _newItemNavigation(tabContext),
+                        onPressed: () => _newItemNavigation(tabContext, ref),
                         hasSecondaryButton: isAdmin,
                         secondaryButtonLabel: "Actualizar Precios",
                         secondaryButtonIcon: Icons.price_check,
                         onPressedSecundary: () =>
                             context.go('inventory/price-preview'),
+                        hasButtons: true,
                       ),
                     ),
                   ),
@@ -94,10 +98,22 @@ class InventoryScreen extends ConsumerWidget {
                           isScrollable: true,
                           tabAlignment: TabAlignment.start,
                           dividerColor: AppColors.outline,
-                          tabs: const [
-                            Tab(text: "Materia Prima"),
-                            Tab(text: "Productos"),
-                            Tab(text: "Retazos"),
+                          tabs: [
+                            const Tab(text: "Materia Prima"),
+                            const Tab(text: "Productos"),
+                            Tab(
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+
+                                children: [
+                                  const Text("Retazos"),
+                                  if (!isPremium) ...[
+                                    const SizedBox(width: 4),
+                                    const Icon(Icons.lock, size: 14),
+                                  ],
+                                ],
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -119,7 +135,7 @@ class InventoryScreen extends ConsumerWidget {
     );
   }
 
-  void _newItemNavigation(BuildContext tabContext) {
+  void _newItemNavigation(BuildContext tabContext, WidgetRef ref) {
     final currentIndex = DefaultTabController.of(tabContext).index;
 
     switch (currentIndex) {
@@ -130,7 +146,11 @@ class InventoryScreen extends ConsumerWidget {
         tabContext.go('/inventory/new-product');
         break;
       case 2:
-        tabContext.go('/inventory/new-scrap');
+        PremiumGate.guard(
+          tabContext,
+          ref,
+          () => tabContext.go('/inventory/new-scrap'),
+        );
         break;
     }
   }

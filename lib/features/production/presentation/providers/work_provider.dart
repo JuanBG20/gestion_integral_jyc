@@ -21,6 +21,15 @@ final workProvider =
       return WorkNotifier(ref.read(workRepositoryProvider));
     });
 
+final activeWorksCountProvider = Provider<int>((ref) {
+  final worksAsync = ref.watch(workProvider);
+
+  return worksAsync.asData?.value
+          .where((w) => w.actualState != WorkState.finalizado)
+          .length ??
+      0;
+});
+
 class WorkNotifier extends StateNotifier<AsyncValue<List<WorkEntity>>> {
   final WorkRepository repository;
 

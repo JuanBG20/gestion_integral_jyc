@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
+import 'package:gestion_integral_jyc/features/subscriptions/presentation/widgets/premium_lock_badge.dart';
 
 class SidebarItem extends StatelessWidget {
   final IconData icon;
@@ -8,6 +9,7 @@ class SidebarItem extends StatelessWidget {
   final bool isActive;
   final VoidCallback onTap;
   final bool isExpanded;
+  final bool isLocked;
 
   const SidebarItem({
     super.key,
@@ -16,6 +18,7 @@ class SidebarItem extends StatelessWidget {
     this.isActive = false,
     required this.onTap,
     required this.isExpanded,
+    this.isLocked = false,
   });
 
   @override
@@ -50,11 +53,12 @@ class SidebarItem extends StatelessWidget {
 
             children: [
               Tooltip(
-                message: title,
+                message: isLocked ? "$title (Premium)" : title,
                 waitDuration: const Duration(milliseconds: 500),
 
-                child: Icon(
-                  icon,
+                child: PremiumLockBadge(
+                  icon: icon,
+                  isLocked: isLocked,
                   color: isActive ? AppColors.primary : AppColors.onBackground,
                 ),
               ),

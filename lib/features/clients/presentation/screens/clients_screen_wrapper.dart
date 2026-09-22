@@ -44,6 +44,7 @@ class ClientsScreenWrapper extends ConsumerWidget {
               subtitle: "Directorio y perfiles de facturación.",
               buttonLabel: "Nuevo Cliente",
               onPressed: () => context.go('/clients/new'),
+              hasButtons: true,
             ),
 
             const SizedBox(height: 32),

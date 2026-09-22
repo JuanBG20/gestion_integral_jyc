@@ -82,7 +82,7 @@ class AuthLayout extends StatelessWidget {
 
               const SizedBox(height: 32),
 
-              Text("v1.4.3", style: context.textTheme.bodySmall),
+              Text("v1.5.0", style: context.textTheme.bodySmall),
               Text(
                 "© 2026 Dédalo Studio. Todos los derechos reservados.",
                 style: context.textTheme.bodySmall,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gestion_integral_jyc/core/enums/measurement_unit.dart';
 import 'package:gestion_integral_jyc/core/presentation/extensions/screen_size.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_dropdown.dart';
@@ -8,8 +9,11 @@ import 'package:gestion_integral_jyc/core/utils/price_calculator.dart';
 import 'package:gestion_integral_jyc/features/inventory/domain/entities/material_recipe_entity.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/widgets/recipe_dialog.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/widgets/products/variants_table_section.dart';
+import 'package:gestion_integral_jyc/features/subscriptions/presentation/providers/subscription_provider.dart';
+import 'package:gestion_integral_jyc/features/subscriptions/presentation/utils/premium_gate.dart';
+import 'package:gestion_integral_jyc/features/subscriptions/presentation/widgets/premium_lock_badge.dart';
 
-class VariantFormEditor extends StatefulWidget {
+class VariantFormEditor extends ConsumerStatefulWidget {
   final VariantFormData? initialVariant;
   final ValueChanged<VariantFormData> onSave;
   final VoidCallback onCancel;
@@ -22,10 +26,10 @@ class VariantFormEditor extends StatefulWidget {
   });
 
   @override
-  State<VariantFormEditor> createState() => _VariantFormEditorState();
+  ConsumerState<VariantFormEditor> createState() => _VariantFormEditorState();
 }
 
-class _VariantFormEditorState extends State<VariantFormEditor> {
+class _VariantFormEditorState extends ConsumerState<VariantFormEditor> {
   final _skuController = TextEditingController();
   final _colorController = TextEditingController();
   final _sizeController = TextEditingController();
@@ -224,14 +228,18 @@ class _VariantFormEditorState extends State<VariantFormEditor> {
   }
 
   Widget _buildActionButtons(bool isWide) {
+    final isPremium = ref.watch(subscriptionProvider).asData?.value ?? false;
+
     final recipeButton = OutlinedButton.icon(
-      onPressed: _openRecipeDialog,
+      onPressed: () => PremiumGate.guard(context, ref, _openRecipeDialog),
       label: Text(
         _recipe.isEmpty ? "Definir Receta" : "Receta (${_recipe.length})",
       ),
-      icon: Icon(
-        Icons.science_outlined,
+      icon: PremiumLockBadge(
+        icon: Icons.science_outlined,
+        isLocked: !isPremium,
         color: _recipe.isNotEmpty ? AppColors.primary : null,
+        size: 20,
       ),
     );
 
