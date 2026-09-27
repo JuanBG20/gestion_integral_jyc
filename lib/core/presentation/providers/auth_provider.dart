@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:gestion_integral_jyc/core/domain/services/analytics_service.dart';
 import 'package:gestion_integral_jyc/core/enums/role.dart';
+import 'package:gestion_integral_jyc/core/presentation/providers/analytics_provider.dart';
 import 'package:gestion_integral_jyc/core/presentation/providers/auth_state.dart';
 import 'package:gestion_integral_jyc/features/auth/data/datasources/user_remote_data_source.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' hide AuthState;
@@ -10,14 +12,19 @@ final userRemoteDataSourceProvider = Provider<UserRemoteDataSource>((ref) {
 });
 
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
-  return AuthNotifier(ref.read(userRemoteDataSourceProvider));
+  final userDataSource = ref.read(userRemoteDataSourceProvider);
+  final analyticsService = ref.read(analyticsProvider);
+
+  return AuthNotifier(userDataSource, analyticsService);
 });
 
 class AuthNotifier extends StateNotifier<AuthState> {
   final UserRemoteDataSource userDataSource;
+  final AnalyticsService analyticsService;
   final _supabase = Supabase.instance.client;
 
-  AuthNotifier(this.userDataSource) : super(const AuthState.initial()) {
+  AuthNotifier(this.userDataSource, this.analyticsService)
+    : super(const AuthState.initial()) {
     _restoreSession();
   }
 
@@ -41,7 +48,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
       }
 
       await _loadUserProfile(response.user!.id);
+
+      await analyticsService.logLoginSuccess(loginMethod: 'email');
     } on AuthException catch (e) {
+      await analyticsService.logLoginFailed(error: e.message);
+
       if (e.message.contains('Email not confirmed')) {
         state = state.copyWith(
           isLoading: false,
@@ -55,6 +66,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
         );
       }
     } catch (e) {
+      await analyticsService.logLoginFailed(error: e.toString());
+
       state = state.copyWith(
         isLoading: false,
         errorMessage: 'Error al iniciar sesión: $e',
@@ -113,6 +126,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
       final newUser = response.user;
       if (newUser == null) throw Exception('No se pudo crear la cuenta');
+
+      await analyticsService.logSignUpCompleted(signUpMethod: 'email');
 
       if (response.session == null) {
         state = state.copyWith(
