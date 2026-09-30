@@ -85,4 +85,9 @@ class SaleRepositoryImpl implements SaleRepository {
       additionalDiscounts: additionalDiscounts,
     );
   }
+
+  @override
+  Future<void> markAsManuallyInvoiced(int saleId) async {
+    await billRemoteDataSource.insertManualInvoice(saleId);
+  }
 }

@@ -3,7 +3,7 @@ import 'package:gestion_integral_jyc/features/sales/domain/entities/bill_entity.
 
 extension BillFormatting on BillEntity {
   String get letraComprobante {
-    switch (arcaData.cbteTipo) {
+    switch (arcaData!.cbteTipo) {
       case 1:
         return 'A';
       case 6:
@@ -15,7 +15,7 @@ extension BillFormatting on BillEntity {
   }
 
   String get codigoComprobante {
-    switch (arcaData.cbteTipo) {
+    switch (arcaData!.cbteTipo) {
       case 1:
         return '001';
       case 6:
@@ -27,7 +27,7 @@ extension BillFormatting on BillEntity {
   }
 
   String get docTipoLabel {
-    switch (arcaData.docTipo) {
+    switch (arcaData!.docTipo) {
       case 80:
         return 'CUIT';
       case 86:
@@ -39,12 +39,12 @@ extension BillFormatting on BillEntity {
     }
   }
 
-  bool get isConsumidorFinalAnonimo => arcaData.docTipo == 99;
+  bool get isConsumidorFinalAnonimo => arcaData!.docTipo == 99;
 
   String get condicionIvaReceptorLabel {
     return CondicionIvaReceptor.values
         .firstWhere(
-          (c) => c.arcaId == arcaData.condicionIvaReceptorId,
+          (c) => c.arcaId == arcaData!.condicionIvaReceptorId,
           orElse: () => CondicionIvaReceptor.consumidorFinal,
         )
         .label;

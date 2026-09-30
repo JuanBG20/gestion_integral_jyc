@@ -20,4 +20,5 @@ abstract class SaleRepository {
     PaymentMethod paymentMethod, {
     List<DiscountEntity> additionalDiscounts = const [],
   });
+  Future<void> markAsManuallyInvoiced(int saleId);
 }

@@ -33,4 +33,13 @@ class BillRemoteDataSource {
       throw Exception(error);
     }
   }
+
+  Future<void> insertManualInvoice(int saleId) async {
+    await supabaseClient.from('factura').insert({
+      'venta': saleId,
+      'exitoso': true,
+      'fecha_emision': DateTime.now().toUtc().toIso8601String(),
+      'es_manual': true,
+    });
+  }
 }

@@ -4,8 +4,9 @@ import 'package:gestion_integral_jyc/features/sales/domain/entities/bill_entity.
 class BillModel extends BillEntity {
   BillModel({
     super.id,
-    required super.arcaData,
+    super.arcaData,
     required super.isSuccessful,
+    required super.isManual,
     required super.emissionDate,
     super.cae,
   });
@@ -13,12 +14,15 @@ class BillModel extends BillEntity {
   factory BillModel.fromJson(Map<String, dynamic> json) {
     return BillModel(
       id: json['idfactura'],
-      arcaData: ArcaDataModel.fromJson(
-        json['respuesta_arca'] as Map<String, dynamic>? ?? {},
-      ),
+      arcaData: json['respuesta_arca'] != null
+          ? ArcaDataModel.fromJson(
+              json['respuesta_arca'] as Map<String, dynamic>? ?? {},
+            )
+          : null,
       isSuccessful: json['exitoso'] ?? false,
       emissionDate: DateTime.parse(json['fecha_emision']),
       cae: json['cae'],
+      isManual: json['es_manual'],
     );
   }
 }

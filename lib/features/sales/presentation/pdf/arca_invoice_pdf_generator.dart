@@ -40,7 +40,7 @@ class ArcaInvoicePdfGenerator {
             pw.SizedBox(height: 10),
             _buildItemsTable(sale.items),
             pw.SizedBox(height: 20),
-            _buildTotal(currencyFormat, data.impTotal),
+            _buildTotal(currencyFormat, data!.impTotal),
             pw.Spacer(),
             _buildFooter(bill, qrUrl),
           ],
@@ -59,7 +59,7 @@ class ArcaInvoicePdfGenerator {
 
     final qrDataMap = {
       "ver": 1,
-      "fecha": DateFormat('yyyy-MM-dd').format(data.fechaComprobante),
+      "fecha": DateFormat('yyyy-MM-dd').format(data!.fechaComprobante),
       "cuit": int.parse(EmisorFiscalData.cuit),
       "ptoVta": data.ptoVta,
       "tipoCmp": data.cbteTipo,
@@ -150,7 +150,7 @@ class ArcaInvoicePdfGenerator {
                       ),
                       pw.SizedBox(height: 5),
                       pw.Text(
-                        'Punto de Venta: ${data.ptoVta.toString().padLeft(5, '0')}  '
+                        'Punto de Venta: ${data!.ptoVta.toString().padLeft(5, '0')}  '
                         'Comp. Nro: ${data.cbteNro.toString().padLeft(8, '0')}',
                         style: const pw.TextStyle(fontSize: 10),
                       ),
@@ -234,7 +234,7 @@ class ArcaInvoicePdfGenerator {
               children: [
                 if (!bill.isConsumidorFinalAnonimo)
                   pw.Text(
-                    '${bill.docTipoLabel}: ${data.docNro}',
+                    '${bill.docTipoLabel}: ${data!.docNro}',
                     style: const pw.TextStyle(fontSize: 9),
                   ),
                 pw.Text(
@@ -405,7 +405,7 @@ class ArcaInvoicePdfGenerator {
                       fontWeight: pw.FontWeight.bold,
                     ),
                   ),
-                  pw.Text(data.cae, style: const pw.TextStyle(fontSize: 10)),
+                  pw.Text(data!.cae, style: const pw.TextStyle(fontSize: 10)),
                 ],
               ),
               pw.Row(

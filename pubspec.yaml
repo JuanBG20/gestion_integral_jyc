@@ -1,7 +1,7 @@
 name: gestion_integral_jyc
 description: "A new Flutter project."
 publish_to: "none"
-version: 1.5.2+13
+version: 1.5.3+14
 
 environment:
   sdk: ^3.11.5
@@ -19,7 +19,7 @@ dependencies:
   riverpod: ^3.2.1
   flutter_dotenv: ^6.0.1
   pdf: ^3.12.0
-  printing: ^5.14.3
+  printing: ^5.15.1
   mobile_scanner: ^7.2.1
   url_launcher: ^6.3.2
   purchases_flutter: ^10.11.0
@@ -54,7 +54,7 @@ msix_config:
   display_name: "Gestión J&C Impresiones 3D"
   publisher_display_name: Dédalo Studio
   identity_name: ar.com.dedalostudio.jyc
-  msix_version: 1.5.2.0
+  msix_version: 1.5.3.0
   logo_path: assets/icons/logo.png
   capabilities: internetClient
   logo_padding: 0

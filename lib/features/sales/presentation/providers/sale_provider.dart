@@ -141,4 +141,13 @@ class SaleNotifier extends StateNotifier<AsyncValue<List<SaleEntity>>> {
       throw Exception('Error al registrar el pago: $e');
     }
   }
+
+  Future<void> markAsManuallyInvoiced(int saleId) async {
+    try {
+      await repository.markAsManuallyInvoiced(saleId);
+      await fetchSales();
+    } catch (e) {
+      throw Exception('Error al registrar factura manual: $e');
+    }
+  }
 }
