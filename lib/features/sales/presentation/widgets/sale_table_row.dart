@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gestion_integral_jyc/core/presentation/extensions/date_formatting.dart';
+import 'package:gestion_integral_jyc/core/presentation/providers/auth_provider.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/app_action_menu.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_cell.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_row.dart';
@@ -8,7 +10,7 @@ import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_entity.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/utils/sale_action_handler.dart';
 
-class SaleTableRow extends StatelessWidget {
+class SaleTableRow extends ConsumerWidget {
   final SaleEntity sale;
   final double trailingWidth;
 
@@ -19,7 +21,9 @@ class SaleTableRow extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isRoot = ref.watch(isRootProvider);
+
     return AppTableRow(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       trailingWidth: trailingWidth,
@@ -32,11 +36,23 @@ class SaleTableRow extends StatelessWidget {
                   icon: Icons.visibility_outlined,
                 ),
 
-                if (!sale.isInvoiced && sale.isPaid)
-                  AppActionMenuItem(value: 'bill', label: 'Facturar'),
+                if (!sale.isInvoiced && sale.isPaid) ...[
+                  const AppActionMenuItem(
+                    value: 'manual_bill',
+                    label: 'Marcar como Facturada',
+                    icon: Icons.done_all,
+                  ),
+
+                  if (isRoot)
+                    const AppActionMenuItem(
+                      value: 'bill',
+                      label: 'Facturar con ARCA',
+                      icon: Icons.receipt_long_outlined,
+                    ),
+                ],
               ],
               onSelected: (value) =>
-                  handleSaleSharedAction(context, value, sale),
+                  handleSaleSharedAction(context, ref, value, sale),
             )
           : null,
 

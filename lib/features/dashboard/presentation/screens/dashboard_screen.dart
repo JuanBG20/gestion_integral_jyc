@@ -191,16 +191,15 @@ class DashboardScreen extends ConsumerWidget {
                   onTap: () => context.go('/inventory'),
                 ),
 
-                if (isRoot)
-                  SummaryCard(
-                    width: cardWidth,
-                    title: 'FACTURAS PENDIENTES',
-                    value: facturasPendientes.toString(),
-                    subtitle: 'Listas para facturar',
-                    icon: Icons.receipt_long_outlined,
-                    iconColor: Colors.yellow[800]!,
-                    onTap: () => context.go('/sales'),
-                  ),
+                SummaryCard(
+                  width: cardWidth,
+                  title: 'FACTURAS PENDIENTES',
+                  value: facturasPendientes.toString(),
+                  subtitle: 'Listas para facturar',
+                  icon: Icons.receipt_long_outlined,
+                  iconColor: Colors.yellow[800]!,
+                  onTap: () => context.go('/sales'),
+                ),
               ],
             );
           },

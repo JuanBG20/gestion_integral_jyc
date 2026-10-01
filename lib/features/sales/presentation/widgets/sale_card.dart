@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gestion_integral_jyc/core/presentation/extensions/date_formatting.dart';
+import 'package:gestion_integral_jyc/core/presentation/providers/auth_provider.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/app_action_menu.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/app_card_shell.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
@@ -9,13 +11,15 @@ import 'package:gestion_integral_jyc/features/sales/presentation/utils/sale_acti
 import 'package:gestion_integral_jyc/features/sales/presentation/widgets/sale_status_badge.dart';
 import 'package:go_router/go_router.dart';
 
-class SaleCard extends StatelessWidget {
+class SaleCard extends ConsumerWidget {
   final SaleEntity sale;
 
   const SaleCard({super.key, required this.sale});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isRoot = ref.watch(isRootProvider);
+
     final String status = sale.isPaid
         ? sale.isInvoiced
               ? 'FACTURADA'
@@ -53,11 +57,23 @@ class SaleCard extends StatelessWidget {
                   icon: Icons.visibility_outlined,
                 ),
 
-                if (!sale.isInvoiced && sale.isPaid)
-                  AppActionMenuItem(value: 'bill', label: 'Facturar'),
+                if (!sale.isInvoiced && sale.isPaid) ...[
+                  const AppActionMenuItem(
+                    value: 'manual_bill',
+                    label: 'Marcar como Facturada',
+                    icon: Icons.done_all,
+                  ),
+
+                  if (isRoot)
+                    const AppActionMenuItem(
+                      value: 'bill',
+                      label: 'Facturar con ARCA',
+                      icon: Icons.receipt_long_outlined,
+                    ),
+                ],
               ],
               onSelected: (value) =>
-                  handleSaleSharedAction(context, value, sale),
+                  handleSaleSharedAction(context, ref, value, sale),
             ),
           ],
         ),
