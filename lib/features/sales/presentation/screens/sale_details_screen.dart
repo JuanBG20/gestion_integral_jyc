@@ -210,7 +210,15 @@ class _SaleDetailsScreenState extends ConsumerState<SaleDetailsScreen> {
         ),
 
         if (!sale.isPaid) ...[
-          SalePaymentCard(sale: sale, additionalDiscounts: additionalDiscounts),
+          SalePaymentCard(
+            sale: sale,
+            additionalDiscounts: additionalDiscounts,
+            onMethodChanged: (method) {
+              setState(() {
+                _selectedMethod = method;
+              });
+            },
+          ),
         ] else ...[
           const SizedBox(height: 16),
 

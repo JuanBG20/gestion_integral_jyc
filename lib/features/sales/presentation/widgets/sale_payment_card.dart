@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gestion_integral_jyc/core/enums/payment_method.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
@@ -12,11 +11,13 @@ import 'package:gestion_integral_jyc/features/sales/presentation/widgets/payment
 class SalePaymentCard extends ConsumerStatefulWidget {
   final SaleEntity sale;
   final List<DiscountEntity> additionalDiscounts;
+  final ValueChanged<PaymentMethod> onMethodChanged;
 
   const SalePaymentCard({
     super.key,
     required this.sale,
     required this.additionalDiscounts,
+    required this.onMethodChanged,
   });
 
   @override
@@ -52,6 +53,8 @@ class _SalePaymentCardState extends ConsumerState<SalePaymentCard> {
               setState(() {
                 _selectedMethod = method;
               });
+
+              widget.onMethodChanged(method);
             },
           ),
 
