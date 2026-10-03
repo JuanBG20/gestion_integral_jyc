@@ -31,7 +31,7 @@ class _ProductCardState extends ConsumerState<ProductCard> {
 
     return AppCardShell(
       onTapCard: () =>
-          context.go('/inventory/edit-product', extra: widget.product),
+          context.push('/inventory/edit-product', extra: widget.product),
       cardContent: [
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,

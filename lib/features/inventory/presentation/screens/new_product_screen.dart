@@ -120,7 +120,11 @@ class _NewRawMaterialScreenState extends ConsumerState<NewProductScreen> {
                 ),
               ),
             );
-            context.go('/inventory');
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/inventory');
+            }
           })
           .catchError((error) {
             ScaffoldMessenger.of(
@@ -228,7 +232,11 @@ class _NewRawMaterialScreenState extends ConsumerState<NewProductScreen> {
       ),
 
       onReturn: () {
-        context.go('/inventory');
+        if (context.canPop()) {
+          context.pop();
+        } else {
+          context.go('/inventory');
+        }
       },
       onSave: _saveFullProduct,
       onCancel: () {

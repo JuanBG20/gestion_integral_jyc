@@ -37,7 +37,7 @@ class InventoryScreen extends ConsumerWidget {
                         FloatingActionButton.small(
                           heroTag: "btn_small",
                           onPressed: () =>
-                              context.go('inventory/price-preview'),
+                              context.push('inventory/price-preview'),
                           child: const Icon(Icons.price_check),
                         ),
 
@@ -75,7 +75,7 @@ class InventoryScreen extends ConsumerWidget {
                         secondaryButtonLabel: "Actualizar Precios",
                         secondaryButtonIcon: Icons.price_check,
                         onPressedSecundary: () =>
-                            context.go('inventory/price-preview'),
+                            context.push('inventory/price-preview'),
                         hasButtons: true,
                       ),
                     ),
@@ -140,16 +140,16 @@ class InventoryScreen extends ConsumerWidget {
 
     switch (currentIndex) {
       case 0:
-        tabContext.go('/inventory/new-material');
+        tabContext.push('/inventory/new-material');
         break;
       case 1:
-        tabContext.go('/inventory/new-product');
+        tabContext.push('/inventory/new-product');
         break;
       case 2:
         PremiumGate.guard(
           tabContext,
           ref,
-          () => tabContext.go('/inventory/new-scrap'),
+          () => tabContext.push('/inventory/new-scrap'),
         );
         break;
     }

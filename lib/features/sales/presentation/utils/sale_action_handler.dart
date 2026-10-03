@@ -13,7 +13,7 @@ Future<void> handleSaleSharedAction(
 ) async {
   switch (action) {
     case 'detail':
-      context.go('/sales/detail', extra: sale);
+      context.push('/sales/detail', extra: sale);
       break;
 
     case 'bill':
@@ -21,7 +21,7 @@ Future<void> handleSaleSharedAction(
 
       if (!isRoot || !sale.isPaid || sale.isInvoiced) return;
 
-      context.go('/sales/detail/bill', extra: sale);
+      context.push('/sales/detail/bill', extra: sale);
       break;
 
     case 'manual_bill':

@@ -16,6 +16,6 @@ void handleClientSharedAction(
         ref.read(clientProvider.notifier).removeClient(client.id!);
       }
     case 'edit':
-      context.go('/clients/edit', extra: client);
+      context.push('/clients/edit', extra: client);
   }
 }

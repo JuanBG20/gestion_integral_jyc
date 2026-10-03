@@ -28,7 +28,7 @@ void handleRawMaterialSharedAction(
         },
       );
     case 'edit':
-      context.go('/inventory/edit-material', extra: material);
+      context.push('/inventory/edit-material', extra: material);
     case 'delete':
       if (material.id != null) {
         ref.read(rawMaterialProvider.notifier).removeRawMaterial(material.id!);

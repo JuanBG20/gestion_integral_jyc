@@ -17,7 +17,7 @@ class ScrapCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return AppCardShell(
-      onTapCard: () => context.go('/inventory/edit-scrap', extra: scrap),
+      onTapCard: () => context.push('/inventory/edit-scrap', extra: scrap),
       cardContent: [
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,

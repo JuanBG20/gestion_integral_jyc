@@ -104,7 +104,11 @@ class _NewRawMaterialScreenState extends ConsumerState<NewWorkScreen> {
                 ),
               ),
             );
-            context.go('/work');
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/work');
+            }
           })
           .catchError((error) {
             ScaffoldMessenger.of(
@@ -239,7 +243,11 @@ class _NewRawMaterialScreenState extends ConsumerState<NewWorkScreen> {
         ),
       ),
       onReturn: () {
-        context.go('/work');
+        if (context.canPop()) {
+          context.pop();
+        } else {
+          context.go('/work');
+        }
       },
       onSave: _saveWork,
       onCancel: () {

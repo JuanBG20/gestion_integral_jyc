@@ -160,7 +160,7 @@ class SaleInvoiceCard extends ConsumerWidget {
                   label: 'Facturar Venta',
                   icon: Icons.receipt_long_outlined,
                   onPressed: () =>
-                      context.go('/sales/detail/bill', extra: sale),
+                      context.push('/sales/detail/bill', extra: sale),
                 ),
               ),
             ],

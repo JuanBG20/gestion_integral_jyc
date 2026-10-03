@@ -15,7 +15,7 @@ void handleBaseProductSharedAction(
 ) {
   switch (action) {
     case 'edit':
-      context.go('/inventory/edit-product', extra: product);
+      context.push('/inventory/edit-product', extra: product);
     case 'delete':
       if (product.baseProduct.id != null) {
         ref

@@ -83,7 +83,7 @@ class DraggableWorkCard extends StatelessWidget {
 
             OutlinedButton(
               onPressed: () {
-                context.go('/work/detail', extra: work);
+                context.push('/work/detail', extra: work);
               },
               child: Text("Ver Detalles"),
             ),

@@ -34,7 +34,7 @@ class ProductionQuickActions extends ConsumerWidget {
         QuickActionButton(
           label: 'Editar Orden',
           icon: Icons.edit_outlined,
-          onPressed: () => context.go('/work/edit', extra: work),
+          onPressed: () => context.push('/work/edit', extra: work),
         ),
       ],
     );

@@ -252,7 +252,7 @@ class MpMovements extends ConsumerWidget {
           isPaid: true,
         );
 
-        context.go(
+        context.push(
           '/sales/detail/bill?mpMovementId=${movement.id}',
           extra: quickSale,
         );

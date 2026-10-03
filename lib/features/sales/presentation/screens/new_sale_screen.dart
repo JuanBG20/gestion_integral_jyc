@@ -81,7 +81,12 @@ class _NewRawMaterialScreenState extends ConsumerState<NewSaleScreen> {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Venta registrada exitosamente')),
             );
-            context.go('/sales');
+
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/sales');
+            }
           })
           .catchError((error) {
             ScaffoldMessenger.of(
@@ -219,7 +224,11 @@ class _NewRawMaterialScreenState extends ConsumerState<NewSaleScreen> {
       ),
 
       onReturn: () {
-        context.go('/sales');
+        if (context.canPop()) {
+          context.pop();
+        } else {
+          context.go('/sales');
+        }
       },
       onSave: _saveSale,
       onCancel: () {

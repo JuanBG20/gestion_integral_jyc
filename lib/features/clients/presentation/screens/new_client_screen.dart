@@ -122,7 +122,11 @@ class _NewClientScreenState extends ConsumerState<NewClientScreen> {
                 ),
               ),
             );
-            context.go('/clients');
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/clients');
+            }
           })
           .catchError((error) {
             ScaffoldMessenger.of(
@@ -320,7 +324,11 @@ class _NewClientScreenState extends ConsumerState<NewClientScreen> {
       ),
 
       onReturn: () {
-        context.go('/clients');
+        if (context.canPop()) {
+          context.pop();
+        } else {
+          context.go('/clients');
+        }
       },
       onSave: _saveClient,
       onCancel: () {

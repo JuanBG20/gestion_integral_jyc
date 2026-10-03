@@ -62,7 +62,11 @@ class WorkDetailsScreen extends ConsumerWidget {
 
                 TextButton.icon(
                   onPressed: () {
-                    context.go('/work');
+                    if (context.canPop()) {
+                      context.pop();
+                    } else {
+                      context.go('/work');
+                    }
                   },
                   label: Text("Volver al Kanban"),
                   icon: Icon(Icons.arrow_back),

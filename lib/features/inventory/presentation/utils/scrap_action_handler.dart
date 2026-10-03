@@ -28,7 +28,7 @@ void handleScrapSharedAction(
         },
       );
     case 'edit':
-      context.go('/inventory/edit-scrap', extra: scrap);
+      context.push('/inventory/edit-scrap', extra: scrap);
     case 'delete':
       if (scrap.id != null) {
         ref.read(scrapProvider.notifier).removeScrap(scrap.id!);

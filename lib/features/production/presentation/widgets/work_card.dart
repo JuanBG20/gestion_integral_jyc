@@ -19,7 +19,7 @@ class WorkCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppCardShell(
-      onTapCard: () => context.go('/work/detail', extra: work),
+      onTapCard: () => context.push('/work/detail', extra: work),
       cardContent: [
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,

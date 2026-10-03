@@ -54,7 +54,7 @@ class ProductionSummaryTable extends ConsumerWidget {
               const SizedBox(width: 8),
 
               TextButton(
-                onPressed: () => context.go('/work'),
+                onPressed: () => context.push('/work'),
                 child: Text("Ver Todo"),
               ),
             ],

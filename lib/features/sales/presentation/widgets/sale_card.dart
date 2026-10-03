@@ -27,7 +27,7 @@ class SaleCard extends ConsumerWidget {
         : 'PENDIENTE DE PAGO';
 
     return AppCardShell(
-      onTapCard: () => context.go('/sales/detail', extra: sale),
+      onTapCard: () => context.push('/sales/detail', extra: sale),
       cardContent: [
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,

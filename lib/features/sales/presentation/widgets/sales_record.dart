@@ -54,7 +54,7 @@ class SalesRecord extends ConsumerWidget {
 
               TextButton.icon(
                 onPressed: () {
-                  context.go('/sales/all');
+                  context.push('/sales/all');
                 },
                 label: Text("Ver todas"),
                 icon: Icon(Icons.arrow_forward),

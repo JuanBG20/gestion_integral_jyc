@@ -121,7 +121,11 @@ class _SaleDetailsScreenState extends ConsumerState<SaleDetailsScreen> {
 
           TextButton.icon(
             onPressed: () {
-              context.go('/sales');
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go('/sales');
+              }
             },
             label: Text("Volver a Ventas"),
             icon: Icon(Icons.arrow_back),

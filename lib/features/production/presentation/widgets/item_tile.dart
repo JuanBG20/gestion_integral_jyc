@@ -42,18 +42,27 @@ class ItemTile extends ConsumerWidget {
         borderRadius: BorderRadius.circular(4),
       ),
 
-      child: CheckboxListTile(
-        value: item.isDone,
-        onChanged: (bool? newValue) {
-          if (newValue != null && item.id != null) {
-            ref.read(workProvider.notifier).toggleItemDone(item.id!, newValue);
-          }
-        },
-        controlAffinity: ListTileControlAffinity.leading,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-        title: Text('${item.quantity}x $baseName'),
-        subtitle: Text(subtitleText),
+      child: Material(
+        type: MaterialType.transparency,
+
+        child: CheckboxListTile(
+          value: item.isDone,
+          onChanged: (bool? newValue) {
+            if (newValue != null && item.id != null) {
+              ref
+                  .read(workProvider.notifier)
+                  .toggleItemDone(item.id!, newValue);
+            }
+          },
+          controlAffinity: ListTileControlAffinity.leading,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 4,
+          ),
+          title: Text('${item.quantity}x $baseName'),
+          subtitle: Text(subtitleText),
+        ),
       ),
     );
   }

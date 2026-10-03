@@ -27,7 +27,7 @@ class ClientsScreenWrapper extends ConsumerWidget {
 
       floatingActionButton: context.isMobileLayout
           ? FloatingActionButton(
-              onPressed: () => context.go('/clients/new'),
+              onPressed: () => context.push('/clients/new'),
               child: const Icon(Icons.add),
             )
           : null,
@@ -43,7 +43,7 @@ class ClientsScreenWrapper extends ConsumerWidget {
               title: "Gestión de Clientes",
               subtitle: "Directorio y perfiles de facturación.",
               buttonLabel: "Nuevo Cliente",
-              onPressed: () => context.go('/clients/new'),
+              onPressed: () => context.push('/clients/new'),
               hasButtons: true,
             ),
 

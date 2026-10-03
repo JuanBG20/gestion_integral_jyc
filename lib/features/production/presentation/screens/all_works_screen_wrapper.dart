@@ -26,8 +26,11 @@ class AllWorksScreenWrapper extends ConsumerWidget {
     final currentSort = ref.watch(workSortOptionProvider);
     final hideCompleted = ref.watch(hideCompletedProvider);
 
-    void goToNewWork() =>
-        WorkLimitGate.guardNewWork(context, ref, () => context.go('/work/new'));
+    void goToNewWork() => WorkLimitGate.guardNewWork(
+      context,
+      ref,
+      () => context.push('/work/new'),
+    );
 
     return Scaffold(
       backgroundColor: AppColors.surface,

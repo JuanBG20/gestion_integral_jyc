@@ -19,7 +19,7 @@ class ClientCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return AppCardShell(
-      onTapCard: () => context.go('/clients/edit', extra: client),
+      onTapCard: () => context.push('/clients/edit', extra: client),
       cardContent: [
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,

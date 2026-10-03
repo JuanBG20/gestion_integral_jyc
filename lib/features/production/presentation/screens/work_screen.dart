@@ -12,8 +12,11 @@ class WorkScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    void goToNewWork() =>
-        WorkLimitGate.guardNewWork(context, ref, () => context.go('/work/new'));
+    void goToNewWork() => WorkLimitGate.guardNewWork(
+      context,
+      ref,
+      () => context.push('/work/new'),
+    );
 
     return Scaffold(
       backgroundColor: AppColors.surface,
@@ -41,7 +44,7 @@ class WorkScreen extends ConsumerWidget {
               hasSecondaryButton: true,
               secondaryButtonLabel: "Ver Trabajos",
               secondaryButtonIcon: Icons.visibility_outlined,
-              onPressedSecundary: () => context.go('/work/all'),
+              onPressedSecundary: () => context.push('/work/all'),
               hasButtons: true,
             ),
 

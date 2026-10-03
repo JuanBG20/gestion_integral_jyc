@@ -23,7 +23,7 @@ class RawMaterialCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return AppCardShell(
       onTapCard: () =>
-          context.go('/inventory/edit-material', extra: rawMaterial),
+          context.push('/inventory/edit-material', extra: rawMaterial),
       cardContent: [
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,

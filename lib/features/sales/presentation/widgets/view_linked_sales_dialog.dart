@@ -47,7 +47,7 @@ class ViewLinkedSalesDialog extends ConsumerWidget {
                     style: context.textTheme.bodyMedium,
                   ),
                   onTap: () {
-                    context.go('/sales/detail', extra: sale);
+                    context.push('/sales/detail', extra: sale);
                     Navigator.of(context).pop();
                   },
                 );

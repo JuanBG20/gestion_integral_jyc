@@ -27,7 +27,7 @@ class AllSalesScreenWrapper extends ConsumerWidget {
 
       floatingActionButton: context.isMobileLayout
           ? FloatingActionButton(
-              onPressed: () => context.go('/sales/new'),
+              onPressed: () => context.push('/sales/new'),
               child: const Icon(Icons.add),
             )
           : null,
@@ -44,7 +44,7 @@ class AllSalesScreenWrapper extends ConsumerWidget {
               subtitle:
                   "Registra ventas, controla las transacciones y emite facturas.",
               buttonLabel: "Nueva Venta",
-              onPressed: () => context.go('/sales/new'),
+              onPressed: () => context.push('/sales/new'),
               hasButtons: true,
             ),
 
