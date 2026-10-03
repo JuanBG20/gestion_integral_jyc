@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gestion_integral_jyc/core/enums/work_state.dart';
 import 'package:gestion_integral_jyc/core/presentation/extensions/screen_size.dart';
-import 'package:gestion_integral_jyc/core/presentation/providers/auth_provider.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/features/dashboard/presentation/widgets/production_summary_table.dart';
@@ -142,8 +141,6 @@ class DashboardScreen extends ConsumerWidget {
     int alertasStock,
     int facturasPendientes,
   ) {
-    final isRoot = ref.watch(isRootProvider);
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
 

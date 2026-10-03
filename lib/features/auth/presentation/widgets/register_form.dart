@@ -39,97 +39,112 @@ class RegisterForm extends StatelessWidget {
     return Form(
       key: formKey,
 
-      child: Column(
-        children: [
-          _buildResponsiveRow(
-            context,
-            LabeledTextField(
-              controller: nameController,
-              label: 'Nombre',
-              hint: 'Juan Bautista',
-              prefixIcon: const Icon(Icons.badge_outlined),
-              validator: _required,
-            ),
-            LabeledTextField(
-              controller: lastnameController,
-              label: 'Apellido',
-              hint: 'Galván',
-              prefixIcon: const Icon(Icons.badge_outlined),
-              validator: _required,
-            ),
-          ),
-
-          const SizedBox(height: 20),
-
-          LabeledTextField(
-            controller: emailController,
-            inputType: TextInputType.emailAddress,
-            label: 'Email',
-            hint: 'operario@gmail.com',
-            prefixIcon: const Icon(Icons.person_outline),
-            validator: (value) {
-              if (value == null || value.trim().isEmpty) return 'Requerido';
-              if (!value.contains('@')) return 'Email inválido';
-              return null;
-            },
-          ),
-
-          const SizedBox(height: 20),
-
-          _buildResponsiveRow(
-            context,
-            LabeledTextField(
-              controller: passwordController,
-              obscureText: obscurePassword,
-              label: 'Contraseña',
-              hint: '*******',
-              prefixIcon: const Icon(Icons.lock_outline),
-              suffixIcon: IconButton(
-                onPressed: onObscureChange,
-                icon: Icon(
-                  obscurePassword ? Icons.visibility_off : Icons.visibility,
-                ),
+      child: AutofillGroup(
+        child: Column(
+          children: [
+            _buildResponsiveRow(
+              context,
+              LabeledTextField(
+                controller: nameController,
+                label: 'Nombre',
+                hint: 'Juan Bautista',
+                prefixIcon: const Icon(Icons.badge_outlined),
+                autofillHints: const [AutofillHints.givenName],
+                textInputAction: TextInputAction.next,
+                validator: _required,
               ),
+
+              LabeledTextField(
+                controller: lastnameController,
+                label: 'Apellido',
+                hint: 'Galván',
+                prefixIcon: const Icon(Icons.badge_outlined),
+                autofillHints: const [AutofillHints.familyName],
+                textInputAction: TextInputAction.next,
+                validator: _required,
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            LabeledTextField(
+              controller: emailController,
+              inputType: TextInputType.emailAddress,
+              label: 'Email',
+              hint: 'operario@gmail.com',
+              prefixIcon: const Icon(Icons.person_outline),
+              autofillHints: const [AutofillHints.email],
+              textInputAction: TextInputAction.next,
               validator: (value) {
-                if (value == null || value.isEmpty) return 'Requerido';
-                if (value.length < 6) {
-                  return 'Debe tener al menos 6 caracteres';
-                }
+                if (value == null || value.trim().isEmpty) return 'Requerido';
+                if (!value.contains('@')) return 'Email inválido';
                 return null;
               },
             ),
-            LabeledTextField(
-              controller: confirmPasswordController,
-              obscureText: obscurePassword,
-              label: 'Confirmar contraseña',
-              hint: '*******',
-              prefixIcon: const Icon(Icons.lock_outline),
-              suffixIcon: IconButton(
-                onPressed: onObscureChange,
-                icon: Icon(
-                  obscurePassword ? Icons.visibility_off : Icons.visibility,
+
+            const SizedBox(height: 20),
+
+            _buildResponsiveRow(
+              context,
+              LabeledTextField(
+                controller: passwordController,
+                obscureText: obscurePassword,
+                label: 'Contraseña',
+                hint: '*******',
+                prefixIcon: const Icon(Icons.lock_outline),
+                suffixIcon: IconButton(
+                  onPressed: onObscureChange,
+                  icon: Icon(
+                    obscurePassword ? Icons.visibility_off : Icons.visibility,
+                  ),
                 ),
+                autofillHints: const [AutofillHints.newPassword],
+                textInputAction: TextInputAction.next,
+                validator: (value) {
+                  if (value == null || value.isEmpty) return 'Requerido';
+                  if (value.length < 6) {
+                    return 'Debe tener al menos 6 caracteres';
+                  }
+                  return null;
+                },
               ),
-              validator: (value) {
-                if (value == null || value.isEmpty) return 'Requerido';
-                if (value != passwordController.text) {
-                  return 'Las contraseñas no coinciden';
-                }
-                return null;
-              },
+
+              LabeledTextField(
+                controller: confirmPasswordController,
+                obscureText: obscurePassword,
+                label: 'Confirmar contraseña',
+                hint: '*******',
+                prefixIcon: const Icon(Icons.lock_outline),
+                suffixIcon: IconButton(
+                  onPressed: onObscureChange,
+                  icon: Icon(
+                    obscurePassword ? Icons.visibility_off : Icons.visibility,
+                  ),
+                ),
+                autofillHints: const [AutofillHints.newPassword],
+                textInputAction: TextInputAction.done,
+                onFieldSubmitted: (_) => onSubmit(),
+                validator: (value) {
+                  if (value == null || value.isEmpty) return 'Requerido';
+                  if (value != passwordController.text) {
+                    return 'Las contraseñas no coinciden';
+                  }
+                  return null;
+                },
+              ),
             ),
-          ),
 
-          AuthErrorMessage(errorMessage: authState.errorMessage),
+            AuthErrorMessage(errorMessage: authState.errorMessage),
 
-          const SizedBox(height: 20),
+            const SizedBox(height: 20),
 
-          AuthSubmitButton(
-            isLoading: authState.isLoading,
-            label: "Crear Cuenta",
-            onPressed: onSubmit,
-          ),
-        ],
+            AuthSubmitButton(
+              isLoading: authState.isLoading,
+              label: "Crear Cuenta",
+              onPressed: onSubmit,
+            ),
+          ],
+        ),
       ),
     );
   }

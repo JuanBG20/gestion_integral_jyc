@@ -31,58 +31,65 @@ class LoginForm extends StatelessWidget {
     return Form(
       key: formKey,
 
-      child: Column(
-        children: [
-          LabeledTextField(
-            controller: emailController,
-            inputType: TextInputType.emailAddress,
-            label: 'Email',
-            hint: 'operario@gmail.com',
-            prefixIcon: const Icon(Icons.person_outline),
-            validator: (value) =>
-                (value == null || value.trim().isEmpty) ? 'Requerido' : null,
-          ),
+      child: AutofillGroup(
+        child: Column(
+          children: [
+            LabeledTextField(
+              controller: emailController,
+              inputType: TextInputType.emailAddress,
+              label: 'Email',
+              hint: 'operario@gmail.com',
+              prefixIcon: const Icon(Icons.person_outline),
+              autofillHints: const [AutofillHints.email],
+              textInputAction: TextInputAction.next,
+              validator: (value) =>
+                  (value == null || value.trim().isEmpty) ? 'Requerido' : null,
+            ),
 
-          const SizedBox(height: 20),
+            const SizedBox(height: 20),
 
-          LabeledTextField(
-            controller: passwordController,
-            obscureText: obscurePassword,
-            label: 'Contraseña',
-            hint: '*******',
-            prefixIcon: const Icon(Icons.lock_outline),
-            suffixIcon: IconButton(
-              onPressed: onObscureChange,
-              icon: Icon(
-                obscurePassword ? Icons.visibility_off : Icons.visibility,
+            LabeledTextField(
+              controller: passwordController,
+              obscureText: obscurePassword,
+              label: 'Contraseña',
+              hint: '*******',
+              prefixIcon: const Icon(Icons.lock_outline),
+              suffixIcon: IconButton(
+                onPressed: onObscureChange,
+                icon: Icon(
+                  obscurePassword ? Icons.visibility_off : Icons.visibility,
+                ),
+              ),
+              autofillHints: const [AutofillHints.password],
+              textInputAction: TextInputAction.done,
+              onFieldSubmitted: (_) => onSubmit(),
+              validator: (value) =>
+                  (value == null || value.isEmpty) ? 'Requerido' : null,
+            ),
+
+            AuthErrorMessage(errorMessage: authState.errorMessage),
+
+            const SizedBox(height: 20),
+
+            TextButton(
+              onPressed: () {},
+              child: Text(
+                "¿Olvidaste tu contraseña?",
+                style: context.textTheme.bodyMedium?.copyWith(
+                  color: AppColors.primary,
+                ),
               ),
             ),
-            validator: (value) =>
-                (value == null || value.isEmpty) ? 'Requerido' : null,
-          ),
 
-          AuthErrorMessage(errorMessage: authState.errorMessage),
+            const SizedBox(height: 20),
 
-          const SizedBox(height: 20),
-
-          TextButton(
-            onPressed: () {},
-            child: Text(
-              "¿Olvidaste tu contraseña?",
-              style: context.textTheme.bodyMedium?.copyWith(
-                color: AppColors.primary,
-              ),
+            AuthSubmitButton(
+              isLoading: authState.isLoading,
+              label: "Iniciar Sesión",
+              onPressed: onSubmit,
             ),
-          ),
-
-          const SizedBox(height: 20),
-
-          AuthSubmitButton(
-            isLoading: authState.isLoading,
-            label: "Iniciar Sesión",
-            onPressed: onSubmit,
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

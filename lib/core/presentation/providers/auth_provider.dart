@@ -4,6 +4,7 @@ import 'package:gestion_integral_jyc/core/domain/services/analytics_service.dart
 import 'package:gestion_integral_jyc/core/enums/role.dart';
 import 'package:gestion_integral_jyc/core/presentation/providers/analytics_provider.dart';
 import 'package:gestion_integral_jyc/core/presentation/providers/auth_state.dart';
+import 'package:gestion_integral_jyc/core/utils/error_handler.dart';
 import 'package:gestion_integral_jyc/features/auth/data/datasources/user_remote_data_source.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' hide AuthState;
 
@@ -48,29 +49,13 @@ class AuthNotifier extends StateNotifier<AuthState> {
       }
 
       await _loadUserProfile(response.user!.id);
-
       await analyticsService.logLoginSuccess(loginMethod: 'email');
-    } on AuthException catch (e) {
-      await analyticsService.logLoginFailed(error: e.message);
-
-      if (e.message.contains('Email not confirmed')) {
-        state = state.copyWith(
-          isLoading: false,
-          errorMessage: 'Tenés que verificar tu correo antes de entrar.',
-          needsEmailConfirmation: true,
-        );
-      } else {
-        state = state.copyWith(
-          isLoading: false,
-          errorMessage: 'Error de inicio de sesión: ${e.message}',
-        );
-      }
     } catch (e) {
       await analyticsService.logLoginFailed(error: e.toString());
 
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Error al iniciar sesión: $e',
+        errorMessage: AppErrorHandler.getMessage(e),
       );
     }
   }
@@ -139,12 +124,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
       }
 
       await _loadUserProfile(newUser.id);
-    } on AuthException catch (e) {
-      state = state.copyWith(isLoading: false, errorMessage: e.message);
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Error al registrarse: $e',
+        errorMessage: AppErrorHandler.getMessage(e),
       );
     }
   }

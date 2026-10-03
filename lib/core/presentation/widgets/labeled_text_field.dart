@@ -12,6 +12,9 @@ class LabeledTextField extends StatelessWidget {
   final String? Function(String?)? validator;
   final bool readOnly;
   final FocusNode? focusNode;
+  final Iterable<String>? autofillHints;
+  final TextInputAction? textInputAction;
+  final ValueChanged<String>? onFieldSubmitted;
 
   const LabeledTextField({
     super.key,
@@ -25,6 +28,9 @@ class LabeledTextField extends StatelessWidget {
     this.validator,
     this.readOnly = false,
     this.focusNode,
+    this.autofillHints,
+    this.textInputAction,
+    this.onFieldSubmitted,
   });
 
   @override
@@ -49,6 +55,9 @@ class LabeledTextField extends StatelessWidget {
           controller: controller,
           keyboardType: inputType,
           obscureText: obscureText,
+          autofillHints: autofillHints,
+          textInputAction: textInputAction,
+          onFieldSubmitted: onFieldSubmitted,
           decoration: InputDecoration(
             hintText: hint,
             prefixIcon: prefixIcon,

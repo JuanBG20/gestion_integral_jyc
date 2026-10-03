@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gestion_integral_jyc/core/presentation/providers/analytics_provider.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
@@ -56,6 +57,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
       final authState = ref.read(authProvider);
       if (authState.isAuthenticated && mounted) {
+        TextInput.finishAutofillContext();
         context.go('/dashboard');
       }
     }
