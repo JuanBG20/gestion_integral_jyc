@@ -21,6 +21,7 @@ import 'package:gestion_integral_jyc/features/production/presentation/screens/al
 import 'package:gestion_integral_jyc/features/production/presentation/screens/new_work_screen.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/screens/work_adaptative_screen.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/screens/work_details_screen.dart';
+import 'package:gestion_integral_jyc/features/reports/presentation/screens/reports_screen.dart';
 import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_entity.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/screens/all_sales_screen_wrapper.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/screens/new_invoice_screen.dart';
@@ -209,6 +210,14 @@ final goRouter = GoRouter(
                   ],
                 ),
               ],
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/reports',
+              builder: (context, state) => const ReportsScreen(),
             ),
           ],
         ),

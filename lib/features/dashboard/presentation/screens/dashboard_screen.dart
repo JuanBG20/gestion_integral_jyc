@@ -6,7 +6,7 @@ import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/features/dashboard/presentation/widgets/production_summary_table.dart';
 import 'package:gestion_integral_jyc/features/dashboard/presentation/widgets/dashboard_quick_actions.dart';
-import 'package:gestion_integral_jyc/features/dashboard/presentation/widgets/summary_card.dart';
+import 'package:gestion_integral_jyc/core/presentation/widgets/summary_card.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/providers/raw_material_provider.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/providers/work_provider.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/providers/sale_provider.dart';
