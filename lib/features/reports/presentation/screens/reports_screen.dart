@@ -69,6 +69,14 @@ class ReportsScreen extends ConsumerWidget {
       return sum + (double.tryParse(cleanValue) ?? 0.0);
     });
 
+    final totalSupplyCosts = dashboard.profitabilityByCategory.fold(0.0, (
+      sum,
+      item,
+    ) {
+      final cleanValue = item.supplyCosts.replaceAll(RegExp(r'[^\d.]'), '');
+      return sum + (double.tryParse(cleanValue) ?? 0.0);
+    });
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
 
@@ -149,7 +157,7 @@ class ReportsScreen extends ConsumerWidget {
         CategoryProfitabilityCard(
           items: dashboard.profitabilityByCategory,
           totalSalesConsolidated: dashboard.totalInvoiced.toStringAsFixed(0),
-          totalCostsConsolidated: dashboard.monthlyExpenses.toStringAsFixed(0),
+          totalCostsConsolidated: totalSupplyCosts.toStringAsFixed(0),
           totalNetProfitConsolidated: dashboard.netProfit.toStringAsFixed(0),
           averageMarginConsolidated: dashboard.globalMargin,
         ),
