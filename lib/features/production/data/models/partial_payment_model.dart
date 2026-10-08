@@ -14,7 +14,7 @@ class PartialPaymentModel extends PartialPaymentEntity {
     return PartialPaymentModel(
       id: json['idpago_parcial'],
       amount: (json['monto'] as num).toDouble(),
-      date: DateTime.parse(json['fecha']),
+      date: DateTime.parse(json['fecha']).toLocal(),
       paymentMethod: PaymentMethod.fromDB(json['metodo_pago']),
       workId: json['trabajo'],
     );

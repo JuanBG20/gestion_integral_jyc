@@ -62,7 +62,7 @@ class SaleModel extends SaleEntity {
       paymentMethod: json['metodo_pago'] != null
           ? PaymentMethod.fromDB(json['metodo_pago'])
           : null,
-      date: DateTime.parse(json['fecha']),
+      date: DateTime.parse(json['fecha']).toLocal(),
       finalAmount: (json['monto_total'] as num).toDouble(),
       subtotal: (json['subtotal'] as num).toDouble(),
       client: ClientModel.fromJson(json['cliente']),

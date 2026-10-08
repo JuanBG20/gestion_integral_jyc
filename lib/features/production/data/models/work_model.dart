@@ -46,9 +46,9 @@ class WorkModel extends WorkEntity {
 
     return WorkModel(
       id: json['idtrabajo'],
-      creationDate: DateTime.parse(json['fecha_creacion']),
+      creationDate: DateTime.parse(json['fecha_creacion']).toLocal(),
       deadline: json['fecha_limite'] != null
-          ? DateTime.parse(json['fecha_limite'])
+          ? DateTime.parse(json['fecha_limite']).toLocal()
           : null,
       client: ClientModel.fromJson(json['cliente']),
       actualState: currentState,

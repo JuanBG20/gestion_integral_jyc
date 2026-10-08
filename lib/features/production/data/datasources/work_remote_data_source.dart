@@ -32,7 +32,7 @@ class WorkRemoteDataSource {
   Future<void> createWorkRPC(WorkModel work) async {
     final payload = {
       'p_cliente': work.client.id,
-      'p_fecha_limite': work.deadline?.toIso8601String(),
+      'p_fecha_limite': work.deadline?.toUtc().toIso8601String(),
       'p_items': work.items
           .map((item) => (item as WorkItemModel).toJson())
           .toList(),
@@ -56,7 +56,7 @@ class WorkRemoteDataSource {
       final payload = {
         'p_id_trabajo': work.id,
         'p_cliente': work.client.id,
-        'p_fecha_limite': work.deadline?.toIso8601String(),
+        'p_fecha_limite': work.deadline?.toUtc().toIso8601String(),
         'p_items': work.items
             .map(
               (item) => {

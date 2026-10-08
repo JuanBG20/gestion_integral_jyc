@@ -20,7 +20,7 @@ class BillModel extends BillEntity {
             )
           : null,
       isSuccessful: json['exitoso'] ?? false,
-      emissionDate: DateTime.parse(json['fecha_emision']),
+      emissionDate: DateTime.parse(json['fecha_emision']).toLocal(),
       cae: json['cae'],
       isManual: json['es_manual'],
     );

@@ -29,7 +29,7 @@ class MpMovementModel extends MpMovementEntity {
     return MpMovementModel(
       id: json['idmovimiento_mp'],
       idMp: json['id_mp'],
-      date: DateTime.parse(json['fecha']),
+      date: DateTime.parse(json['fecha']).toLocal(),
       amount: (json['monto'] as num).toDouble(),
       paymentMethod: PaymentMethod.fromDB(json['metodo_pago']),
       docType: _parseDocType(json['tipo_documento']),
