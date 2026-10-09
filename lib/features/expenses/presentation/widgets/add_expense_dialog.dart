@@ -39,7 +39,7 @@ class _AddExpenseDialogState extends ConsumerState<AddExpenseDialog> {
     super.dispose();
   }
 
-  Future<void> _save() async {
+  /* Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isLoading = true);
 
@@ -73,7 +73,7 @@ class _AddExpenseDialogState extends ConsumerState<AddExpenseDialog> {
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
-  }
+  } */
 
   @override
   Widget build(BuildContext context) {
@@ -132,7 +132,7 @@ class _AddExpenseDialogState extends ConsumerState<AddExpenseDialog> {
         ),
 
         ElevatedButton.icon(
-          onPressed: _isLoading ? null : _save,
+          onPressed: null /* _isLoading ? null : _save */,
           icon: _isLoading
               ? const SizedBox(
                   width: 16,

@@ -28,10 +28,10 @@ class RegisteredExpensesCard extends StatelessWidget {
       col3Header: "Monto",
       col2Flex: 3,
       items: items,
-      onTap: () => showDialog(
+      /* onTap: () => showDialog(
         context: context,
         builder: (context) => const AddExpenseDialog(),
-      ),
+      ), */
     );
   }
 }
