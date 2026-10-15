@@ -10,16 +10,16 @@ jobs:
   backup:
     runs-on: ubuntu-latest
     steps:
-      - name: Generar Backup con pg_dump
+      - name: Generar Backup con pg_dump (vía Docker)
         run: |
-          set -o pipefail # Evita que gzip oculte el error de pg_dump
-        
+          set -o pipefail
+          
           mkdir -p backups
           TIMESTAMP=$(date +'%Y-%m-%d_%H%M%S')
           BACKUP_FILE="backups/gestion_jc_${TIMESTAMP}.sql.gz"
           
-          # Realiza el volcado y lo comprime
-          pg_dump "${{ secrets.SUPABASE_DB_URL }}" \
+          # Usamos la imagen oficial de Postgres 17 en Docker aislando el proceso
+          docker run --rm postgres:17 pg_dump "${{ secrets.SUPABASE_DB_URL }}" \
             --clean \
             --if-exists \
             --no-owner \
