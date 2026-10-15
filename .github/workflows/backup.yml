@@ -10,11 +10,6 @@ jobs:
   backup:
     runs-on: ubuntu-latest
     steps:
-      - name: Instalar herramientas (PostgreSQL Client y AWS CLI)
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq postgresql-client awscli
-
       - name: Generar Backup con pg_dump
         run: |
           mkdir -p backups
