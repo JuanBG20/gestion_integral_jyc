@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:gestion_integral_jyc/core/presentation/providers/auth_provider.dart';
+import 'package:gestion_integral_jyc/core/presentation/providers/auth_state.dart';
 import 'package:gestion_integral_jyc/features/subscriptions/data/repositories/subscription_repository_impl.dart';
 import 'package:gestion_integral_jyc/features/subscriptions/domain/repositories/subscription_repository.dart';
 import 'package:purchases_ui_flutter/purchases_ui_flutter.dart';
@@ -26,15 +27,22 @@ class SubscriptionNotifier extends StateNotifier<AsyncValue<bool>> {
 
   SubscriptionNotifier(this.repository, this.ref)
     : super(const AsyncValue.loading()) {
-    checkPremiumStatus();
+    ref.listen<AuthState>(authProvider, (previous, next) {
+      if (previous?.isLoading != next.isLoading ||
+          previous?.user != next.user) {
+        checkPremiumStatus(next);
+      }
+    }, fireImmediately: true);
   }
 
-  Future<void> checkPremiumStatus() async {
+  Future<void> checkPremiumStatus(AuthState authState) async {
     try {
-      state = const AsyncValue.loading();
+      if (authState.isLoading) {
+        state = const AsyncValue.loading();
+        return;
+      }
 
       if (Platform.isWindows) {
-        final authState = ref.read(authProvider);
         final user = authState.user;
 
         if (user == null) {
