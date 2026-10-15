@@ -41,4 +41,26 @@ class SubscriptionRepositoryImpl implements SubscriptionRepository {
       return false;
     }
   }
+
+  @override
+  Future<void> logIn(String appUserId) async {
+    try {
+      if (Platform.isIOS || Platform.isAndroid || Platform.isMacOS) {
+        await Purchases.logIn(appUserId);
+      }
+    } catch (e) {
+      print("Error al hacer login en RevenueCat: $e");
+    }
+  }
+
+  @override
+  Future<void> logOut() async {
+    try {
+      if (Platform.isIOS || Platform.isAndroid || Platform.isMacOS) {
+        await Purchases.logOut();
+      }
+    } catch (e) {
+      print("Error al hacer logout en RevenueCat: $e");
+    }
+  }
 }

@@ -10,7 +10,7 @@ class UserRemoteDataSource {
     final response = await supabaseClient
         .from('usuario')
         .select(
-          'idusuario, id_auth, nombre, apellido, rol_usuario(rol(nombre))',
+          'idusuario, id_auth, nombre, apellido, es_premium, fecha_expiracion_premium, rol_usuario(rol(nombre))',
         )
         .eq('id_auth', idAuth)
         .single();

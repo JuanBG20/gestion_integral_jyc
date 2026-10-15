@@ -5,6 +5,8 @@ class UserEntity {
   final String idAuth;
   final String name;
   final String lastName;
+  final bool isPremium;
+  final DateTime? premiumExpiresAt;
   final List<Role> roles;
 
   UserEntity({
@@ -13,6 +15,8 @@ class UserEntity {
     required this.lastName,
     required this.roles,
     this.id,
+    this.isPremium = false,
+    this.premiumExpiresAt,
   });
 
   String get fullName => '$name $lastName';

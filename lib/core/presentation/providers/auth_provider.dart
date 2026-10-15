@@ -6,6 +6,8 @@ import 'package:gestion_integral_jyc/core/presentation/providers/analytics_provi
 import 'package:gestion_integral_jyc/core/presentation/providers/auth_state.dart';
 import 'package:gestion_integral_jyc/core/utils/error_handler.dart';
 import 'package:gestion_integral_jyc/features/auth/data/datasources/user_remote_data_source.dart';
+import 'package:gestion_integral_jyc/features/subscriptions/domain/repositories/subscription_repository.dart';
+import 'package:gestion_integral_jyc/features/subscriptions/presentation/providers/subscription_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' hide AuthState;
 
 final userRemoteDataSourceProvider = Provider<UserRemoteDataSource>((ref) {
@@ -15,17 +17,22 @@ final userRemoteDataSourceProvider = Provider<UserRemoteDataSource>((ref) {
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
   final userDataSource = ref.read(userRemoteDataSourceProvider);
   final analyticsService = ref.read(analyticsProvider);
+  final subscriptionRepo = ref.read(subscriptionRepositoryProvider);
 
-  return AuthNotifier(userDataSource, analyticsService);
+  return AuthNotifier(userDataSource, analyticsService, subscriptionRepo);
 });
 
 class AuthNotifier extends StateNotifier<AuthState> {
   final UserRemoteDataSource userDataSource;
   final AnalyticsService analyticsService;
+  final SubscriptionRepository subscriptionRepo;
   final _supabase = Supabase.instance.client;
 
-  AuthNotifier(this.userDataSource, this.analyticsService)
-    : super(const AuthState.initial()) {
+  AuthNotifier(
+    this.userDataSource,
+    this.analyticsService,
+    this.subscriptionRepo,
+  ) : super(const AuthState.initial()) {
     _restoreSession();
   }
 
@@ -62,6 +69,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   Future<void> _loadUserProfile(String idAuth) async {
     try {
+      await subscriptionRepo.logIn(idAuth);
+
       final user = await userDataSource.fetchUserByAuthId(idAuth);
 
       // El rol de logueo por defecto siempre es Operario, aunque el
@@ -133,6 +142,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Future<void> signOut() async {
+    await subscriptionRepo.logOut();
     await _supabase.auth.signOut();
     state = const AuthState.initial();
   }

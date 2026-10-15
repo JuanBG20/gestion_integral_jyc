@@ -8,6 +8,8 @@ class UserModel extends UserEntity {
     required super.name,
     required super.lastName,
     required super.roles,
+    super.isPremium = false,
+    super.premiumExpiresAt,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -18,12 +20,21 @@ class UserModel extends UserEntity {
         .whereType<Role>()
         .toList();
 
+    DateTime? expiracion;
+    if (json['fecha_expiracion_premium'] != null) {
+      expiracion = DateTime.parse(
+        json['fecha_expiracion_premium'] as String,
+      ).toUtc();
+    }
+
     return UserModel(
       id: json['idusuario'],
       idAuth: json['id_auth'],
       name: json['nombre'],
       lastName: json['apellido'],
       roles: roles,
+      isPremium: json['es_premium'] as bool? ?? false,
+      premiumExpiresAt: expiracion,
     );
   }
 }
