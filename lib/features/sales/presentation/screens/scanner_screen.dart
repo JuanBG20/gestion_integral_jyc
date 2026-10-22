@@ -11,6 +11,7 @@ class ScannerScreen extends StatefulWidget {
 
 class _ScannerScreenState extends State<ScannerScreen> {
   final MobileScannerController _scannerController = MobileScannerController(
+    formats: [BarcodeFormat.qrCode],
     // TODO: Ajustar a tipo de código específico
   );
 

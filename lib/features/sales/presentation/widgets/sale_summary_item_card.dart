@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
-import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
+import 'package:gestion_integral_jyc/core/presentation/widgets/base_summary_item_card.dart';
 import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_item_entity.dart';
 
 class SaleSummaryItemCard extends StatelessWidget {
@@ -15,41 +14,10 @@ class SaleSummaryItemCard extends StatelessWidget {
               .trim()
         : item.description ?? 'Producto Genérico';
 
-    return Container(
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        border: Border.all(color: AppColors.outline),
-        borderRadius: BorderRadius.circular(4),
-      ),
-
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-
-              children: [
-                Text(
-                  itemName,
-                  overflow: TextOverflow.ellipsis,
-                  style: context.textTheme.bodyMedium,
-                ),
-
-                Text(item.quantityText, style: context.textTheme.bodySmall),
-              ],
-            ),
-          ),
-
-          const SizedBox(width: 8),
-
-          Text(
-            "\$${item.subtotal.toStringAsFixed(2)}",
-            style: context.textTheme.bodyMedium,
-          ),
-        ],
-      ),
+    return BaseSummaryItemCard(
+      title: itemName,
+      subtitle: item.quantityText,
+      subtotal: "\$${item.subtotal.toStringAsFixed(2)}",
     );
   }
 }

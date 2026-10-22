@@ -6,7 +6,7 @@ import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/models/product_group_ui.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/utils/product_action_handler.dart';
-import 'package:gestion_integral_jyc/features/inventory/presentation/widgets/category_budget.dart';
+import 'package:gestion_integral_jyc/features/inventory/presentation/widgets/info_budget.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/widgets/products/product_variant_card.dart';
 import 'package:go_router/go_router.dart';
 
@@ -43,7 +43,7 @@ class _ProductCardState extends ConsumerState<ProductCard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
 
                 children: [
-                  CategoryBudget(text: base.fullCategory),
+                  InfoBudget(text: base.fullCategory),
 
                   const SizedBox(height: 8),
 

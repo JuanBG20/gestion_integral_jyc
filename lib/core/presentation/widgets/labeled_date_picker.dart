@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:intl/intl.dart';
 
@@ -6,21 +7,57 @@ class LabeledDatePicker extends StatelessWidget {
   final String label;
   final DateTime? value;
   final String hint;
-  final VoidCallback onTap;
+  final ValueChanged<DateTime> onChanged;
   final Widget? prefixIcon;
   final Widget? suffixIcon;
   final DateFormat? dateFormat;
+  final DateTime? firstDate;
+  final DateTime? lastDate;
+  final String? helpText;
 
   const LabeledDatePicker({
     super.key,
     required this.label,
     this.value,
     required this.hint,
-    required this.onTap,
+    required this.onChanged,
     this.prefixIcon,
     this.suffixIcon,
     this.dateFormat,
+    this.firstDate,
+    this.lastDate,
+    this.helpText,
   });
+
+  Future<void> _pickDate(BuildContext context) async {
+    DateTime initial = value ?? DateTime.now();
+
+    if (firstDate != null && initial.isBefore(firstDate!)) {
+      initial = firstDate!;
+    } else if (lastDate != null && initial.isAfter(lastDate!)) {
+      initial = lastDate!;
+    }
+
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: initial,
+      firstDate: firstDate ?? DateTime(2020),
+      lastDate: lastDate ?? DateTime(2100),
+      helpText: helpText,
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(primary: AppColors.primary),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null) {
+      onChanged(picked);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +78,7 @@ class LabeledDatePicker extends StatelessWidget {
         const SizedBox(height: 4),
 
         InkWell(
-          onTap: onTap,
+          onTap: () => _pickDate(context),
 
           child: InputDecorator(
             decoration: InputDecoration(

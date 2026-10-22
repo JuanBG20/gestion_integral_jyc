@@ -12,4 +12,8 @@ class ExpenseRawMaterialEntity {
     required this.quantity,
     this.unitPrice,
   });
+
+  double get subtotal => quantity * (unitPrice ?? 0);
+  String get quantityText =>
+      '${quantity.toStringAsFixed(0)}${rawMaterial.measurementUnit.abbreviation}';
 }

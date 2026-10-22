@@ -4,6 +4,7 @@ import 'package:gestion_integral_jyc/core/presentation/extensions/date_formattin
 import 'package:gestion_integral_jyc/core/presentation/extensions/deadline_extensions.dart';
 import 'package:gestion_integral_jyc/core/presentation/extensions/screen_size.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/items_card_layout.dart';
+import 'package:gestion_integral_jyc/core/presentation/widgets/return_screen_header.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/features/production/domain/entities/partial_payment_entity.dart';
@@ -14,7 +15,6 @@ import 'package:gestion_integral_jyc/features/production/presentation/widgets/it
 import 'package:gestion_integral_jyc/features/production/presentation/widgets/production_quick_actions.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/widgets/status_badge.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/summary_products_card.dart';
-import 'package:go_router/go_router.dart';
 
 class WorkDetailsScreen extends ConsumerWidget {
   final WorkEntity initialWork;
@@ -37,41 +37,11 @@ class WorkDetailsScreen extends ConsumerWidget {
 
         child: Column(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-
-                    children: [
-                      Text(
-                        "Orden TRB-${currentWork.id ?? '---'}",
-                        style: context.textTheme.titleLarge,
-                      ),
-                      Text(
-                        currentWork.client.fullName,
-                        style: context.textTheme.bodyLarge,
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(width: 16),
-
-                TextButton.icon(
-                  onPressed: () {
-                    if (context.canPop()) {
-                      context.pop();
-                    } else {
-                      context.go('/work');
-                    }
-                  },
-                  label: Text("Volver al Kanban"),
-                  icon: Icon(Icons.arrow_back),
-                ),
-              ],
+            ReturnScreenHeader(
+              title: "Orden TRB-${currentWork.id ?? '---'}",
+              subtitle: currentWork.client.fullName,
+              returnLabel: "Volver a Trabajos",
+              returnUri: "/work",
             ),
 
             const SizedBox(height: 32),

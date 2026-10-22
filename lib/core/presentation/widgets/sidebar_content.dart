@@ -132,10 +132,18 @@ class SidebarContent extends ConsumerWidget {
         ),
 
         SidebarItem(
-          icon: Icons.settings_outlined,
-          title: "Configuración",
+          icon: Icons.shopping_bag_outlined,
+          title: "Gastos",
           onTap: () => _goToBranch(ref, 6),
           isActive: navigationShell.currentIndex == 6,
+          isExpanded: isExpanded,
+        ),
+
+        SidebarItem(
+          icon: Icons.settings_outlined,
+          title: "Configuración",
+          onTap: () => _goToBranch(ref, 7),
+          isActive: navigationShell.currentIndex == 7,
           isExpanded: isExpanded,
         ),
 

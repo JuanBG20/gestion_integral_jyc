@@ -8,6 +8,12 @@ import 'package:gestion_integral_jyc/features/clients/presentation/screens/clien
 import 'package:gestion_integral_jyc/features/clients/presentation/screens/new_client_screen.dart';
 import 'package:gestion_integral_jyc/features/config/presentation/screens/config_screen.dart';
 import 'package:gestion_integral_jyc/features/dashboard/presentation/screens/dashboard_screen.dart';
+import 'package:gestion_integral_jyc/features/expenses/domain/entities/expense_entity.dart';
+import 'package:gestion_integral_jyc/features/expenses/domain/entities/expense_template_entity.dart';
+import 'package:gestion_integral_jyc/features/expenses/presentation/screens/expense_details_screen.dart';
+import 'package:gestion_integral_jyc/features/expenses/presentation/screens/expenses_screen.dart';
+import 'package:gestion_integral_jyc/features/expenses/presentation/screens/new_expense_screen.dart';
+import 'package:gestion_integral_jyc/features/expenses/presentation/screens/new_expense_template_screen.dart';
 import 'package:gestion_integral_jyc/features/inventory/domain/entities/raw_material_entity.dart';
 import 'package:gestion_integral_jyc/features/inventory/domain/entities/scrap_entity.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/models/product_group_ui.dart';
@@ -236,6 +242,61 @@ final goRouter = GoRouter(
                   builder: (context, state) {
                     final client = state.extra as ClientEntity;
                     return NewClientScreen(clientToEdit: client);
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/expenses',
+              builder: (context, state) => const ExpensesScreen(),
+              routes: [
+                GoRoute(
+                  path: 'new',
+                  builder: (context, state) => const NewExpenseScreen(),
+                ),
+                GoRoute(
+                  path: 'edit',
+                  builder: (context, state) {
+                    if (state.extra is ExpenseEntity) {
+                      return NewExpenseScreen(
+                        expenseToEdit: state.extra as ExpenseEntity,
+                      );
+                    }
+
+                    return const ExpensesScreen();
+                  },
+                ),
+                GoRoute(
+                  path: 'detail',
+                  builder: (context, state) {
+                    if (state.extra is ExpenseEntity) {
+                      return ExpenseDetailsScreen(
+                        initialExpense: state.extra as ExpenseEntity,
+                      );
+                    }
+
+                    return const ExpensesScreen();
+                  },
+                ),
+
+                GoRoute(
+                  path: 'new-template',
+                  builder: (context, state) => const NewExpenseTemplateScreen(),
+                ),
+                GoRoute(
+                  path: 'edit-template',
+                  builder: (context, state) {
+                    if (state.extra is ExpenseTemplateEntity) {
+                      return NewExpenseTemplateScreen(
+                        templateToEdit: state.extra as ExpenseTemplateEntity,
+                      );
+                    }
+
+                    return const ExpensesScreen();
                   },
                 ),
               ],

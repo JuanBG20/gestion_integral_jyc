@@ -97,7 +97,7 @@ class ExpenseTemplateNotifier
 
   ExpenseTemplateNotifier(this.repository, this.ref)
     : super(const AsyncValue.loading()) {
-    fetchTemplates();
+    fetchTemplates(onlyActive: false);
   }
 
   Future<void> fetchTemplates({bool onlyActive = true}) async {

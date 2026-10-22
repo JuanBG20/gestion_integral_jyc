@@ -6,7 +6,7 @@ import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/features/inventory/domain/entities/raw_material_entity.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/utils/raw_material_action_handler.dart';
-import 'package:gestion_integral_jyc/features/inventory/presentation/widgets/category_budget.dart';
+import 'package:gestion_integral_jyc/features/inventory/presentation/widgets/info_budget.dart';
 import 'package:go_router/go_router.dart';
 
 class RawMaterialCard extends ConsumerWidget {
@@ -35,7 +35,7 @@ class RawMaterialCard extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
 
                 children: [
-                  CategoryBudget(text: rawMaterial.fullCategory),
+                  InfoBudget(text: rawMaterial.fullCategory),
 
                   const SizedBox(height: 8),
 

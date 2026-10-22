@@ -40,7 +40,7 @@ class ExpenseRemoteDataSource {
   }) async {
     var query = supabaseClient.from('gasto').select('''
       *,
-      plantilla_gasto(*),
+      plantilla_gasto(*, categoria_gasto(*)),
       categoria_gasto(*),
       gasto_materia_prima(*, materia_prima(*))
     ''');
@@ -65,7 +65,7 @@ class ExpenseRemoteDataSource {
         .from('gasto')
         .select('''
       *,
-      plantilla_gasto(*),
+      plantilla_gasto(*, categoria_gasto(*)),
       categoria_gasto(*),
       gasto_materia_prima(*, materia_prima(*))
     ''')

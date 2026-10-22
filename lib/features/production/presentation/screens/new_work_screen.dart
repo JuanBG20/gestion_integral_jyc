@@ -47,20 +47,6 @@ class _NewRawMaterialScreenState extends ConsumerState<NewWorkScreen> {
     }
   }
 
-  Future<void> _pickDeadline() async {
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now().add(const Duration(days: 1)),
-      firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(const Duration(days: 365)),
-    );
-    if (picked != null) {
-      setState(() {
-        _selectedDeadline = picked;
-      });
-    }
-  }
-
   void _saveWork() {
     if (_formKey.currentState!.validate()) {
       if (_selectedClient == null) {
@@ -170,8 +156,14 @@ class _NewRawMaterialScreenState extends ConsumerState<NewWorkScreen> {
                 child: LabeledDatePicker(
                   label: 'Fecha Límite (Opcional)',
                   hint: 'Seleccione una fecha...',
-                  onTap: _pickDeadline,
+                  onChanged: (picked) {
+                    setState(() {
+                      _selectedDeadline = picked;
+                    });
+                  },
                   value: _selectedDeadline,
+                  firstDate: DateTime.now(),
+                  lastDate: DateTime.now().add(const Duration(days: 365)),
                 ),
               ),
 

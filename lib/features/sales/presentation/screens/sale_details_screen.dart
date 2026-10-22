@@ -4,6 +4,7 @@ import 'package:gestion_integral_jyc/core/enums/payment_method.dart';
 import 'package:gestion_integral_jyc/core/presentation/extensions/date_formatting.dart';
 import 'package:gestion_integral_jyc/core/presentation/extensions/screen_size.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/items_card_layout.dart';
+import 'package:gestion_integral_jyc/core/presentation/widgets/return_screen_header.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/summary_products_card.dart';
@@ -15,7 +16,6 @@ import 'package:gestion_integral_jyc/features/sales/presentation/widgets/sale_cl
 import 'package:gestion_integral_jyc/features/sales/presentation/widgets/sale_invoice_card.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/widgets/sale_payment_card.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/widgets/sale_summary_item_card.dart';
-import 'package:go_router/go_router.dart';
 
 class SaleDetailsScreen extends ConsumerStatefulWidget {
   final SaleEntity sale;
@@ -50,7 +50,15 @@ class _SaleDetailsScreenState extends ConsumerState<SaleDetailsScreen> {
 
         child: Column(
           children: [
-            _buildHeader(context, currentSale),
+            ReturnScreenHeader(
+              title: "Venta VTA-${currentSale.id ?? '---'}",
+              subtitle:
+                  "Registrada el ${currentSale.date.ddMMyyyy} - ${currentSale.date.hour}:${currentSale.date.minute} hrs",
+              additionalSubtitle:
+                  "Corresponde al trabajo TRB-${currentSale.work!.id}",
+              returnLabel: "Volver a Ventas",
+              returnUri: "/sales",
+            ),
 
             const SizedBox(height: 32),
 
@@ -86,52 +94,6 @@ class _SaleDetailsScreenState extends ConsumerState<SaleDetailsScreen> {
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildHeader(BuildContext context, SaleEntity currentSale) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-
-            children: [
-              Text(
-                "Venta VTA-${currentSale.id ?? '---'}",
-                style: context.textTheme.titleLarge,
-              ),
-              Text(
-                "Registrada el ${currentSale.date.ddMMyyyy} - ${currentSale.date.hour}:${currentSale.date.minute} hrs",
-                style: context.textTheme.bodyLarge,
-              ),
-              if (currentSale.work != null)
-                Text(
-                  "Corresponde al trabajo TRB-${currentSale.work!.id}",
-                  style: context.textTheme.bodyLarge,
-                ),
-            ],
-          ),
-        ),
-
-        if (!context.isMobileLayout) ...[
-          const SizedBox(width: 16),
-
-          TextButton.icon(
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              } else {
-                context.go('/sales');
-              }
-            },
-            label: Text("Volver a Ventas"),
-            icon: Icon(Icons.arrow_back),
-          ),
-        ],
-      ],
     );
   }
 

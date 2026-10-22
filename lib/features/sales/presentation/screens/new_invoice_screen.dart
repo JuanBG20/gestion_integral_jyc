@@ -94,25 +94,6 @@ class _NewInvoiceScreenState extends ConsumerState<NewInvoiceScreen> {
     }
   }
 
-  Future<void> _pickIssueDate() async {
-    final (min, max) = _allowedDateRange();
-
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: _issueDate.isBefore(min)
-          ? min
-          : (_issueDate.isAfter(max) ? max : _issueDate),
-      firstDate: min,
-      lastDate: max,
-      helpText: _concept == 'Productos'
-          ? 'AFIP permite hasta 5 días de diferencia'
-          : 'AFIP permite hasta 10 días de diferencia',
-    );
-    if (picked != null) {
-      setState(() => _issueDate = picked);
-    }
-  }
-
   Future<void> _generateInvoice() async {
     if (_isLoading) return;
     if (!_formKey.currentState!.validate()) return;
@@ -170,6 +151,8 @@ class _NewInvoiceScreenState extends ConsumerState<NewInvoiceScreen> {
   Widget build(BuildContext context) {
     final sale = widget.sale;
 
+    final (minDate, maxDate) = _allowedDateRange();
+
     return FormScreenLayout(
       title: "Generar Factura",
       subtitle: "Complete los datos fiscales para emitir la factura en ARCA.",
@@ -201,8 +184,17 @@ class _NewInvoiceScreenState extends ConsumerState<NewInvoiceScreen> {
                 child: LabeledDatePicker(
                   label: 'Fecha de Emisión',
                   hint: 'Seleccione una fecha...',
-                  onTap: _pickIssueDate,
+                  onChanged: (picked) {
+                    setState(() {
+                      _issueDate = picked;
+                    });
+                  },
                   value: _issueDate,
+                  firstDate: minDate,
+                  lastDate: maxDate,
+                  helpText: _concept == 'Productos'
+                      ? 'ARCA permite hasta 5 días de diferencia'
+                      : 'ARCA permite hasta 10 días de diferencia',
                 ),
               ),
 
