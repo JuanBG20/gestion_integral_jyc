@@ -100,7 +100,7 @@ class ExpenseTemplateNotifier
     fetchTemplates(onlyActive: false);
   }
 
-  Future<void> fetchTemplates({bool onlyActive = true}) async {
+  Future<void> fetchTemplates({bool onlyActive = false}) async {
     try {
       state = const AsyncValue.loading();
       final templates = await repository.getTemplates(onlyActive: onlyActive);

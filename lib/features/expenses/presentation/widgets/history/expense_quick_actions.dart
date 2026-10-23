@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/quick_action_button.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/quick_actions_layout.dart';
 import 'package:gestion_integral_jyc/features/expenses/domain/entities/expense_entity.dart';
-import 'package:gestion_integral_jyc/features/expenses/presentation/widgets/confirm_payment_dialog.dart';
+import 'package:gestion_integral_jyc/features/expenses/presentation/widgets/history/confirm_payment_dialog.dart';
 import 'package:go_router/go_router.dart';
 
 class ExpenseQuickActions extends StatelessWidget {

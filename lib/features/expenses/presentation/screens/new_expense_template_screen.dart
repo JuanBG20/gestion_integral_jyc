@@ -11,6 +11,7 @@ import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/features/expenses/domain/entities/expense_category_entity.dart';
 import 'package:gestion_integral_jyc/features/expenses/domain/entities/expense_template_entity.dart';
 import 'package:gestion_integral_jyc/features/expenses/presentation/providers/expense_provider.dart';
+import 'package:gestion_integral_jyc/features/expenses/presentation/widgets/templates/variable_template_info_banner.dart';
 import 'package:go_router/go_router.dart';
 
 class NewExpenseTemplateScreen extends ConsumerStatefulWidget {
@@ -160,7 +161,6 @@ class _NewExpenseTemplateScreenState
             spacing: 24,
             runSpacing: 24,
             children: [
-              // 1. ESTADO ACTIVO
               SizedBox(
                 width: constraints.maxWidth,
                 child: SwitchListTile(
@@ -181,7 +181,6 @@ class _NewExpenseTemplateScreenState
 
               Divider(color: AppColors.outline),
 
-              // 2. DETALLES PRINCIPALES
               SizedBox(
                 width: constraints.maxWidth,
                 child: LabeledTextField(
@@ -272,8 +271,7 @@ class _NewExpenseTemplateScreenState
                   inputType: const TextInputType.numberWithOptions(
                     decimal: true,
                   ),
-                  /* enabled:
-                      isFijo, // Se desactiva visual y lógicamente si es variable */
+                  readOnly: !isFijo,
                 ),
               ),
 
@@ -295,37 +293,10 @@ class _NewExpenseTemplateScreenState
                 ),
               ),
 
-              // Mensaje de ayuda si es variable
               if (!isFijo)
                 SizedBox(
                   width: constraints.maxWidth,
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: AppColors.primary.withValues(alpha: 0.3),
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Icons.info_outline,
-                          color: AppColors.primary,
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            "Al ser un monto variable (ej. Luz, Gas), el gasto se generará con importe \$0. Deberás ingresar el monto real al momento de registrar su pago.",
-                            style: context.textTheme.bodySmall?.copyWith(
-                              color: AppColors.primary,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  child: VariableTemplateInfoBanner(),
                 ),
             ],
           );

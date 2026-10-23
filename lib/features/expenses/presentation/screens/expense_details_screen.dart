@@ -10,8 +10,8 @@ import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/features/expenses/domain/entities/expense_entity.dart';
 import 'package:gestion_integral_jyc/features/expenses/presentation/providers/expense_provider.dart';
-import 'package:gestion_integral_jyc/features/expenses/presentation/widgets/expense_quick_actions.dart';
-import 'package:gestion_integral_jyc/features/expenses/presentation/widgets/expense_summary_item_card.dart';
+import 'package:gestion_integral_jyc/features/expenses/presentation/widgets/history/expense_quick_actions.dart';
+import 'package:gestion_integral_jyc/features/expenses/presentation/widgets/history/expense_summary_item_card.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/widgets/info_budget.dart';
 
 class ExpenseDetailsScreen extends ConsumerWidget {

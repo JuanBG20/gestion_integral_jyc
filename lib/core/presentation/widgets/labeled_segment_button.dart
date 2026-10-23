@@ -6,6 +6,7 @@ class LabeledSegmentButton<T> extends StatelessWidget {
   final String label;
   final T groupValue;
   final ValueChanged<T> onChanged;
+  final double stackBreakpoint;
 
   final String leftTitle;
   final IconData leftIcon;
@@ -26,10 +27,25 @@ class LabeledSegmentButton<T> extends StatelessWidget {
     required this.rightTitle,
     required this.rightIcon,
     required this.rightValue,
+    this.stackBreakpoint = 360,
   });
 
   @override
   Widget build(BuildContext context) {
+    final leftButton = AppSegmentButton(
+      title: leftTitle,
+      icon: leftIcon,
+      isSelected: groupValue == leftValue,
+      onTap: () => onChanged(leftValue),
+    );
+
+    final rightButton = AppSegmentButton(
+      title: rightTitle,
+      icon: rightIcon,
+      isSelected: groupValue == rightValue,
+      onTap: () => onChanged(rightValue),
+    );
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
 
@@ -44,28 +60,28 @@ class LabeledSegmentButton<T> extends StatelessWidget {
 
         const SizedBox(height: 4),
 
-        Row(
-          children: [
-            Expanded(
-              child: AppSegmentButton(
-                title: leftTitle,
-                icon: leftIcon,
-                isSelected: groupValue == leftValue,
-                onTap: () => onChanged(leftValue),
-              ),
-            ),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final stacked = constraints.maxWidth < stackBreakpoint;
 
-            const SizedBox(width: 24),
+            if (stacked) {
+              return Column(
+                children: [
+                  SizedBox(width: double.infinity, child: leftButton),
+                  const SizedBox(height: 8),
+                  SizedBox(width: double.infinity, child: rightButton),
+                ],
+              );
+            }
 
-            Expanded(
-              child: AppSegmentButton(
-                title: rightTitle,
-                icon: rightIcon,
-                isSelected: groupValue == rightValue,
-                onTap: () => onChanged(rightValue),
-              ),
-            ),
-          ],
+            return Row(
+              children: [
+                Expanded(child: leftButton),
+                const SizedBox(width: 24),
+                Expanded(child: rightButton),
+              ],
+            );
+          },
         ),
       ],
     );

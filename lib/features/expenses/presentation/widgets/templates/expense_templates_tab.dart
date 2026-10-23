@@ -52,18 +52,21 @@ class ExpenseTemplatesTab extends ConsumerWidget {
           cells: [
             AppTableCell(
               flex: 1,
-              child: Switch(
-                value: template.isActive,
-                onChanged: isAdmin
-                    ? (value) {
-                        if (template.id != null) {
-                          ref
-                              .read(expenseTemplateProvider.notifier)
-                              .toggleTemplateStatus(template.id!, value);
-                        }
-                      }
-                    : null,
-                activeThumbColor: AppColors.primary,
+              child: Align(
+                alignment: Alignment.centerLeft,
+
+                child: Switch(
+                  value: template.isActive,
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  onChanged: (value) {
+                    if (template.id != null) {
+                      ref
+                          .read(expenseTemplateProvider.notifier)
+                          .toggleTemplateStatus(template.id!, value);
+                    }
+                  },
+                  activeThumbColor: AppColors.primary,
+                ),
               ),
             ),
             AppTableCell.text(template.description, flex: 3),

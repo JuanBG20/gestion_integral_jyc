@@ -4,38 +4,50 @@ import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_searchabl
 import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_text_field.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
-import 'package:gestion_integral_jyc/features/inventory/domain/entities/variant_product_entity.dart';
 
-class ProductItemEntryForm extends StatelessWidget {
+class LineItemEntryForm<O extends Object> extends StatelessWidget {
   final bool isAddingItem;
   final bool isGenericItem;
   final String genericDescriptionHint;
 
-  final List<VariantProductEntity> availableVariants;
-  final VariantProductEntity? selectedVariant;
+  final String optionLabel;
+  final String optionHint;
+  final List<O> options;
+  final O? selectedOption;
+  final String Function(O option) optionItemLabel;
+
+  final String quantityLabel;
+  final bool decimalQuantity;
+  final String priceLabel;
 
   final TextEditingController qtyController;
   final TextEditingController priceController;
   final TextEditingController descController;
   final FocusNode qtyFocusNode;
 
-  final ValueChanged<VariantProductEntity?> onVariantChanged;
+  final ValueChanged<O?> onOptionChanged;
   final VoidCallback onStartAdding;
   final VoidCallback onCancel;
   final VoidCallback onSubmit;
 
-  const ProductItemEntryForm({
+  const LineItemEntryForm({
     super.key,
     required this.isAddingItem,
     required this.isGenericItem,
     required this.genericDescriptionHint,
-    required this.availableVariants,
-    this.selectedVariant,
+    required this.optionLabel,
+    required this.optionHint,
+    required this.options,
+    this.selectedOption,
+    required this.optionItemLabel,
+    this.quantityLabel = "Cant.",
+    this.decimalQuantity = false,
+    this.priceLabel = "Precio Un. (\$)",
     required this.qtyController,
     required this.priceController,
     required this.descController,
     required this.qtyFocusNode,
-    required this.onVariantChanged,
+    required this.onOptionChanged,
     required this.onStartAdding,
     required this.onCancel,
     required this.onSubmit,
@@ -86,45 +98,40 @@ class ProductItemEntryForm extends StatelessWidget {
                 label: "Descripción",
                 hint: genericDescriptionHint,
               )
-            : LabeledSearchableDropdown<VariantProductEntity>(
-                label: "Producto",
-                hint: "Seleccione un producto...",
-                value: selectedVariant,
-                items: availableVariants,
-                itemLabel: (v) {
-                  final title =
-                      '${v.baseProduct.description} ${v.color ?? ''} ${v.size ?? ''}'
-                          .trim();
-                  return '$title (${v.sku})';
-                },
-                onChanged: onVariantChanged,
+            : LabeledSearchableDropdown<O>(
+                label: optionLabel,
+                hint: optionHint,
+                value: selectedOption,
+                items: options,
+                itemLabel: optionItemLabel,
+                onChanged: onOptionChanged,
               ),
 
         const SizedBox(height: 16),
 
         Row(
           children: [
-            // Cantidad
             Expanded(
               child: LabeledTextField(
                 controller: qtyController,
                 focusNode: qtyFocusNode,
-                label: "Cant.",
+                label: quantityLabel,
                 hint: "0",
-                inputType: TextInputType.number,
+                inputType: decimalQuantity
+                    ? const TextInputType.numberWithOptions(decimal: true)
+                    : TextInputType.number,
               ),
             ),
 
             const SizedBox(width: 16),
 
-            // Precio Unitario
             Expanded(
               child: LabeledTextField(
                 controller: priceController,
-                label: "Precio Un. (\$)",
+                label: priceLabel,
                 hint: "1000",
-                inputType: TextInputType.numberWithOptions(decimal: true),
-                prefixIcon: Icon(Icons.attach_money),
+                inputType: const TextInputType.numberWithOptions(decimal: true),
+                prefixIcon: const Icon(Icons.attach_money),
               ),
             ),
           ],
@@ -140,7 +147,7 @@ class ProductItemEntryForm extends StatelessWidget {
 
                 child: OutlinedButton.icon(
                   onPressed: onCancel,
-                  label: Text("Cancelar"),
+                  label: const Text("Cancelar"),
                   icon: const Icon(Icons.close),
                 ),
               ),
@@ -152,7 +159,7 @@ class ProductItemEntryForm extends StatelessWidget {
 
                 child: ElevatedButton.icon(
                   onPressed: onSubmit,
-                  label: Text("Agregar"),
+                  label: const Text("Agregar"),
                   icon: const Icon(Icons.add),
                 ),
               ),
@@ -165,7 +172,7 @@ class ProductItemEntryForm extends StatelessWidget {
             children: [
               OutlinedButton.icon(
                 onPressed: onCancel,
-                label: Text("Cancelar"),
+                label: const Text("Cancelar"),
                 icon: const Icon(Icons.close),
               ),
 
@@ -173,7 +180,7 @@ class ProductItemEntryForm extends StatelessWidget {
 
               ElevatedButton.icon(
                 onPressed: onSubmit,
-                label: Text("Agregar"),
+                label: const Text("Agregar"),
                 icon: const Icon(Icons.add),
               ),
             ],

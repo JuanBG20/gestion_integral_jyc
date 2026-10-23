@@ -1,28 +1,28 @@
-import 'package:flutter/material.dart';
-import 'package:gestion_integral_jyc/core/domain/entities/product_line_item_entity.dart';
-import 'package:gestion_integral_jyc/features/inventory/domain/entities/variant_product_entity.dart';
+import 'package:flutter/foundation.dart';
 
-typedef ProductLineItemBuilder<T extends ProductLineItemEntity> =
+typedef LineItemBuilder<T, O extends Object> =
     T Function({
-      required VariantProductEntity? variantProduct,
-      required int quantity,
+      required O? option,
+      required double quantity,
       required double unitPrice,
       String? description,
     });
 
-class ProductItemsListController<T extends ProductLineItemEntity>
-    extends ChangeNotifier {
-  final ProductLineItemBuilder<T> _itemBuilder;
+class LineItemsListController<T, O extends Object> extends ChangeNotifier {
+  final LineItemBuilder<T, O> _itemBuilder;
   final ValueChanged<List<T>> _onItemsChanged;
+
+  final bool allowGeneric;
 
   List<T> _items;
   bool _isGenericItem = false;
   bool _isAddingItem = false;
-  VariantProductEntity? _selectedVariant;
+  O? _selectedOption;
 
-  ProductItemsListController({
-    required ProductLineItemBuilder<T> itemBuilder,
+  LineItemsListController({
+    required LineItemBuilder<T, O> itemBuilder,
     required ValueChanged<List<T>> onItemsChanged,
+    this.allowGeneric = true,
     List<T> initialItems = const [],
   }) : _itemBuilder = itemBuilder,
        _onItemsChanged = onItemsChanged,
@@ -31,7 +31,7 @@ class ProductItemsListController<T extends ProductLineItemEntity>
   List<T> get items => List.unmodifiable(_items);
   bool get isGenericItem => _isGenericItem;
   bool get isAddingItem => _isAddingItem;
-  VariantProductEntity? get selectedVariant => _selectedVariant;
+  O? get selectedOption => _selectedOption;
 
   void startAdding() {
     _isAddingItem = true;
@@ -41,13 +41,14 @@ class ProductItemsListController<T extends ProductLineItemEntity>
   void cancelAdding() {
     _isAddingItem = false;
     _isGenericItem = false;
-    _selectedVariant = null;
+    _selectedOption = null;
     notifyListeners();
   }
 
   void switchToGeneric() {
+    if (!allowGeneric) return;
     _isGenericItem = true;
-    _selectedVariant = null;
+    _selectedOption = null;
     notifyListeners();
   }
 
@@ -56,22 +57,22 @@ class ProductItemsListController<T extends ProductLineItemEntity>
     notifyListeners();
   }
 
-  void selectVariant(VariantProductEntity? variant) {
-    _selectedVariant = variant;
+  void selectOption(O? option) {
+    _selectedOption = option;
     notifyListeners();
   }
 
-  VariantProductEntity? matchScannedSku(
-    String sku,
-    List<VariantProductEntity> availableVariants,
+  O? matchScannedCode(
+    String code,
+    List<O> options,
+    String Function(O option) codeOf,
   ) {
-    // Buscamos la variante que coincida con el SKU
-    final matched = availableVariants.where((v) => v.sku == sku).firstOrNull;
+    final matched = options.where((o) => codeOf(o) == code).firstOrNull;
 
     if (matched != null) {
       _isAddingItem = true;
       _isGenericItem = false;
-      _selectedVariant = matched;
+      _selectedOption = matched;
       notifyListeners();
     }
 
@@ -79,29 +80,29 @@ class ProductItemsListController<T extends ProductLineItemEntity>
   }
 
   bool addItem({
-    required int quantity,
+    required double quantity,
     required double unitPrice,
     String? description,
   }) {
     final desc = description?.trim() ?? '';
 
     if (quantity <= 0) return false;
-    if (!_isGenericItem && _selectedVariant == null) return false;
+    if (!_isGenericItem && _selectedOption == null) return false;
     if (_isGenericItem && desc.isEmpty) {
-      return false; // Si es genérico, debe tener descripción
+      return false;
     }
 
     _items = List<T>.from(_items)
       ..add(
         _itemBuilder(
-          variantProduct: _isGenericItem ? null : _selectedVariant,
+          option: _isGenericItem ? null : _selectedOption,
           quantity: quantity,
           unitPrice: unitPrice,
           description: _isGenericItem ? desc : null,
         ),
       );
 
-    _selectedVariant = null;
+    _selectedOption = null;
     _isGenericItem = false;
     _isAddingItem = false;
 

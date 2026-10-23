@@ -21,7 +21,6 @@ class ExpenseTemplateCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Primera letra en mayúsculas, el resto en minúsculas
     final frequency =
         template.frequency.name[0].toUpperCase() +
         template.frequency.name.substring(1).toLowerCase();
@@ -42,15 +41,13 @@ class ExpenseTemplateCard extends ConsumerWidget {
               children: [
                 Switch(
                   value: template.isActive,
-                  onChanged: isAdmin
-                      ? (value) {
-                          if (template.id != null) {
-                            ref
-                                .read(expenseTemplateProvider.notifier)
-                                .toggleTemplateStatus(template.id!, value);
-                          }
-                        }
-                      : null,
+                  onChanged: (value) {
+                    if (template.id != null) {
+                      ref
+                          .read(expenseTemplateProvider.notifier)
+                          .toggleTemplateStatus(template.id!, value);
+                    }
+                  },
                   activeThumbColor: AppColors.primary,
                 ),
 
@@ -97,10 +94,7 @@ class ExpenseTemplateCard extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
 
               children: [
-                Text(
-                  isFixedAmount ? "Monto Fijo" : "Tipo de Monto",
-                  style: context.textTheme.bodySmall,
-                ),
+                Text("Monto", style: context.textTheme.bodySmall),
 
                 Text(
                   isFixedAmount

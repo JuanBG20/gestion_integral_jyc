@@ -1,28 +1,30 @@
 import 'package:flutter/material.dart';
-import 'package:gestion_integral_jyc/core/domain/entities/product_line_item_entity.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 
-class ProductLineItemCard<T extends ProductLineItemEntity>
-    extends StatelessWidget {
-  final T item;
-  final String genericItemLabel;
+class LineItemCard extends StatelessWidget {
+  final String leadingText;
+  final String title;
+  final String? subtitle;
+
+  final String amountText;
+
+  final String? amountCaption;
+
   final VoidCallback onDelete;
 
-  const ProductLineItemCard({
+  const LineItemCard({
     super.key,
-    required this.item,
-    required this.genericItemLabel,
+    required this.leadingText,
+    required this.title,
+    this.subtitle,
+    required this.amountText,
+    this.amountCaption,
     required this.onDelete,
   });
 
   @override
   Widget build(BuildContext context) {
-    final itemName = item.variantProduct != null
-        ? '${item.variantProduct!.baseProduct.description} ${item.variantProduct!.color ?? ''}'
-              .trim()
-        : item.description ?? genericItemLabel;
-
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
@@ -41,7 +43,7 @@ class ProductLineItemCard<T extends ProductLineItemEntity>
             ),
 
             child: Text(
-              '${item.quantity}x',
+              leadingText,
               style: context.textTheme.bodyMedium?.copyWith(
                 color: AppColors.primary,
                 fontWeight: FontWeight.bold,
@@ -57,24 +59,42 @@ class ProductLineItemCard<T extends ProductLineItemEntity>
 
               children: [
                 Text(
-                  itemName,
+                  title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                   style: context.textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                if (item.variantProduct?.sku != null)
-                  Text(
-                    item.variantProduct!.sku,
-                    style: context.textTheme.bodySmall,
-                  ),
+                if (subtitle != null)
+                  Text(subtitle!, style: context.textTheme.bodySmall),
               ],
             ),
           ),
 
-          Text(
-            "\$${(item.quantity * item.unitPrice).toStringAsFixed(2)}",
-            style: context.textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.bold,
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 150),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+
+              children: [
+                Text(
+                  amountText,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: context.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                if (amountCaption != null)
+                  Text(
+                    amountCaption!,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.end,
+                    style: context.textTheme.bodySmall,
+                  ),
+              ],
             ),
           ),
 
@@ -90,10 +110,3 @@ class ProductLineItemCard<T extends ProductLineItemEntity>
     );
   }
 }
-
-/* 
-
-Widget _buildItemCard(T item, int index) {
-    
-  }
- */
