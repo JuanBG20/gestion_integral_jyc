@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gestion_integral_jyc/core/presentation/extensions/screen_size.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/screen_header.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/summary_card.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/features/reports/domain/entities/report_dashboard_entity.dart';
+import 'package:gestion_integral_jyc/features/reports/domain/services/report_pdf_generator.dart';
 import 'package:gestion_integral_jyc/features/reports/presentation/providers/report_provider.dart';
 import 'package:gestion_integral_jyc/features/reports/presentation/widgets/applied_discounts_card.dart';
 import 'package:gestion_integral_jyc/features/reports/presentation/widgets/category_profitability_card.dart';
@@ -11,6 +13,8 @@ import 'package:gestion_integral_jyc/features/reports/presentation/widgets/month
 import 'package:gestion_integral_jyc/features/reports/presentation/widgets/payment_methods_card.dart';
 import 'package:gestion_integral_jyc/features/reports/presentation/widgets/registered_expenses_card.dart';
 import 'package:go_router/go_router.dart';
+import 'package:pdf/pdf.dart';
+import 'package:printing/printing.dart';
 
 class ReportsScreen extends ConsumerWidget {
   const ReportsScreen({super.key});
@@ -19,8 +23,25 @@ class ReportsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final reportState = ref.watch(reportMetricsProvider);
 
+    void exportReport() {
+      reportState.whenData((dashboard) async {
+        await Printing.layoutPdf(
+          onLayout: (PdfPageFormat format) async =>
+              ReportPdfGenerator.generate(dashboard),
+        );
+      });
+    }
+
     return Scaffold(
       backgroundColor: AppColors.surface,
+
+      floatingActionButton: context.isMobileLayout
+          ? FloatingActionButton(
+              onPressed: exportReport,
+              tooltip: "Exportar Reporte",
+              child: const Icon(Icons.download),
+            )
+          : null,
 
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
@@ -34,6 +55,7 @@ class ReportsScreen extends ConsumerWidget {
               subtitle:
                   "Métricas en tiempo real, ingresos netos y balance financiero por categoría.",
               buttonLabel: "Exportar Reporte",
+              onPressed: exportReport,
 
               hasSecondaryButton: true,
               secondaryButtonLabel: "Este Mes",
