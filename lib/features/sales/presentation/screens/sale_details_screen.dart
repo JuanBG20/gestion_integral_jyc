@@ -54,8 +54,9 @@ class _SaleDetailsScreenState extends ConsumerState<SaleDetailsScreen> {
               title: "Venta VTA-${currentSale.id ?? '---'}",
               subtitle:
                   "Registrada el ${currentSale.date.ddMMyyyy} - ${currentSale.date.hour}:${currentSale.date.minute} hrs",
-              additionalSubtitle:
-                  "Corresponde al trabajo TRB-${currentSale.work!.id}",
+              additionalSubtitle: currentSale.work != null
+                  ? "Corresponde al trabajo TRB-${currentSale.work!.id}"
+                  : null,
               returnLabel: "Volver a Ventas",
               returnUri: "/sales",
             ),

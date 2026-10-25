@@ -110,23 +110,29 @@ class ReportsScreen extends ConsumerWidget {
 
                 SummaryCard(
                   width: cardWidth,
-                  title: 'ÓRDENES ACTIVAS',
-                  value: '${dashboard.activeOrders}',
-                  subtitle: '${dashboard.activeOrders} con diseño pendiente',
-                  icon: Icons.precision_manufacturing_outlined,
-                  iconColor: Colors.deepPurple,
-                  onTap: () => context.go('/work'),
+                  title: 'GASTOS TOTALES',
+                  value: '\$${dashboard.totalExpenses.toStringAsFixed(0)}',
+                  subtitle: dashboard.pendingExpenses > 0
+                      ? '\$${dashboard.pendingExpenses.toStringAsFixed(0)} pendientes de pago'
+                      : 'Todo el mes pagado',
+                  icon: Icons.receipt_long_outlined,
+                  iconColor: dashboard.pendingExpenses > 0
+                      ? Colors.orange
+                      : AppColors.primary,
+                  onTap: () => context.go('/expenses'),
                 ),
 
                 SummaryCard(
                   width: cardWidth,
-                  title: 'ALERTAS DE STOCK DE MATERIA PRIMA',
+                  title: 'ALERTAS DE STOCK',
                   value: '${dashboard.stockAlerts}',
                   subtitle: dashboard.stockAlerts > 0
                       ? 'Revisar inventario'
                       : 'Stock en niveles óptimos',
-                  icon: Icons.report_problem_outlined,
-                  iconColor: AppColors.error,
+                  icon: Icons.inventory_2_outlined,
+                  iconColor: dashboard.stockAlerts > 0
+                      ? AppColors.error
+                      : Colors.deepPurple,
                   onTap: () => context.go('/inventory'),
                 ),
 
@@ -150,6 +156,8 @@ class ReportsScreen extends ConsumerWidget {
           totalCollected: dashboard.monthlyCollected,
           operatingExpenses: dashboard.monthlyExpenses,
           finalAmount: dashboard.monthlyFinalAmount,
+          pendingCollection: dashboard.pendingCollection,
+          pendingExpenses: dashboard.pendingExpenses,
         ),
 
         const SizedBox(height: 16),

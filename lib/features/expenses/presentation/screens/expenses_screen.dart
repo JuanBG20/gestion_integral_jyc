@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gestion_integral_jyc/core/enums/expense_payment_status.dart';
 import 'package:gestion_integral_jyc/core/presentation/extensions/screen_size.dart';
 import 'package:gestion_integral_jyc/core/presentation/providers/auth_provider.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/screen_header.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/summary_card.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
+import 'package:gestion_integral_jyc/features/expenses/presentation/providers/expense_provider.dart';
 import 'package:gestion_integral_jyc/features/expenses/presentation/widgets/history/expenses_history_tab_wrapper.dart';
 import 'package:gestion_integral_jyc/features/expenses/presentation/widgets/templates/expense_templates_tab_wrapper.dart';
 import 'package:go_router/go_router.dart';
@@ -15,6 +17,39 @@ class ExpensesScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isAdmin = ref.watch(isAdminProvider);
+    final expensesState = ref.watch(expenseProvider);
+    final templatesState = ref.watch(expenseTemplateProvider);
+
+    double totalSpent = 0;
+    double totalOutstanding = 0;
+    int invoicesDue = 0;
+
+    expensesState.maybeWhen(
+      data: (expenses) {
+        for (var e in expenses) {
+          if (e.paymentStatus == ExpensePaymentStatus.pagado) {
+            totalSpent += (e.amount ?? 0);
+          } else {
+            totalOutstanding += (e.amount ?? 0);
+            invoicesDue++;
+          }
+        }
+      },
+      orElse: () {},
+    );
+
+    double fixedAmount = 0;
+    int activeTemplates = 0;
+
+    templatesState.maybeWhen(
+      data: (templates) {
+        for (var t in templates) {
+          fixedAmount += (t.amount ?? 0);
+          activeTemplates++;
+        }
+      },
+      orElse: () {},
+    );
 
     return DefaultTabController(
       length: 2,
@@ -75,8 +110,8 @@ class ExpensesScreen extends ConsumerWidget {
                                   SummaryCard(
                                     width: cardWidth,
                                     title: 'TOTAL GASTADO',
-                                    value: '\$184200',
-                                    subtitle: '+12.4% vs. mes anterior',
+                                    value: '\$${totalSpent.toStringAsFixed(0)}',
+                                    subtitle: 'Historial de gastos abonados',
                                     icon: Icons.receipt_long_outlined,
                                     iconColor: AppColors.primary,
                                     onTap: () => context.go('/sales'),
@@ -85,8 +120,10 @@ class ExpensesScreen extends ConsumerWidget {
                                   SummaryCard(
                                     width: cardWidth,
                                     title: 'TOTAL PENDIENTE DE PAGO',
-                                    value: '\$43200',
-                                    subtitle: '2 facturas por vencer',
+                                    value:
+                                        '\$${totalOutstanding.toStringAsFixed(0)}',
+                                    subtitle:
+                                        '$invoicesDue facturas por vencer',
                                     icon: Icons.alarm_outlined,
                                     iconColor: AppColors.error,
                                     onTap: () => context.go('/work'),
@@ -95,8 +132,10 @@ class ExpensesScreen extends ConsumerWidget {
                                   SummaryCard(
                                     width: cardWidth,
                                     title: 'MONTO DE GASTOS FIJOS',
-                                    value: '\$78500',
-                                    subtitle: 'Valores fijos',
+                                    value:
+                                        '\$${fixedAmount.toStringAsFixed(0)}',
+                                    subtitle:
+                                        '$activeTemplates suscripciones activas',
                                     icon: Icons.replay_outlined,
                                     iconColor: Colors.deepPurple,
                                     onTap: () => context.go('/inventory'),

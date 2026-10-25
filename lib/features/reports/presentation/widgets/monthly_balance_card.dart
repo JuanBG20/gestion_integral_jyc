@@ -7,12 +7,16 @@ class MonthlyBalanceCard extends StatelessWidget {
   final double totalCollected;
   final double operatingExpenses;
   final double finalAmount;
+  final double pendingCollection;
+  final double pendingExpenses;
 
   const MonthlyBalanceCard({
     super.key,
     required this.totalCollected,
     required this.operatingExpenses,
     required this.finalAmount,
+    required this.pendingCollection,
+    required this.pendingExpenses,
   });
 
   @override
@@ -76,7 +80,7 @@ class MonthlyBalanceCard extends StatelessWidget {
               const SizedBox(height: 4),
 
               Text(
-                "Total cobrado menos gastos operativos del mes. Dinero disponible para repartir.",
+                "Total cobrado menos gastos operativos del mes.",
                 style: context.textTheme.bodySmall,
               ),
             ],
@@ -87,7 +91,7 @@ class MonthlyBalanceCard extends StatelessWidget {
   }
 
   Widget _buildMetricBox(BuildContext context, {required bool isCompact}) {
-    final content = isCompact
+    final mathRow = isCompact
         ? Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
@@ -95,8 +99,8 @@ class MonthlyBalanceCard extends StatelessWidget {
               Expanded(
                 child: _buildMetricItem(
                   context,
-                  label: "TOTAL COBRADO",
-                  value: "+\$$totalCollected",
+                  label: "INGRESOS",
+                  value: "+\$${totalCollected.toStringAsFixed(0)}",
                   color: AppColors.onBackground,
                   align: CrossAxisAlignment.start,
                 ),
@@ -110,8 +114,8 @@ class MonthlyBalanceCard extends StatelessWidget {
               Expanded(
                 child: _buildMetricItem(
                   context,
-                  label: "GASTOS OP.",
-                  value: "-\$$operatingExpenses",
+                  label: "GASTOS",
+                  value: "-\$${operatingExpenses.toStringAsFixed(0)}",
                   color: AppColors.error,
                   align: CrossAxisAlignment.center,
                 ),
@@ -126,7 +130,7 @@ class MonthlyBalanceCard extends StatelessWidget {
                 child: _buildMetricItem(
                   context,
                   label: "MONTO FINAL",
-                  value: "\$$finalAmount",
+                  value: "\$${finalAmount.toStringAsFixed(0)}",
                   color: AppColors.primary,
                   align: CrossAxisAlignment.end,
                 ),
@@ -139,8 +143,8 @@ class MonthlyBalanceCard extends StatelessWidget {
             children: [
               _buildMetricItem(
                 context,
-                label: "TOTAL COBRADO",
-                value: "+\$$totalCollected",
+                label: "INGRESOS",
+                value: "+\$${totalCollected.toStringAsFixed(0)}",
                 color: AppColors.onBackground,
                 align: CrossAxisAlignment.end,
               ),
@@ -151,8 +155,8 @@ class MonthlyBalanceCard extends StatelessWidget {
 
               _buildMetricItem(
                 context,
-                label: "GASTOS OPERATIVOS",
-                value: "-\$$operatingExpenses",
+                label: "GASTOS",
+                value: "-\$${operatingExpenses.toStringAsFixed(0)}",
                 color: AppColors.error,
                 align: CrossAxisAlignment.end,
               ),
@@ -164,7 +168,7 @@ class MonthlyBalanceCard extends StatelessWidget {
               _buildMetricItem(
                 context,
                 label: "MONTO FINAL",
-                value: "\$$finalAmount",
+                value: "\$${finalAmount.toStringAsFixed(0)}",
                 color: AppColors.primary,
                 align: CrossAxisAlignment.end,
               ),
@@ -180,7 +184,46 @@ class MonthlyBalanceCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(4),
       ),
 
-      child: content,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: isCompact
+            ? CrossAxisAlignment.start
+            : CrossAxisAlignment.end,
+
+        children: [
+          mathRow,
+
+          if (pendingExpenses > 0 || pendingCollection > 0) ...[
+            Padding(
+              padding: const EdgeInsetsGeometry.only(top: 12),
+
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+
+                children: [
+                  const Icon(
+                    Icons.info_outline,
+                    size: 14,
+                    color: Colors.orange,
+                  ),
+
+                  const SizedBox(width: 6),
+
+                  Flexible(
+                    child: Text(
+                      "Dinero sin cobrar: \$${pendingCollection.toStringAsFixed(0)} | Gastos sin pagar: \$${pendingExpenses.toStringAsFixed(0)}",
+                      style: context.textTheme.bodySmall?.copyWith(
+                        color: Colors.orange,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ],
+      ),
     );
   }
 

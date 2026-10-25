@@ -5,8 +5,6 @@ import 'package:gestion_integral_jyc/features/reports/domain/entities/report_das
 class ReportDashboardModel extends ReportDashboardEntity {
   ReportDashboardModel({
     required super.totalInvoiced,
-    required super.activeOrders,
-    required super.pendingDesignOrders,
     required super.stockAlerts,
     required super.netProfit,
     required super.globalMargin,
@@ -18,6 +16,8 @@ class ReportDashboardModel extends ReportDashboardEntity {
     required super.appliedDiscounts,
     required super.registeredExpenses,
     required super.pendingCollection,
+    required super.pendingExpenses,
+    required super.totalExpenses,
   });
 
   factory ReportDashboardModel.fromJson(Map<String, dynamic> json) {
@@ -25,9 +25,8 @@ class ReportDashboardModel extends ReportDashboardEntity {
       totalInvoiced: (json['total_invoiced'] as num?)?.toDouble() ?? 0.0,
       pendingCollection:
           (json['pending_collection'] as num?)?.toDouble() ?? 0.0,
-      activeOrders: (json['active_orders'] as num?)?.toInt() ?? 0,
-      pendingDesignOrders:
-          (json['pending_design_orders'] as num?)?.toInt() ?? 0,
+      totalExpenses: (json['total_expenses'] as num?)?.toDouble() ?? 0,
+      pendingExpenses: (json['pending_expenses'] as num?)?.toDouble() ?? 0,
       stockAlerts: (json['stock_alerts'] as num?)?.toInt() ?? 0,
       netProfit: (json['net_profit'] as num?)?.toDouble() ?? 0.0,
       globalMargin: (json['global_margin'] as num?)?.toDouble() ?? 0.0,

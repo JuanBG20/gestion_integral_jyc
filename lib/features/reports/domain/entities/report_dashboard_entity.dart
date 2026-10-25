@@ -3,12 +3,12 @@ import 'package:gestion_integral_jyc/features/reports/domain/entities/category_p
 
 class ReportDashboardEntity {
   final double totalInvoiced;
-  final int activeOrders;
-  final int pendingDesignOrders;
   final int stockAlerts;
   final double netProfit;
   final double globalMargin;
   final double pendingCollection;
+  final double totalExpenses;
+  final double pendingExpenses;
 
   // Balance Mensual
   final double monthlyCollected;
@@ -23,8 +23,6 @@ class ReportDashboardEntity {
 
   ReportDashboardEntity({
     required this.totalInvoiced,
-    required this.activeOrders,
-    required this.pendingDesignOrders,
     required this.stockAlerts,
     required this.netProfit,
     required this.globalMargin,
@@ -36,5 +34,7 @@ class ReportDashboardEntity {
     required this.appliedDiscounts,
     required this.registeredExpenses,
     required this.pendingCollection,
+    required this.pendingExpenses,
+    required this.totalExpenses,
   });
 }

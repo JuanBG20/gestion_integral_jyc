@@ -52,10 +52,13 @@ flutter_launcher_icons:
 
 msix_config:
   display_name: "Gestión J&C Impresiones 3D"
-  publisher_display_name: Dédalo Studio
+  publisher_display_name: "Dédalo Studio"
   identity_name: ar.com.dedalostudio.jyc
   msix_version: 1.7.0.0
-  logo_path: assets/icons/logo.png
+  logo_path: "assets/icons/logo.png"
+  square150x150logo_path: "assets/icons/logo.png"
+  square44x44logo_path: "assets/icons/logo.png"
+  wide310x150logo_path: "assets/icons/logo_wide.png"
   capabilities: internetClient
   logo_padding: 0
   background_color: "#000000"
