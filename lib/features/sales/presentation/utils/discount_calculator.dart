@@ -3,7 +3,7 @@ import 'package:gestion_integral_jyc/core/enums/payment_method.dart';
 import 'package:gestion_integral_jyc/features/sales/domain/entities/discount_entity.dart';
 
 class DiscountCalculator {
-  static List<DiscountEntity> calculatePaymenthMethodDiscounts({
+  static List<DiscountEntity> calculatePaymentMethodDiscounts({
     required PaymentMethod method,
     required double subtotal,
     required double percentage,

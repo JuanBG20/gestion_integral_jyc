@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gestion_integral_jyc/core/constants/payment_method_discounts.dart';
 import 'package:gestion_integral_jyc/core/domain/entities/client_entity.dart';
 import 'package:gestion_integral_jyc/core/enums/payment_method.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_searchable_dropdown.dart';
@@ -11,6 +10,7 @@ import 'package:gestion_integral_jyc/core/presentation/screens/form_screen_layou
 import 'package:gestion_integral_jyc/features/sales/domain/entities/discount_entity.dart';
 import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_entity.dart';
 import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_item_entity.dart';
+import 'package:gestion_integral_jyc/features/sales/presentation/providers/payment_method_discount_provider.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/providers/sale_provider.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/utils/discount_calculator.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/widgets/discount_items_list_section.dart';
@@ -42,10 +42,20 @@ class _NewSaleScreenState extends ConsumerState<NewSaleScreen> {
   List<DiscountEntity> get _currentDiscounts {
     List<DiscountEntity> autoDiscounts = [];
     if (_isPaidInFull) {
-      autoDiscounts = DiscountCalculator.calculatePaymenthMethodDiscounts(
+      final discountsList =
+          ref.read(paymentMethodDiscountsProvider).value ?? [];
+
+      final percentage =
+          discountsList
+              .where((d) => d.method == _selectedMethod)
+              .firstOrNull
+              ?.effectivePercentage ??
+          0;
+
+      autoDiscounts = DiscountCalculator.calculatePaymentMethodDiscounts(
         method: _selectedMethod,
         subtotal: _subtotalAmount,
-        percentage: kPaymentMethodDiscountPercentages[_selectedMethod] ?? 0,
+        percentage: percentage,
       );
     }
 

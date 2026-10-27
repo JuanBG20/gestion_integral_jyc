@@ -4,6 +4,7 @@ import 'package:gestion_integral_jyc/core/presentation/providers/auth_provider.d
 import 'package:gestion_integral_jyc/core/presentation/widgets/screen_header.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
+import 'package:gestion_integral_jyc/features/config/presentation/widgets/payment_method_discounts_section.dart';
 
 class ConfigScreen extends ConsumerWidget {
   const ConfigScreen({super.key});
@@ -72,6 +73,25 @@ class ConfigScreen extends ConsumerWidget {
             ),
 
             const SizedBox(height: 24),
+
+            Text(
+              "Descuentos por Método de Pago",
+              style: context.textTheme.titleMedium,
+            ),
+
+            const SizedBox(height: 4),
+
+            Text(
+              "Se aplican automáticamente al cobrar. Las ventas ya registradas no cambian.",
+              style: context.textTheme.bodySmall,
+            ),
+
+            Divider(color: AppColors.outline),
+
+            const PaymentMethodDiscountsSection(),
+
+            const SizedBox(height: 24),
+            Divider(color: AppColors.outline),
 
             ListTile(
               leading: Icon(Icons.delete_outline, color: AppColors.error),

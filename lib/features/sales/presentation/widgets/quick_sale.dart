@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gestion_integral_jyc/core/constants/payment_method_discounts.dart';
 import 'package:gestion_integral_jyc/core/domain/entities/client_entity.dart';
 import 'package:gestion_integral_jyc/core/enums/payment_method.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_searchable_dropdown.dart';
@@ -12,6 +11,7 @@ import 'package:gestion_integral_jyc/features/inventory/domain/entities/raw_mate
 import 'package:gestion_integral_jyc/features/inventory/presentation/providers/raw_material_provider.dart';
 import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_entity.dart';
 import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_item_entity.dart';
+import 'package:gestion_integral_jyc/features/sales/presentation/providers/payment_method_discount_provider.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/providers/sale_provider.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/utils/discount_calculator.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/widgets/payment_method_selector.dart';
@@ -72,10 +72,20 @@ class _QuickSaleState extends ConsumerState<QuickSale> {
         return;
       }
 
-      final discounts = DiscountCalculator.calculatePaymenthMethodDiscounts(
+      final discountsList =
+          ref.read(paymentMethodDiscountsProvider).value ?? [];
+
+      final percentage =
+          discountsList
+              .where((d) => d.method == _selectedMethod)
+              .firstOrNull
+              ?.effectivePercentage ??
+          0;
+
+      final discounts = DiscountCalculator.calculatePaymentMethodDiscounts(
         method: _selectedMethod,
         subtotal: baseAmount,
-        percentage: kPaymentMethodDiscountPercentages[_selectedMethod] ?? 0,
+        percentage: percentage,
       );
       final discountsAmount = discounts.fold(0.0, (sum, d) => sum + d.amount);
       final finalAmount = baseAmount - discountsAmount;

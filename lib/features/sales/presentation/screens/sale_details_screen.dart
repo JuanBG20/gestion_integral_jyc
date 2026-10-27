@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gestion_integral_jyc/core/constants/payment_method_discounts.dart';
 import 'package:gestion_integral_jyc/core/enums/payment_method.dart';
 import 'package:gestion_integral_jyc/core/presentation/extensions/date_formatting.dart';
 import 'package:gestion_integral_jyc/core/presentation/extensions/screen_size.dart';
@@ -11,6 +10,7 @@ import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/summary_products_card.dart';
 import 'package:gestion_integral_jyc/features/sales/domain/entities/discount_entity.dart';
 import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_entity.dart';
+import 'package:gestion_integral_jyc/features/sales/presentation/providers/payment_method_discount_provider.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/providers/sale_provider.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/utils/discount_calculator.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/widgets/sale_client_info_card.dart';
@@ -125,10 +125,20 @@ class _SaleDetailsScreenState extends ConsumerState<SaleDetailsScreen> {
     List<DiscountEntity> additionalDiscounts = [];
 
     if (!sale.isPaid) {
-      additionalDiscounts = DiscountCalculator.calculatePaymenthMethodDiscounts(
+      final discountsList =
+          ref.read(paymentMethodDiscountsProvider).value ?? [];
+
+      final percentage =
+          discountsList
+              .where((d) => d.method == _selectedMethod)
+              .firstOrNull
+              ?.effectivePercentage ??
+          0;
+
+      additionalDiscounts = DiscountCalculator.calculatePaymentMethodDiscounts(
         method: _selectedMethod,
         subtotal: sale.subtotal,
-        percentage: kPaymentMethodDiscountPercentages[_selectedMethod] ?? 0,
+        percentage: percentage,
       );
     }
 
