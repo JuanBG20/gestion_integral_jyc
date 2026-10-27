@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gestion_integral_jyc/core/constants/payment_method_discounts.dart';
 import 'package:gestion_integral_jyc/core/enums/payment_method.dart';
 import 'package:gestion_integral_jyc/core/presentation/extensions/date_formatting.dart';
 import 'package:gestion_integral_jyc/core/presentation/extensions/screen_size.dart';
@@ -127,6 +128,7 @@ class _SaleDetailsScreenState extends ConsumerState<SaleDetailsScreen> {
       additionalDiscounts = DiscountCalculator.calculatePaymenthMethodDiscounts(
         method: _selectedMethod,
         subtotal: sale.subtotal,
+        percentage: kPaymentMethodDiscountPercentages[_selectedMethod] ?? 0,
       );
     }
 

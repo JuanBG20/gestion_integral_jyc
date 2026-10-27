@@ -89,11 +89,7 @@ class SaleRemoteDataSource {
     if (additionalDiscounts.isNotEmpty) {
       final discountPayload = additionalDiscounts
           .map(
-            (d) => {
-              'venta': saleId,
-              'motivo': d.reason,
-              'monto_descontado': d.amount,
-            },
+            (d) => {...DiscountModel.fromEntity(d).toJson(), 'venta': saleId},
           )
           .toList();
 

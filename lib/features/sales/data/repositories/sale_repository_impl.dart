@@ -37,11 +37,7 @@ class SaleRepositoryImpl implements SaleRepository {
             ),
           )
           .toList(),
-      discounts: sale.discounts
-          .map(
-            (d) => DiscountModel(id: d.id, reason: d.reason, amount: d.amount),
-          )
-          .toList(),
+      discounts: sale.discounts.map(DiscountModel.fromEntity).toList(),
       isPaid: sale.isPaid,
     );
     final newSaleId = await remoteDataSource.createSaleRPC(

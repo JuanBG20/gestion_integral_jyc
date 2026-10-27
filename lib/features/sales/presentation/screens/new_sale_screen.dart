@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gestion_integral_jyc/core/constants/payment_method_discounts.dart';
 import 'package:gestion_integral_jyc/core/domain/entities/client_entity.dart';
 import 'package:gestion_integral_jyc/core/enums/payment_method.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_searchable_dropdown.dart';
@@ -12,6 +13,7 @@ import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_entity.
 import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_item_entity.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/providers/sale_provider.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/utils/discount_calculator.dart';
+import 'package:gestion_integral_jyc/features/sales/presentation/widgets/discount_items_list_section.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/widgets/sale_items_list_section.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/widgets/summary_sale_card.dart';
 import 'package:go_router/go_router.dart';
@@ -20,10 +22,10 @@ class NewSaleScreen extends ConsumerStatefulWidget {
   const NewSaleScreen({super.key});
 
   @override
-  ConsumerState<NewSaleScreen> createState() => _NewRawMaterialScreenState();
+  ConsumerState<NewSaleScreen> createState() => _NewSaleScreenState();
 }
 
-class _NewRawMaterialScreenState extends ConsumerState<NewSaleScreen> {
+class _NewSaleScreenState extends ConsumerState<NewSaleScreen> {
   final _formKey = GlobalKey<FormState>();
 
   ClientEntity? _selectedClient;
@@ -35,12 +37,19 @@ class _NewRawMaterialScreenState extends ConsumerState<NewSaleScreen> {
   double get _subtotalAmount =>
       _currentItems.fold(0, (sum, item) => sum + item.subtotal);
 
+  List<DiscountEntity> _manualDiscounts = [];
+
   List<DiscountEntity> get _currentDiscounts {
-    if (!_isPaidInFull) return [];
-    return DiscountCalculator.calculatePaymenthMethodDiscounts(
-      method: _selectedMethod,
-      subtotal: _subtotalAmount,
-    );
+    List<DiscountEntity> autoDiscounts = [];
+    if (_isPaidInFull) {
+      autoDiscounts = DiscountCalculator.calculatePaymenthMethodDiscounts(
+        method: _selectedMethod,
+        subtotal: _subtotalAmount,
+        percentage: kPaymentMethodDiscountPercentages[_selectedMethod] ?? 0,
+      );
+    }
+
+    return [...autoDiscounts, ..._manualDiscounts];
   }
 
   double get _discountsAmount =>
@@ -204,6 +213,21 @@ class _NewRawMaterialScreenState extends ConsumerState<NewSaleScreen> {
                   onItemsChanged: (items) {
                     setState(() {
                       _currentItems = items;
+                    });
+                  },
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              SizedBox(
+                width: constraints.maxWidth,
+
+                child: DiscountItemsListSection(
+                  currentSubtotal: _subtotalAmount,
+                  onItemsChanged: (discounts) {
+                    setState(() {
+                      _manualDiscounts = discounts;
                     });
                   },
                 ),

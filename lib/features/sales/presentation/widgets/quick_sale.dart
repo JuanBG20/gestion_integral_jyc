@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gestion_integral_jyc/core/constants/payment_method_discounts.dart';
 import 'package:gestion_integral_jyc/core/domain/entities/client_entity.dart';
 import 'package:gestion_integral_jyc/core/enums/payment_method.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_searchable_dropdown.dart';
@@ -74,6 +75,7 @@ class _QuickSaleState extends ConsumerState<QuickSale> {
       final discounts = DiscountCalculator.calculatePaymenthMethodDiscounts(
         method: _selectedMethod,
         subtotal: baseAmount,
+        percentage: kPaymentMethodDiscountPercentages[_selectedMethod] ?? 0,
       );
       final discountsAmount = discounts.fold(0.0, (sum, d) => sum + d.amount);
       final finalAmount = baseAmount - discountsAmount;

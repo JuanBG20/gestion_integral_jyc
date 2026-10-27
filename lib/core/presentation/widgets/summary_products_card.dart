@@ -60,7 +60,7 @@ class SummaryProductsCard extends StatelessWidget {
 
                 children: [
                   Text(
-                    "Desc. ${d.reason}",
+                    d.displayReason,
                     style: context.textTheme.bodyMedium?.copyWith(
                       color: Colors.red,
                     ),
