@@ -1,4 +1,7 @@
 import 'dart:async';
+import 'dart:io';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gestion_integral_jyc/core/domain/entities/client_entity.dart';
 import 'package:gestion_integral_jyc/features/auth/presentation/screens/login_screen.dart';
@@ -56,9 +59,16 @@ class GoRouterRefreshStream extends ChangeNotifier {
   }
 }
 
+final bool _isAnalyticsSupported =
+    kIsWeb || Platform.isAndroid || Platform.isIOS || Platform.isMacOS;
+
 final goRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
   initialLocation: '/dashboard',
+  observers: [
+    if (_isAnalyticsSupported)
+      FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance),
+  ],
   refreshListenable: GoRouterRefreshStream(
     Supabase.instance.client.auth.onAuthStateChange,
   ),
@@ -73,13 +83,19 @@ final goRouter = GoRouter(
     return null;
   },
   routes: [
-    GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
+    GoRoute(
+      path: '/login',
+      name: 'LoginScreen',
+      builder: (context, state) => const LoginScreen(),
+    ),
     GoRoute(
       path: '/register',
+      name: 'RegisterScreen',
       builder: (context, state) => const RegisterScreen(),
     ),
     GoRoute(
       path: '/scanner',
+      name: 'ScannerScreen',
       builder: (context, state) => const ScannerScreen(),
     ),
 
@@ -92,6 +108,7 @@ final goRouter = GoRouter(
           routes: [
             GoRoute(
               path: '/dashboard',
+              name: 'DashboardScreen',
               builder: (context, state) => const DashboardScreen(),
             ),
           ],
@@ -100,14 +117,17 @@ final goRouter = GoRouter(
           routes: [
             GoRoute(
               path: '/inventory',
+              name: 'InventoryScreen',
               builder: (context, state) => const InventoryScreen(),
               routes: [
                 GoRoute(
                   path: 'new-material',
+                  name: 'NewRawMaterialScreen',
                   builder: (context, state) => const NewRawMaterialScreen(),
                 ),
                 GoRoute(
                   path: 'edit-material',
+                  name: 'EditRawMaterialScreen',
                   builder: (context, state) {
                     final material = state.extra as RawMaterialEntity;
                     return NewRawMaterialScreen(rawMaterialToEdit: material);
@@ -116,10 +136,12 @@ final goRouter = GoRouter(
 
                 GoRoute(
                   path: 'new-product',
+                  name: 'NewProductScreen',
                   builder: (context, state) => const NewProductScreen(),
                 ),
                 GoRoute(
                   path: 'edit-product',
+                  name: 'EditProductScreen',
                   builder: (context, state) {
                     final product = state.extra as ProductGroupUi;
                     return NewProductScreen(productToEdit: product);
@@ -128,10 +150,12 @@ final goRouter = GoRouter(
 
                 GoRoute(
                   path: 'new-scrap',
+                  name: 'NewScrapScreen',
                   builder: (context, state) => const NewScrapScreen(),
                 ),
                 GoRoute(
                   path: 'edit-scrap',
+                  name: 'EditScrapScreen',
                   builder: (context, state) {
                     final scrap = state.extra as ScrapEntity;
                     return NewScrapScreen(scrapToEdit: scrap);
@@ -140,6 +164,7 @@ final goRouter = GoRouter(
 
                 GoRoute(
                   path: 'price-preview',
+                  name: 'PricePreviewScreen',
                   builder: (context, state) => const PriceUpdatePreviewScreen(),
                 ),
               ],
@@ -150,14 +175,17 @@ final goRouter = GoRouter(
           routes: [
             GoRoute(
               path: '/work',
+              name: 'WorkScreen',
               builder: (context, state) => const WorkAdaptativeScreen(),
               routes: [
                 GoRoute(
                   path: 'new',
+                  name: 'NewWorkScreen',
                   builder: (context, state) => const NewWorkScreen(),
                 ),
                 GoRoute(
                   path: 'edit',
+                  name: 'EditWorkScreen',
                   builder: (context, state) {
                     final work = state.extra as WorkEntity;
                     return NewWorkScreen(workToEdit: work);
@@ -165,6 +193,7 @@ final goRouter = GoRouter(
                 ),
                 GoRoute(
                   path: 'detail',
+                  name: 'WorkDetailsScreen',
                   builder: (context, state) {
                     final work = state.extra as WorkEntity;
                     return WorkDetailsScreen(initialWork: work);
@@ -172,6 +201,7 @@ final goRouter = GoRouter(
                 ),
                 GoRoute(
                   path: 'all',
+                  name: 'AllWorksScreen',
                   builder: (context, state) => const AllWorksScreenWrapper(),
                 ),
               ],
@@ -182,18 +212,22 @@ final goRouter = GoRouter(
           routes: [
             GoRoute(
               path: '/sales',
+              name: 'SalesScreen',
               builder: (context, state) => const SalesScreen(),
               routes: [
                 GoRoute(
                   path: 'new',
+                  name: 'NewSaleScreen',
                   builder: (context, state) => const NewSaleScreen(),
                 ),
                 GoRoute(
                   path: 'all',
+                  name: 'AllSalesScreen',
                   builder: (context, state) => const AllSalesScreenWrapper(),
                 ),
                 GoRoute(
                   path: 'detail',
+                  name: 'SaleDetailsScreen',
                   builder: (context, state) {
                     final sale = state.extra as SaleEntity;
                     return SaleDetailsScreen(sale: sale);
@@ -201,6 +235,7 @@ final goRouter = GoRouter(
                   routes: [
                     GoRoute(
                       path: 'bill',
+                      name: 'BillScreen',
                       builder: (context, state) {
                         final sale = state.extra as SaleEntity;
                         final mpMovementId = int.tryParse(
@@ -223,6 +258,7 @@ final goRouter = GoRouter(
           routes: [
             GoRoute(
               path: '/reports',
+              name: 'ReportsScreen',
               builder: (context, state) => const ReportsScreen(),
             ),
           ],
@@ -231,14 +267,17 @@ final goRouter = GoRouter(
           routes: [
             GoRoute(
               path: '/clients',
+              name: 'ClientsScreen',
               builder: (context, state) => const ClientsScreenWrapper(),
               routes: [
                 GoRoute(
                   path: 'new',
+                  name: 'NewClientScreen',
                   builder: (context, state) => const NewClientScreen(),
                 ),
                 GoRoute(
                   path: 'edit',
+                  name: 'EditClientScreen',
                   builder: (context, state) {
                     final client = state.extra as ClientEntity;
                     return NewClientScreen(clientToEdit: client);
@@ -252,14 +291,17 @@ final goRouter = GoRouter(
           routes: [
             GoRoute(
               path: '/expenses',
+              name: 'ExpensesScreen',
               builder: (context, state) => const ExpensesScreen(),
               routes: [
                 GoRoute(
                   path: 'new',
+                  name: 'NewExpenseScreen',
                   builder: (context, state) => const NewExpenseScreen(),
                 ),
                 GoRoute(
                   path: 'edit',
+                  name: 'EditExpenseScreen',
                   builder: (context, state) {
                     if (state.extra is ExpenseEntity) {
                       return NewExpenseScreen(
@@ -272,6 +314,7 @@ final goRouter = GoRouter(
                 ),
                 GoRoute(
                   path: 'detail',
+                  name: 'ExpenseDetailsScreen',
                   builder: (context, state) {
                     if (state.extra is ExpenseEntity) {
                       return ExpenseDetailsScreen(
@@ -285,10 +328,12 @@ final goRouter = GoRouter(
 
                 GoRoute(
                   path: 'new-template',
+                  name: 'NewExpenseTemplateScreen',
                   builder: (context, state) => const NewExpenseTemplateScreen(),
                 ),
                 GoRoute(
                   path: 'edit-template',
+                  name: 'EditExpenseTemplateScreen',
                   builder: (context, state) {
                     if (state.extra is ExpenseTemplateEntity) {
                       return NewExpenseTemplateScreen(
@@ -307,6 +352,7 @@ final goRouter = GoRouter(
           routes: [
             GoRoute(
               path: '/config',
+              name: 'ConfigScreen',
               builder: (context, state) => const ConfigScreen(),
             ),
           ],
@@ -315,6 +361,7 @@ final goRouter = GoRouter(
           routes: [
             GoRoute(
               path: '/subscriptions',
+              name: 'SubscriptionsScreen',
               builder: (context, state) => const Placeholder(),
               routes: [
                 GoRoute(

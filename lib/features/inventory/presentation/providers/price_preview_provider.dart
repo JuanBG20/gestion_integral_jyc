@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:gestion_integral_jyc/core/domain/services/analytics_service.dart';
+import 'package:gestion_integral_jyc/core/presentation/providers/analytics_provider.dart';
 import 'package:gestion_integral_jyc/features/inventory/data/datasources/price_preview_remote_data_source.dart';
 import 'package:gestion_integral_jyc/features/inventory/data/repositories/price_preview_repository_impl.dart';
 import 'package:gestion_integral_jyc/features/inventory/domain/entities/price_preview_entity.dart';
@@ -22,14 +24,19 @@ final pricePreviewProvider =
       PricePreviewNotifier,
       AsyncValue<List<PricePreviewEntity>>
     >((ref) {
-      return PricePreviewNotifier(ref.read(pricePreviewRepositoryProvider));
+      return PricePreviewNotifier(
+        repository: ref.read(pricePreviewRepositoryProvider),
+        analytics: ref.read(analyticsProvider),
+      );
     });
 
 class PricePreviewNotifier
     extends StateNotifier<AsyncValue<List<PricePreviewEntity>>> {
   final PricePreviewRepository repository;
+  final AnalyticsService analytics;
 
-  PricePreviewNotifier(this.repository) : super(const AsyncValue.loading()) {
+  PricePreviewNotifier({required this.repository, required this.analytics})
+    : super(const AsyncValue.loading()) {
     fetchPricePreview();
   }
 
@@ -48,6 +55,8 @@ class PricePreviewNotifier
       state = const AsyncValue.loading();
       await repository.confirmNewPrice(ids);
       await fetchPricePreview();
+
+      await analytics.logPricesUpdated();
     } catch (e, stack) {
       state = AsyncValue.error(e, stack);
     }

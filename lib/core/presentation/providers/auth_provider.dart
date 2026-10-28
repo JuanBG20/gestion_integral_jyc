@@ -1,3 +1,7 @@
+import 'dart:io';
+
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:gestion_integral_jyc/core/domain/services/analytics_service.dart';
@@ -69,12 +73,22 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   Future<void> _loadUserProfile(String idAuth) async {
     try {
+      final bool isCrashlyticsSupported =
+          !kIsWeb && (Platform.isAndroid || Platform.isIOS || Platform.isMacOS);
+      if (isCrashlyticsSupported) {
+        FirebaseCrashlytics.instance.setUserIdentifier(idAuth);
+      }
+
+      final isRoot = idAuth == '06ab61f7-6679-410c-a087-3f617635189d';
+      await analyticsService.setUserProperty(
+        name: 'user_type',
+        value: isRoot ? 'developer' : 'client',
+      );
+
       await subscriptionRepo.logIn(idAuth);
 
       final user = await userDataSource.fetchUserByAuthId(idAuth);
 
-      // El rol de logueo por defecto siempre es Operario, aunque el
-      // usuario también tenga Administrador disponible.
       final defaultRole = user.hasRole(Role.operario)
           ? Role.operario
           : (user.roles.isNotEmpty ? user.roles.first : null);
@@ -142,6 +156,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Future<void> signOut() async {
+    final bool isCrashlyticsSupported =
+        !kIsWeb && (Platform.isAndroid || Platform.isIOS || Platform.isMacOS);
+    if (isCrashlyticsSupported) {
+      FirebaseCrashlytics.instance.setUserIdentifier('');
+    }
+
     await subscriptionRepo.logOut();
     await _supabase.auth.signOut();
     state = const AuthState.initial();

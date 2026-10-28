@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:gestion_integral_jyc/core/domain/services/analytics_service.dart';
+import 'package:gestion_integral_jyc/core/presentation/providers/analytics_provider.dart';
 import 'package:gestion_integral_jyc/features/inventory/data/datasources/raw_material_remote_data_source.dart';
 import 'package:gestion_integral_jyc/features/inventory/data/repositories/raw_material_repository_impl.dart';
 import 'package:gestion_integral_jyc/features/inventory/domain/entities/raw_material_entity.dart';
@@ -22,14 +24,19 @@ final rawMaterialProvider =
       RawMaterialNotifier,
       AsyncValue<List<RawMaterialEntity>>
     >((ref) {
-      return RawMaterialNotifier(ref.read(rawMaterialRepositoryProvider));
+      return RawMaterialNotifier(
+        repository: ref.read(rawMaterialRepositoryProvider),
+        analytics: ref.read(analyticsProvider),
+      );
     });
 
 class RawMaterialNotifier
     extends StateNotifier<AsyncValue<List<RawMaterialEntity>>> {
   final RawMaterialRepository repository;
+  final AnalyticsService analytics;
 
-  RawMaterialNotifier(this.repository) : super(const AsyncValue.loading()) {
+  RawMaterialNotifier({required this.repository, required this.analytics})
+    : super(const AsyncValue.loading()) {
     fetchRawMaterials();
   }
 
@@ -47,6 +54,8 @@ class RawMaterialNotifier
     try {
       await repository.createRawMaterial(material);
       await fetchRawMaterials();
+
+      await analytics.logRawMaterialAdded();
     } catch (e) {
       throw Exception('Error al guardar materia prima: $e');
     }

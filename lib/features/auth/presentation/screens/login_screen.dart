@@ -35,10 +35,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           .read(authProvider.notifier)
           .signIn(_emailController.text.trim(), _passwordController.text);
 
-      final authState = ref.read(authProvider);
-      if (authState.isAuthenticated && mounted) {
-        context.go('/dashboard');
-      }
+      if (!mounted) return;
     }
   }
 

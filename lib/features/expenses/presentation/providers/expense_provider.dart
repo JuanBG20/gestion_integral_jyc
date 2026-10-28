@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:gestion_integral_jyc/core/domain/services/analytics_service.dart';
 import 'package:gestion_integral_jyc/core/enums/expense_payment_status.dart';
+import 'package:gestion_integral_jyc/core/presentation/providers/analytics_provider.dart';
 import 'package:gestion_integral_jyc/features/expenses/data/datasources/expense_remote_data_source.dart';
 import 'package:gestion_integral_jyc/features/expenses/data/repositories/expense_category_repository_impl.dart';
 import 'package:gestion_integral_jyc/features/expenses/data/repositories/expense_repository_impl.dart';
@@ -85,18 +87,23 @@ final expenseTemplateProvider =
       AsyncValue<List<ExpenseTemplateEntity>>
     >((ref) {
       return ExpenseTemplateNotifier(
-        ref.read(expenseTemplateRepositoryProvider),
-        ref,
+        repository: ref.read(expenseTemplateRepositoryProvider),
+        analytics: ref.read(analyticsProvider),
+        ref: ref,
       );
     });
 
 class ExpenseTemplateNotifier
     extends StateNotifier<AsyncValue<List<ExpenseTemplateEntity>>> {
   final ExpenseTemplateRepository repository;
+  final AnalyticsService analytics;
   final Ref ref;
 
-  ExpenseTemplateNotifier(this.repository, this.ref)
-    : super(const AsyncValue.loading()) {
+  ExpenseTemplateNotifier({
+    required this.repository,
+    required this.analytics,
+    required this.ref,
+  }) : super(const AsyncValue.loading()) {
     fetchTemplates(onlyActive: false);
   }
 
@@ -114,6 +121,8 @@ class ExpenseTemplateNotifier
     try {
       await repository.createTemplate(template);
       await fetchTemplates();
+
+      await analytics.logExpenseTemplateAdded(category: template.category.name);
     } catch (e) {
       throw Exception('Error al crear la plantilla: $e');
     }
@@ -144,15 +153,23 @@ final expenseProvider =
     StateNotifierProvider<ExpenseNotifier, AsyncValue<List<ExpenseEntity>>>((
       ref,
     ) {
-      return ExpenseNotifier(ref.read(expenseRepositoryProvider), ref);
+      return ExpenseNotifier(
+        repository: ref.read(expenseRepositoryProvider),
+        analytics: ref.read(analyticsProvider),
+        ref: ref,
+      );
     });
 
 class ExpenseNotifier extends StateNotifier<AsyncValue<List<ExpenseEntity>>> {
   final ExpenseRepository repository;
+  final AnalyticsService analytics;
   final Ref ref;
 
-  ExpenseNotifier(this.repository, this.ref)
-    : super(const AsyncValue.loading()) {
+  ExpenseNotifier({
+    required this.repository,
+    required this.analytics,
+    required this.ref,
+  }) : super(const AsyncValue.loading()) {
     fetchExpenses();
   }
 
@@ -180,8 +197,10 @@ class ExpenseNotifier extends StateNotifier<AsyncValue<List<ExpenseEntity>>> {
       await fetchExpenses();
 
       if (expense.rawMaterialItems.isNotEmpty) {
-        ref.read(rawMaterialProvider.notifier).fetchRawMaterials();
+        ref.invalidate(rawMaterialProvider);
       }
+
+      await analytics.logExpenseAdded(category: expense.category.name);
     } catch (e) {
       throw Exception('Error al registrar el gasto: $e');
     }
@@ -201,7 +220,7 @@ class ExpenseNotifier extends StateNotifier<AsyncValue<List<ExpenseEntity>>> {
       await repository.deleteExpense(id);
       await fetchExpenses();
 
-      ref.read(rawMaterialProvider.notifier).fetchRawMaterials();
+      ref.invalidate(rawMaterialProvider);
     } catch (e) {
       throw Exception('Error al eliminar el gasto: $e');
     }

@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:gestion_integral_jyc/core/domain/services/analytics_service.dart';
+import 'package:gestion_integral_jyc/core/presentation/providers/analytics_provider.dart';
 import 'package:gestion_integral_jyc/features/inventory/data/datasources/product_remote_data_source.dart';
 import 'package:gestion_integral_jyc/features/inventory/data/repositories/product_repository_impl.dart';
 import 'package:gestion_integral_jyc/features/inventory/domain/entities/base_product_entity.dart';
@@ -27,14 +29,18 @@ final inventoryProductsProvider =
       InventoryProductsNotifier,
       AsyncValue<List<ProductGroupUi>>
     >((ref) {
-      return InventoryProductsNotifier(ref.read(productRepositoryProvider));
+      return InventoryProductsNotifier(
+        repository: ref.read(productRepositoryProvider),
+        analytics: ref.read(analyticsProvider),
+      );
     });
 
 class InventoryProductsNotifier
     extends StateNotifier<AsyncValue<List<ProductGroupUi>>> {
   final ProductRepository repository;
+  final AnalyticsService analytics;
 
-  InventoryProductsNotifier(this.repository)
+  InventoryProductsNotifier({required this.repository, required this.analytics})
     : super(const AsyncValue.loading()) {
     fetchInventory();
   }
@@ -55,7 +61,9 @@ class InventoryProductsNotifier
   ) async {
     try {
       await repository.createFullProduct(base, variants);
-      await fetchInventory(); // Refrescamos la UI
+      await fetchInventory();
+
+      await analytics.logProductAdded(variantsNumber: variants.length);
     } catch (e) {
       throw Exception('Error al guardar el producto: $e');
     }

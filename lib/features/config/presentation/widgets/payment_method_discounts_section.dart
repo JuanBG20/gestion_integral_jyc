@@ -15,7 +15,7 @@ class PaymentMethodDiscountsSection extends ConsumerWidget {
 
     return discounts.when(
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (_, __) => const Text('No se pudieron cargar los descuentos'),
+      error: (_, _) => const Text('No se pudieron cargar los descuentos'),
       data: (items) => Column(
         children: [
           for (final d in items)

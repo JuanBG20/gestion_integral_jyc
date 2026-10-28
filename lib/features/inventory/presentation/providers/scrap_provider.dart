@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:gestion_integral_jyc/core/domain/services/analytics_service.dart';
+import 'package:gestion_integral_jyc/core/presentation/providers/analytics_provider.dart';
 import 'package:gestion_integral_jyc/features/inventory/data/datasources/scrap_remote_data_source.dart';
 import 'package:gestion_integral_jyc/features/inventory/data/repositories/scrap_repository_impl.dart';
 import 'package:gestion_integral_jyc/features/inventory/domain/entities/scrap_entity.dart';
@@ -16,13 +18,18 @@ final scrapRepositoryProvider = Provider<ScrapRepository>((ref) {
 
 final scrapProvider =
     StateNotifierProvider<ScrapNotifier, AsyncValue<List<ScrapEntity>>>((ref) {
-      return ScrapNotifier(ref.read(scrapRepositoryProvider));
+      return ScrapNotifier(
+        repository: ref.read(scrapRepositoryProvider),
+        analytics: ref.read(analyticsProvider),
+      );
     });
 
 class ScrapNotifier extends StateNotifier<AsyncValue<List<ScrapEntity>>> {
   final ScrapRepository repository;
+  final AnalyticsService analytics;
 
-  ScrapNotifier(this.repository) : super(const AsyncValue.loading()) {
+  ScrapNotifier({required this.repository, required this.analytics})
+    : super(const AsyncValue.loading()) {
     fetchScraps();
   }
 
@@ -40,6 +47,8 @@ class ScrapNotifier extends StateNotifier<AsyncValue<List<ScrapEntity>>> {
     try {
       await repository.createScrap(scrap);
       await fetchScraps();
+
+      await analytics.logScrapAdded();
     } catch (e) {
       throw Exception('Error al guardar el retazo: $e');
     }

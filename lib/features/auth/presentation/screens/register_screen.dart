@@ -46,6 +46,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   Future<void> _submit() async {
     if (_formKey.currentState!.validate()) {
+      TextInput.finishAutofillContext();
+
       await ref
           .read(authProvider.notifier)
           .signUp(
@@ -55,11 +57,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             _lastnameController.text.trim(),
           );
 
-      final authState = ref.read(authProvider);
-      if (authState.isAuthenticated && mounted) {
-        TextInput.finishAutofillContext();
-        context.go('/dashboard');
-      }
+      if (!mounted) return;
     }
   }
 

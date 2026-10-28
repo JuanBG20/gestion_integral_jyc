@@ -77,8 +77,8 @@ class SubscriptionNotifier extends StateNotifier<AsyncValue<bool>> {
           result == PaywallResult.restored) {
         state = const AsyncValue.data(true);
       }
-    } catch (e) {
-      print("Error o cancelación del paywall: $e");
+    } catch (e, stack) {
+      state = AsyncValue.error(e, stack);
     }
   }
 }

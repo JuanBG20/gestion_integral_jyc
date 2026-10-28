@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:gestion_integral_jyc/core/domain/services/analytics_service.dart';
 import 'package:gestion_integral_jyc/core/enums/payment_method.dart';
+import 'package:gestion_integral_jyc/core/presentation/providers/analytics_provider.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/providers/product_provider.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/providers/raw_material_provider.dart';
 import 'package:gestion_integral_jyc/features/sales/data/datasources/bill_remote_data_source.dart';
@@ -28,14 +30,23 @@ final saleRepositoryProvider = Provider<SaleRepository>((ref) {
 
 final saleProvider =
     StateNotifierProvider<SaleNotifier, AsyncValue<List<SaleEntity>>>((ref) {
-      return SaleNotifier(ref.read(saleRepositoryProvider), ref);
+      return SaleNotifier(
+        repository: ref.read(saleRepositoryProvider),
+        ref: ref,
+        analytics: ref.read(analyticsProvider),
+      );
     });
 
 class SaleNotifier extends StateNotifier<AsyncValue<List<SaleEntity>>> {
   final SaleRepository repository;
+  final AnalyticsService analytics;
   final Ref ref;
 
-  SaleNotifier(this.repository, this.ref) : super(const AsyncValue.loading()) {
+  SaleNotifier({
+    required this.repository,
+    required this.analytics,
+    required this.ref,
+  }) : super(const AsyncValue.loading()) {
     fetchSales();
   }
 
@@ -63,11 +74,11 @@ class SaleNotifier extends StateNotifier<AsyncValue<List<SaleEntity>>> {
       await fetchSales();
 
       if (sale.work == null) {
-        ref.read(inventoryProductsProvider.notifier).fetchInventory();
+        ref.invalidate(inventoryProductsProvider);
       }
 
       if (materiaPrimaId != null) {
-        ref.read(rawMaterialProvider.notifier).fetchRawMaterials();
+        ref.invalidate(rawMaterialProvider);
       }
 
       return savedSale;
@@ -82,6 +93,8 @@ class SaleNotifier extends StateNotifier<AsyncValue<List<SaleEntity>>> {
     double? consumo,
   }) async {
     await createSale(sale, materiaPrimaId: materiaPrimaId, consumo: consumo);
+
+    await analytics.logSaleCreated();
   }
 
   Future<void> emitInvoice(
@@ -97,6 +110,8 @@ class SaleNotifier extends StateNotifier<AsyncValue<List<SaleEntity>>> {
       issueDate: issueDate,
     );
     await fetchSales();
+
+    await analytics.logInvoiceGenerated(isManual: false);
   }
 
   Future<void> markSaleAsPaid(
@@ -146,6 +161,8 @@ class SaleNotifier extends StateNotifier<AsyncValue<List<SaleEntity>>> {
     try {
       await repository.markAsManuallyInvoiced(saleId);
       await fetchSales();
+
+      await analytics.logInvoiceGenerated(isManual: true);
     } catch (e) {
       throw Exception('Error al registrar factura manual: $e');
     }

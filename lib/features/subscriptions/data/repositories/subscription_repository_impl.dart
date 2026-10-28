@@ -10,7 +10,6 @@ class SubscriptionRepositoryImpl implements SubscriptionRepository {
 
     PurchasesConfiguration? configuration;
 
-    // TODO: Windows
     if (Platform.isIOS || Platform.isMacOS) {
       configuration = PurchasesConfiguration(appleApiKey);
     } else if (Platform.isAndroid) {

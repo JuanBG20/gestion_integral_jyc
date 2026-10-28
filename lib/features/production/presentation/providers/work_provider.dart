@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:gestion_integral_jyc/core/domain/services/analytics_service.dart';
 import 'package:gestion_integral_jyc/core/enums/work_state.dart';
+import 'package:gestion_integral_jyc/core/presentation/providers/analytics_provider.dart';
 import 'package:gestion_integral_jyc/features/production/data/datasources/work_remote_data_source.dart';
 import 'package:gestion_integral_jyc/features/production/data/repositories/work_repository_impl.dart';
 import 'package:gestion_integral_jyc/features/production/domain/entities/partial_payment_entity.dart';
@@ -18,7 +20,10 @@ final workRepositoryProvider = Provider<WorkRepository>((ref) {
 
 final workProvider =
     StateNotifierProvider<WorkNotifier, AsyncValue<List<WorkEntity>>>((ref) {
-      return WorkNotifier(ref.read(workRepositoryProvider));
+      return WorkNotifier(
+        repository: ref.read(workRepositoryProvider),
+        analytics: ref.read(analyticsProvider),
+      );
     });
 
 final activeWorksCountProvider = Provider<int>((ref) {
@@ -32,8 +37,10 @@ final activeWorksCountProvider = Provider<int>((ref) {
 
 class WorkNotifier extends StateNotifier<AsyncValue<List<WorkEntity>>> {
   final WorkRepository repository;
+  final AnalyticsService analytics;
 
-  WorkNotifier(this.repository) : super(const AsyncValue.loading()) {
+  WorkNotifier({required this.repository, required this.analytics})
+    : super(const AsyncValue.loading()) {
     fetchWorks();
   }
 
@@ -51,6 +58,8 @@ class WorkNotifier extends StateNotifier<AsyncValue<List<WorkEntity>>> {
     try {
       await repository.createWork(work);
       await fetchWorks();
+
+      await analytics.logWorkCreated();
     } catch (e) {
       throw Exception('Error al guardar el trabajo: $e');
     }

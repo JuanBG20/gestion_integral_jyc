@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:gestion_integral_jyc/core/domain/entities/client_entity.dart';
+import 'package:gestion_integral_jyc/core/domain/services/analytics_service.dart';
+import 'package:gestion_integral_jyc/core/presentation/providers/analytics_provider.dart';
 import 'package:gestion_integral_jyc/features/clients/data/datasources/client_remote_data_source.dart';
 import 'package:gestion_integral_jyc/features/clients/data/repositories/client_repository_impl.dart';
 import 'package:gestion_integral_jyc/features/clients/domain/repositories/client_repository.dart';
@@ -18,13 +20,18 @@ final clientProvider =
     StateNotifierProvider<ClientNotifier, AsyncValue<List<ClientEntity>>>((
       ref,
     ) {
-      return ClientNotifier(ref.read(clientRepositoryProvider));
+      return ClientNotifier(
+        repository: ref.read(clientRepositoryProvider),
+        analytics: ref.read(analyticsProvider),
+      );
     });
 
 class ClientNotifier extends StateNotifier<AsyncValue<List<ClientEntity>>> {
   final ClientRepository repository;
+  final AnalyticsService analytics;
 
-  ClientNotifier(this.repository) : super(const AsyncValue.loading()) {
+  ClientNotifier({required this.repository, required this.analytics})
+    : super(const AsyncValue.loading()) {
     fetchClients();
   }
 
@@ -41,7 +48,9 @@ class ClientNotifier extends StateNotifier<AsyncValue<List<ClientEntity>>> {
   Future<void> addClient(ClientEntity client) async {
     try {
       await repository.createClient(client);
-      await fetchClients(); // Refrescar la lista
+      await fetchClients();
+
+      await analytics.logClientAdded();
     } catch (e) {
       throw Exception('Error al guardar el cliente: $e');
     }
