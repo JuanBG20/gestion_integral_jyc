@@ -9,6 +9,7 @@ class AppTableRow extends StatelessWidget {
   final Widget? trailing;
   final double trailingWidth;
   final bool showBottomBorder;
+  final VoidCallback? onTap;
 
   const AppTableRow({
     super.key,
@@ -23,27 +24,35 @@ class AppTableRow extends StatelessWidget {
     this.trailing,
     this.trailingWidth = 40,
     this.showBottomBorder = true,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: padding,
-      decoration: BoxDecoration(
-        color: background ?? AppColors.background,
-        border: showBottomBorder
-            ? Border(bottom: BorderSide(color: AppColors.outline))
-            : null,
-      ),
+    return Material(
+      color: background ?? AppColors.background,
 
-      child: Row(
-        children: [
-          ...cells.map((c) => Expanded(flex: c.flex, child: c.child)),
-          SizedBox(
-            width: trailingWidth,
-            child: trailing ?? const SizedBox.shrink(),
+      child: InkWell(
+        onTap: onTap,
+
+        child: Container(
+          padding: padding,
+          decoration: BoxDecoration(
+            border: showBottomBorder
+                ? Border(bottom: BorderSide(color: AppColors.outline))
+                : null,
           ),
-        ],
+
+          child: Row(
+            children: [
+              ...cells.map((c) => Expanded(flex: c.flex, child: c.child)),
+              SizedBox(
+                width: trailingWidth,
+                child: trailing ?? const SizedBox.shrink(),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

@@ -11,6 +11,7 @@ import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_s
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/features/expenses/domain/entities/expense_entity.dart';
 import 'package:gestion_integral_jyc/features/expenses/presentation/utils/expense_action_handler.dart';
+import 'package:go_router/go_router.dart';
 
 class ExpensesHistoryTab extends ConsumerWidget {
   final bool isAdmin;
@@ -37,6 +38,7 @@ class ExpensesHistoryTab extends ConsumerWidget {
       rows: expenses
           .map(
             (expense) => AppTableRow(
+              onTap: () => context.push('expenses/detail', extra: expense),
               trailingWidth: 40,
               trailing: AppActionMenu(
                 items: [

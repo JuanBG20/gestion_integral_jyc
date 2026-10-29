@@ -11,6 +11,7 @@ import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_r
 import 'package:gestion_integral_jyc/core/presentation/widgets/table/app_table_shell.dart';
 import 'package:gestion_integral_jyc/features/production/domain/entities/work_entity.dart';
 import 'package:gestion_integral_jyc/features/production/presentation/utils/work_actions_extension.dart';
+import 'package:go_router/go_router.dart';
 
 class AllWorksScreen extends ConsumerWidget {
   final List<WorkEntity> works;
@@ -33,6 +34,7 @@ class AllWorksScreen extends ConsumerWidget {
       rows: works
           .map(
             (w) => AppTableRow(
+              onTap: () => context.push('/work/detail', extra: w),
               trailingWidth: 40,
               trailing: AppActionMenu(
                 items: [
@@ -59,7 +61,9 @@ class AllWorksScreen extends ConsumerWidget {
                 AppTableCell.text(
                   w.deadline != null ? w.deadline!.ddMMyyyy : '-',
                   flex: 2,
-                  style: w.deadline != null
+                  style: w.actualState == WorkState.finalizado
+                      ? null
+                      : w.deadline != null
                       ? TextStyle(color: w.deadline!.deadlineColor)
                       : null,
                 ),

@@ -9,6 +9,7 @@ import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_entity.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/utils/sale_action_handler.dart';
+import 'package:go_router/go_router.dart';
 
 class SaleTableRow extends ConsumerWidget {
   final SaleEntity sale;
@@ -25,6 +26,7 @@ class SaleTableRow extends ConsumerWidget {
     final isRoot = ref.watch(isRootProvider);
 
     return AppTableRow(
+      onTap: () => context.push('/sales/detail', extra: sale),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       trailingWidth: trailingWidth,
       trailing: trailingWidth != 0

@@ -12,7 +12,7 @@ void handleExpenseSharedAction(
 ) {
   switch (action) {
     case 'details':
-      context.go('expenses/detail', extra: expense);
+      context.push('expenses/detail', extra: expense);
       break;
     case 'delete':
       if (expense.id != null) {
