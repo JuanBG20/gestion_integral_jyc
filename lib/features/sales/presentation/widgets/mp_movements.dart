@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gestion_integral_jyc/core/domain/entities/client_entity.dart';
 import 'package:gestion_integral_jyc/core/enums/payment_method.dart';
 import 'package:gestion_integral_jyc/core/presentation/extensions/date_formatting.dart';
+import 'package:gestion_integral_jyc/core/presentation/providers/auth_provider.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/app_action_menu.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
@@ -10,9 +11,12 @@ import 'package:gestion_integral_jyc/features/clients/presentation/providers/cli
 import 'package:gestion_integral_jyc/features/sales/domain/entities/mp_movement_entity.dart';
 import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_entity.dart';
 import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_item_entity.dart';
+import 'package:gestion_integral_jyc/features/sales/presentation/providers/mp_account_provider.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/providers/mp_movement_provider.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/widgets/link_sale_dialog.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/widgets/view_linked_sales_dialog.dart';
+import 'package:gestion_integral_jyc/features/subscriptions/presentation/providers/subscription_provider.dart';
+import 'package:gestion_integral_jyc/features/subscriptions/presentation/widgets/premium_locked_feature.dart';
 import 'package:go_router/go_router.dart';
 
 class MpMovements extends ConsumerWidget {
@@ -20,7 +24,8 @@ class MpMovements extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final movementsState = ref.watch(mpMovementsProvider);
+    final isPremium = ref.watch(subscriptionProvider).asData?.value ?? false;
+    final accountState = ref.watch(mpAccountProvider);
 
     return Container(
       padding: const EdgeInsets.all(24),
@@ -36,11 +41,35 @@ class MpMovements extends ConsumerWidget {
 
           const SizedBox(height: 16),
 
-          movementsState.when(
-            data: (movements) => _buildMovementsList(context, ref, movements),
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (err, stack) => Text('Error al cargar movimientos: $err'),
-          ),
+          if (!isPremium)
+            const PremiumLockedFeature(
+              icon: Icons.sync,
+              title: 'Movimientos de Mercado Pago',
+              description:
+                  'Traé automáticamente tus cobros de Mercado Pago y vinculalos a tus ventas. '
+                  'Disponible en el plan Premium',
+            )
+          else
+            accountState.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (err, stack) =>
+                  Text('Error al cargar la conexión con Mercado Pago: $err'),
+              data: (account) {
+                if (!account.isConnected) {
+                  return _buildConnectPrompt(context);
+                }
+
+                final movementsState = ref.watch(mpMovementsProvider);
+                return movementsState.when(
+                  data: (movements) =>
+                      _buildMovementsList(context, ref, movements),
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
+                  error: (err, stack) =>
+                      Text('Error al cargar movimientos: $err'),
+                );
+              },
+            ),
         ],
       ),
     );
@@ -87,6 +116,29 @@ class MpMovements extends ConsumerWidget {
     );
   }
 
+  Widget _buildConnectPrompt(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 24),
+      child: Column(
+        children: [
+          Text(
+            'Conectá tu cuenta de Mercado Pago para ver tus cobros acá.',
+            textAlign: TextAlign.center,
+            style: context.textTheme.bodyMedium,
+          ),
+
+          const SizedBox(height: 16),
+
+          ElevatedButton.icon(
+            onPressed: () => context.go('/config'),
+            icon: const Icon(Icons.link),
+            label: const Text('Conectar Mercado Pago'),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildMovementsList(
     BuildContext context,
     WidgetRef ref,
@@ -118,6 +170,7 @@ class MpMovements extends ConsumerWidget {
   ) {
     final (icon, title) = _getPaymentMethodDetails(movement.paymentMethod);
     final isLinked = movement.saleIds != null && movement.saleIds!.isNotEmpty;
+    final isRoot = ref.watch(isRootProvider);
 
     return Container(
       padding: const EdgeInsets.all(12),
@@ -166,12 +219,12 @@ class MpMovements extends ConsumerWidget {
             child: AppActionMenu(
               items: [
                 if (isLinked)
-                  AppActionMenuItem(
+                  const AppActionMenuItem(
                     value: 'view_sales',
-                    label: 'Ver ${movement.saleIds!.length} venta(s)',
+                    label: 'Ver ventas asociadas',
                   ),
 
-                if (!isLinked)
+                if (!isLinked && isRoot)
                   const AppActionMenuItem(
                     value: 'bill',
                     label: 'Facturar Rápido',

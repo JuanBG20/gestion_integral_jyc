@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gestion_integral_jyc/core/presentation/extensions/screen_size.dart';
-import 'package:gestion_integral_jyc/core/presentation/providers/auth_provider.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/screen_header.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/widgets/mp_movements.dart';
@@ -14,8 +13,6 @@ class SalesScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isRoot = ref.watch(isRootProvider);
-
     return Scaffold(
       backgroundColor: AppColors.surface,
 
@@ -49,7 +46,7 @@ class SalesScreen extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
 
                     children: [
-                      Expanded(flex: 6, child: _buildLeftColumn(isRoot)),
+                      Expanded(flex: 6, child: _buildLeftColumn()),
 
                       const SizedBox(width: 24),
 
@@ -61,7 +58,7 @@ class SalesScreen extends ConsumerWidget {
             );
           } else {
             return DefaultTabController(
-              length: isRoot ? 3 : 2,
+              length: 3,
 
               child: NestedScrollView(
                 headerSliverBuilder:
@@ -109,7 +106,7 @@ class SalesScreen extends ConsumerWidget {
                                 tabs: [
                                   const Tab(text: "Venta Rápida"),
                                   const Tab(text: "Registro"),
-                                  if (isRoot) const Tab(text: "Movimientos MP"),
+                                  const Tab(text: "Movimientos MP"),
                                 ],
                               ),
                             ),
@@ -127,11 +124,10 @@ class SalesScreen extends ConsumerWidget {
                       padding: EdgeInsets.all(24),
                       child: SalesRecord(),
                     ),
-                    if (isRoot)
-                      const SingleChildScrollView(
-                        padding: EdgeInsets.all(24),
-                        child: MpMovements(),
-                      ),
+                    const SingleChildScrollView(
+                      padding: EdgeInsets.all(24),
+                      child: MpMovements(),
+                    ),
                   ],
                 ),
               ),
@@ -142,12 +138,12 @@ class SalesScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildLeftColumn(bool isRoot) {
+  Widget _buildLeftColumn() {
     return Column(
       children: [
-        SalesRecord(),
-
-        if (isRoot) ...[const SizedBox(height: 16), MpMovements()],
+        const SalesRecord(),
+        const SizedBox(height: 16),
+        const MpMovements(),
       ],
     );
   }

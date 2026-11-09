@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gestion_integral_jyc/core/enums/payment_method.dart';
-import 'package:gestion_integral_jyc/core/presentation/providers/auth_provider.dart';
+import 'package:gestion_integral_jyc/features/sales/presentation/providers/mp_account_provider.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/labeled_dropdown.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/responsive_filter_bar.dart';
 import 'package:gestion_integral_jyc/features/sales/presentation/providers/sale_filter_providers.dart';
@@ -18,14 +18,14 @@ class SaleFilters extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isRoot = ref.watch(isRootProvider);
+    final showMpFilter = ref.watch(isMpConnectedProvider);
 
     return ResponsiveFilterBar(
-      filters: [_buildStateFilter(ref, isRoot), _buildPaymentFilter(ref)],
+      filters: [_buildStateFilter(ref, showMpFilter), _buildPaymentFilter(ref)],
     );
   }
 
-  Widget _buildStateFilter(WidgetRef ref, bool isRoot) {
+  Widget _buildStateFilter(WidgetRef ref, bool showMpFilter) {
     return LabeledDropdown<String?>(
       label: 'Filtrar por Estado',
       value: selectedState,
@@ -42,7 +42,7 @@ class SaleFilters extends ConsumerWidget {
           value: 'withoutPayment',
           child: Text('Pendientes de pago'),
         ),
-        if (isRoot)
+        if (showMpFilter)
           const DropdownMenuItem<String?>(
             value: 'hideMP',
             child: Text('Ocultar ventas de Mercado Pago'),

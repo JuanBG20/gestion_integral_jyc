@@ -4,6 +4,7 @@ import 'package:gestion_integral_jyc/core/presentation/providers/auth_provider.d
 import 'package:gestion_integral_jyc/core/presentation/widgets/screen_header.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
+import 'package:gestion_integral_jyc/features/config/presentation/widgets/mercado_pago_section.dart';
 import 'package:gestion_integral_jyc/features/config/presentation/widgets/payment_method_discounts_section.dart';
 
 class ConfigScreen extends ConsumerWidget {
@@ -89,6 +90,10 @@ class ConfigScreen extends ConsumerWidget {
             Divider(color: AppColors.outline),
 
             const PaymentMethodDiscountsSection(),
+
+            const SizedBox(height: 24),
+
+            const MercadoPagoSection(),
 
             const SizedBox(height: 24),
             Divider(color: AppColors.outline),

@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:gestion_integral_jyc/core/presentation/providers/auth_provider.dart';
 import 'package:gestion_integral_jyc/features/sales/data/datasources/mp_movement_remote_data_source.dart';
 import 'package:gestion_integral_jyc/features/sales/data/repositories/mp_movement_repository_impl.dart';
 import 'package:gestion_integral_jyc/features/sales/domain/entities/mp_movement_entity.dart';
@@ -21,6 +22,7 @@ final mpMovementsProvider =
       MpMovementNotifier,
       AsyncValue<List<MpMovementEntity>>
     >((ref) {
+      ref.watch(authProvider.select((s) => s.user?.idAuth));
       return MpMovementNotifier(ref.read(mpMovementRepositoryProvider));
     });
 
