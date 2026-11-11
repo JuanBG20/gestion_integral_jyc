@@ -62,21 +62,26 @@ class LineItemsListController<T, O extends Object> extends ChangeNotifier {
     notifyListeners();
   }
 
-  O? matchScannedCode(
-    String code,
-    List<O> options,
-    String Function(O option) codeOf,
-  ) {
-    final matched = options.where((o) => codeOf(o) == code).firstOrNull;
+  void addOrIncrement({
+    required O option,
+    required double unitPrice,
+    required bool Function(T item) isSameOption,
+    required T Function(T item) increment,
+  }) {
+    final index = _items.indexWhere(isSameOption);
+    final updated = List<T>.from(_items);
 
-    if (matched != null) {
-      _isAddingItem = true;
-      _isGenericItem = false;
-      _selectedOption = matched;
-      notifyListeners();
+    if (index >= 0) {
+      updated[index] = increment(updated[index]);
+    } else {
+      updated.add(
+        _itemBuilder(option: option, quantity: 1, unitPrice: unitPrice),
+      );
     }
 
-    return matched;
+    _items = updated;
+    _onItemsChanged(_items);
+    notifyListeners();
   }
 
   bool addItem({

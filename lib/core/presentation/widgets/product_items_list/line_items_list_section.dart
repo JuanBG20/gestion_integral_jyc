@@ -38,6 +38,10 @@ class LineItemsListSection<T, O extends Object> extends StatefulWidget {
   final String Function(O option)? scanCodeOf;
   final String Function(String code)? scanNotFoundMessage;
 
+  final O? Function(T item)? scanItemOptionOf;
+
+  final T Function(T item)? scanIncrementQuantity;
+
   const LineItemsListSection({
     super.key,
     required this.onItemsChanged,
@@ -61,7 +65,16 @@ class LineItemsListSection<T, O extends Object> extends StatefulWidget {
     this.scanListener,
     this.scanCodeOf,
     this.scanNotFoundMessage,
-  });
+    this.scanItemOptionOf,
+    this.scanIncrementQuantity,
+  }) : assert(
+         scanListener == null ||
+             (scanCodeOf != null &&
+                 scanItemOptionOf != null &&
+                 scanIncrementQuantity != null),
+         'scanListener requiere scanCodeOf, scanItemOptionOf y '
+         'scanIncrementQuantity',
+       );
 
   @override
   State<LineItemsListSection<T, O>> createState() =>
@@ -118,26 +131,43 @@ class _LineItemsListSectionState<T, O extends Object>
     if (price != null) _priceController.text = price.toStringAsFixed(2);
   }
 
+  // Agrega directamente el producto escaneado (o suma 1 si ya está cargado)
   void _handleScannedCode(String code) {
-    final matched = _controller.matchScannedCode(
-      code,
-      widget.options,
-      widget.scanCodeOf!,
-    );
+    if (!mounted) return;
 
-    if (matched != null) {
-      _fillDefaultPrice(matched);
-      _qtyController.text = '1';
-      _qtyFocusNode.requestFocus();
-    } else {
+    final codeOf = widget.scanCodeOf!;
+    final normalized = _normalizeCode(code);
+    final matched = widget.options
+        .where((o) => _normalizeCode(codeOf(o)) == normalized)
+        .firstOrNull;
+
+    if (matched == null) {
       final message =
           widget.scanNotFoundMessage?.call(code) ??
           'Código no encontrado en inventario: $code';
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(message)));
+      return;
     }
+
+    final defaultPrice = widget.defaultPriceOf?.call(matched) ?? 0.0;
+    final unitPrice =
+        widget.unitPriceFromInput?.call(matched, 1, defaultPrice) ??
+        defaultPrice;
+
+    _controller.addOrIncrement(
+      option: matched,
+      unitPrice: unitPrice,
+      isSameOption: (item) {
+        final option = widget.scanItemOptionOf!(item);
+        return option != null && _normalizeCode(codeOf(option)) == normalized;
+      },
+      increment: widget.scanIncrementQuantity!,
+    );
   }
+
+  static String _normalizeCode(String code) => code.trim().toUpperCase();
 
   void _onOptionChanged(O? option) {
     _controller.selectOption(option);

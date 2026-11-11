@@ -88,6 +88,13 @@ class ProductItemsListSection<T extends ProductLineItemEntity>
 
       scanListener: scanListener,
       scanCodeOf: (v) => v.sku,
+      scanItemOptionOf: (item) => item.variantProduct,
+      scanIncrementQuantity: (item) => itemBuilder(
+        variantProduct: item.variantProduct,
+        quantity: item.quantity + 1,
+        unitPrice: item.unitPrice,
+        description: item.description,
+      ),
       scanNotFoundMessage: (sku) => 'SKU no encontrado en inventario: $sku',
     );
   }
