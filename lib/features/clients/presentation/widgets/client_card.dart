@@ -19,7 +19,7 @@ class ClientCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return AppCardShell(
-      onTapCard: () => context.push('/clients/edit', extra: client),
+      onTapCard: () => context.push('/clients/detail', extra: client),
       cardContent: [
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -35,6 +35,10 @@ class ClientCard extends ConsumerWidget {
 
             AppActionMenu(
               items: [
+                const AppActionMenuItem(
+                  value: 'history',
+                  label: 'Ver historial',
+                ),
                 const AppActionMenuItem(value: 'edit', label: 'Editar'),
                 if (isAdmin)
                   const AppActionMenuItem(

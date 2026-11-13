@@ -7,6 +7,7 @@ import 'package:gestion_integral_jyc/core/domain/entities/client_entity.dart';
 import 'package:gestion_integral_jyc/features/auth/presentation/screens/login_screen.dart';
 import 'package:gestion_integral_jyc/features/auth/presentation/screens/register_screen.dart';
 import 'package:gestion_integral_jyc/core/presentation/screens/layout.dart';
+import 'package:gestion_integral_jyc/features/clients/presentation/screens/client_details_screen.dart';
 import 'package:gestion_integral_jyc/features/clients/presentation/screens/clients_screen_wrapper.dart';
 import 'package:gestion_integral_jyc/features/clients/presentation/screens/new_client_screen.dart';
 import 'package:gestion_integral_jyc/features/config/presentation/screens/config_screen.dart';
@@ -281,6 +282,30 @@ final goRouter = GoRouter(
                   builder: (context, state) {
                     final client = state.extra as ClientEntity;
                     return NewClientScreen(clientToEdit: client);
+                  },
+                ),
+                GoRoute(
+                  path: 'detail',
+                  name: 'ClientDetailsScreen',
+                  builder: (context, state) {
+                    final client = state.extra as ClientEntity;
+                    return ClientDetailsScreen(client: client);
+                  },
+                ),
+                GoRoute(
+                  path: 'sale',
+                  name: 'ClientSaleDetailsScreen',
+                  builder: (context, state) {
+                    final sale = state.extra as SaleEntity;
+                    return SaleDetailsScreen(sale: sale);
+                  },
+                ),
+                GoRoute(
+                  path: 'work',
+                  name: 'ClientWorkDetailsScreen',
+                  builder: (context, state) {
+                    final work = state.extra as WorkEntity;
+                    return WorkDetailsScreen(initialWork: work);
                   },
                 ),
               ],

@@ -4,6 +4,7 @@ import 'package:gestion_integral_jyc/features/production/domain/entities/work_en
 
 abstract class WorkRepository {
   Future<List<WorkEntity>> getWorks();
+  Future<List<WorkEntity>> getWorksByClient(int clientId);
   Future<void> createWork(WorkEntity work);
   Future<void> updateWork(WorkEntity work);
   Future<void> updateWorkState(int workId, WorkState newState);

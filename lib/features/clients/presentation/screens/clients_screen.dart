@@ -13,6 +13,7 @@ import 'package:gestion_integral_jyc/core/presentation/widgets/table/pagination_
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/features/clients/presentation/utils/client_action_handler.dart';
+import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ClientsScreen extends ConsumerWidget {
@@ -69,12 +70,14 @@ class ClientsScreen extends ConsumerWidget {
     required bool isAdmin,
   }) {
     return AppTableRow(
+      onTap: () => context.push('/clients/detail', extra: client),
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       trailingWidth: 100,
       trailing: SizedBox(
         width: 40,
         child: AppActionMenu(
           items: [
+            const AppActionMenuItem(value: 'history', label: 'Ver historial'),
             const AppActionMenuItem(value: 'edit', label: 'Editar'),
             if (isAdmin)
               const AppActionMenuItem(

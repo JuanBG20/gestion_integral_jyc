@@ -4,6 +4,7 @@ import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_entity.
 
 abstract class SaleRepository {
   Future<List<SaleEntity>> getSales(DateTime month);
+  Future<List<SaleEntity>> getSalesByClient(int clientId);
   Future<SaleEntity> createSale(
     SaleEntity sale, {
     int? materiaPrimaId,

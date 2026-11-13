@@ -59,6 +59,11 @@ class SaleRepositoryImpl implements SaleRepository {
   }
 
   @override
+  Future<List<SaleEntity>> getSalesByClient(int clientId) async {
+    return await remoteDataSource.fetchSalesByClient(clientId);
+  }
+
+  @override
   Future<void> emitInvoice(
     int saleId, {
     required int condicionIvaReceptorId,

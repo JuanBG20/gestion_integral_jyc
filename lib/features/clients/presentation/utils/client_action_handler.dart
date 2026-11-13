@@ -17,5 +17,7 @@ void handleClientSharedAction(
       }
     case 'edit':
       context.push('/clients/edit', extra: client);
+    case 'history':
+      context.push('/clients/detail', extra: client);
   }
 }

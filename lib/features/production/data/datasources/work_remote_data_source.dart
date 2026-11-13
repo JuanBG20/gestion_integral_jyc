@@ -8,8 +8,7 @@ class WorkRemoteDataSource {
 
   WorkRemoteDataSource(this.supabaseClient);
 
-  Future<List<WorkModel>> fetchWorks() async {
-    final response = await supabaseClient.from('trabajo').select('''
+  static const _workSelect = '''
       *,
       cliente (*),
       historial_estado (
@@ -24,7 +23,20 @@ class WorkRemoteDataSource {
         )
       ),
       pago_parcial (*)
-    ''');
+    ''';
+
+  Future<List<WorkModel>> fetchWorks() async {
+    final response = await supabaseClient.from('trabajo').select(_workSelect);
+
+    return (response as List).map((json) => WorkModel.fromJson(json)).toList();
+  }
+
+  Future<List<WorkModel>> fetchWorksByClient(int clientId) async {
+    final response = await supabaseClient
+        .from('trabajo')
+        .select(_workSelect)
+        .eq('cliente', clientId)
+        .order('fecha_creacion', ascending: false);
 
     return (response as List).map((json) => WorkModel.fromJson(json)).toList();
   }

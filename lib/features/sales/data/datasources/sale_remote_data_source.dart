@@ -10,13 +10,7 @@ class SaleRemoteDataSource {
 
   SaleRemoteDataSource(this.supabaseClient);
 
-  Future<List<SaleModel>> fetchSales({
-    required DateTime from,
-    required DateTime to,
-  }) async {
-    final response = await supabaseClient
-        .from('venta')
-        .select('''
+  static const _saleSelect = '''
       *,
       cliente (*),
       venta_trabajo (
@@ -45,9 +39,27 @@ class SaleRemoteDataSource {
       ),
       venta_descuento (*),
       factura (*)
-    ''')
+    ''';
+
+  Future<List<SaleModel>> fetchSales({
+    required DateTime from,
+    required DateTime to,
+  }) async {
+    final response = await supabaseClient
+        .from('venta')
+        .select(_saleSelect)
         .gte('fecha', from.toUtc().toIso8601String())
         .lt('fecha', to.toUtc().toIso8601String())
+        .order('fecha', ascending: false);
+
+    return (response as List).map((json) => SaleModel.fromJson(json)).toList();
+  }
+
+  Future<List<SaleModel>> fetchSalesByClient(int clientId) async {
+    final response = await supabaseClient
+        .from('venta')
+        .select(_saleSelect)
+        .eq('cliente', clientId)
         .order('fecha', ascending: false);
 
     return (response as List).map((json) => SaleModel.fromJson(json)).toList();

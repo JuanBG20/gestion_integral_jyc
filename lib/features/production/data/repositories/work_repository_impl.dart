@@ -49,6 +49,11 @@ class WorkRepositoryImpl implements WorkRepository {
   }
 
   @override
+  Future<List<WorkEntity>> getWorksByClient(int clientId) async {
+    return await remoteDataSource.fetchWorksByClient(clientId);
+  }
+
+  @override
   Future<void> updateWorkItemDone(int itemId, bool isDone) async {
     await remoteDataSource.updateItemDone(itemId, isDone);
   }
