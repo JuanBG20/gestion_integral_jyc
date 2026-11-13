@@ -3,7 +3,7 @@ import 'package:gestion_integral_jyc/features/sales/domain/entities/discount_ent
 import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_entity.dart';
 
 abstract class SaleRepository {
-  Future<List<SaleEntity>> getSales();
+  Future<List<SaleEntity>> getSales(DateTime month);
   Future<SaleEntity> createSale(
     SaleEntity sale, {
     int? materiaPrimaId,

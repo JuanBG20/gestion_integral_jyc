@@ -7,15 +7,26 @@ class PaginationFooter extends StatelessWidget {
   final int total;
   final int shown;
 
+  final int start;
+
+  final VoidCallback? onPrevious;
+  final VoidCallback? onNext;
+
   const PaginationFooter({
     super.key,
     required this.total,
     required this.shown,
     required this.label,
+    this.start = 0,
+    this.onPrevious,
+    this.onNext,
   });
 
   @override
   Widget build(BuildContext context) {
+    final from = total == 0 ? 0 : start + 1;
+    final to = start + shown;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
@@ -28,7 +39,7 @@ class PaginationFooter extends StatelessWidget {
 
         children: [
           Text(
-            "Mostrando 1-$shown de $total $label",
+            "Mostrando $from-$to de $total $label",
             style: context.textTheme.bodySmall?.copyWith(
               color: AppColors.onBackground,
             ),
@@ -37,11 +48,13 @@ class PaginationFooter extends StatelessWidget {
           Row(
             children: [
               IconButton(
-                onPressed: () {},
+                tooltip: "Anterior",
+                onPressed: onPrevious,
                 icon: const Icon(Icons.chevron_left),
               ),
               IconButton(
-                onPressed: () {},
+                tooltip: "Siguiente",
+                onPressed: onNext,
                 icon: const Icon(Icons.chevron_right),
               ),
             ],

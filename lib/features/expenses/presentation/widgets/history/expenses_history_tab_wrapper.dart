@@ -21,7 +21,9 @@ class ExpensesHistoryTabWrapper extends ConsumerWidget {
     return expensesState.when(
       data: (expenses) {
         if (expenses.isEmpty) {
-          return const Center(child: Text("No hay gastos registrados."));
+          return const Center(
+            child: Text("No hay gastos registrados en este mes."),
+          );
         }
 
         final filteredExpenses = expenses.where((exp) {

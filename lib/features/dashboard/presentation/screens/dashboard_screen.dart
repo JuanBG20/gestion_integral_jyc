@@ -18,7 +18,8 @@ class DashboardScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final worksState = ref.watch(workProvider);
-    final salesState = ref.watch(saleProvider);
+    // Siempre el mes actual
+    final salesState = ref.watch(currentMonthSalesProvider);
     final materialsState = ref.watch(rawMaterialProvider);
 
     final now = DateTime.now();

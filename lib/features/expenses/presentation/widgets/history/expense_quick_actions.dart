@@ -30,7 +30,7 @@ class ExpenseQuickActions extends StatelessWidget {
           ),
 
         QuickActionButton(
-          label: 'Editar Orden',
+          label: 'Editar Gasto',
           icon: Icons.edit_outlined,
           onPressed: () => context.push('/expenses/edit', extra: expense),
         ),

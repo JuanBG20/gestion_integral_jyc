@@ -10,7 +10,10 @@ class SaleRemoteDataSource {
 
   SaleRemoteDataSource(this.supabaseClient);
 
-  Future<List<SaleModel>> fetchSales() async {
+  Future<List<SaleModel>> fetchSales({
+    required DateTime from,
+    required DateTime to,
+  }) async {
     final response = await supabaseClient
         .from('venta')
         .select('''
@@ -43,6 +46,8 @@ class SaleRemoteDataSource {
       venta_descuento (*),
       factura (*)
     ''')
+        .gte('fecha', from.toUtc().toIso8601String())
+        .lt('fecha', to.toUtc().toIso8601String())
         .order('fecha', ascending: false);
 
     return (response as List).map((json) => SaleModel.fromJson(json)).toList();

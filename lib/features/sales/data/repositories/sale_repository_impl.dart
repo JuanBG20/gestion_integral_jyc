@@ -1,4 +1,5 @@
 import 'package:gestion_integral_jyc/core/enums/payment_method.dart';
+import 'package:gestion_integral_jyc/core/presentation/extensions/date_formatting.dart';
 import 'package:gestion_integral_jyc/features/sales/data/datasources/bill_remote_data_source.dart';
 import 'package:gestion_integral_jyc/features/sales/data/datasources/sale_remote_data_source.dart';
 import 'package:gestion_integral_jyc/features/sales/data/models/discount_model.dart';
@@ -50,8 +51,11 @@ class SaleRepositoryImpl implements SaleRepository {
   }
 
   @override
-  Future<List<SaleEntity>> getSales() async {
-    return await remoteDataSource.fetchSales();
+  Future<List<SaleEntity>> getSales(DateTime month) async {
+    return await remoteDataSource.fetchSales(
+      from: month.monthStart,
+      to: month.nextMonthStart,
+    );
   }
 
   @override

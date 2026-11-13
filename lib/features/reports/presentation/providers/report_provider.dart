@@ -1,4 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
+import 'package:gestion_integral_jyc/core/presentation/extensions/date_formatting.dart';
 import 'package:gestion_integral_jyc/features/reports/data/datasources/report_remote_data_source.dart';
 import 'package:gestion_integral_jyc/features/reports/data/repositories/report_repository_impl.dart';
 import 'package:gestion_integral_jyc/features/reports/domain/entities/report_dashboard_entity.dart';
@@ -14,9 +16,14 @@ final reportRepositoryProvider = Provider<ReportRepository>((ref) {
   return ReportRepositoryImpl(dataSource);
 });
 
+final reportMonthProvider = StateProvider<DateTime>(
+  (ref) => currentMonthStart(),
+);
+
 final reportMetricsProvider = FutureProvider.autoDispose<ReportDashboardEntity>(
   (ref) async {
+    final month = ref.watch(reportMonthProvider);
     final repository = ref.read(reportRepositoryProvider);
-    return await repository.getReportMetrics();
+    return await repository.getReportMetrics(month);
   },
 );

@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:gestion_integral_jyc/core/presentation/extensions/date_formatting.dart';
 import 'package:gestion_integral_jyc/core/presentation/providers/auth_provider.dart';
 import 'package:gestion_integral_jyc/features/sales/data/datasources/mp_movement_remote_data_source.dart';
 import 'package:gestion_integral_jyc/features/sales/data/repositories/mp_movement_repository_impl.dart';
@@ -17,27 +18,35 @@ final mpMovementRepositoryProvider = Provider<MpMovementRepository>((ref) {
   return MpMovementRepositoryImpl(ref.read(mpMovementDataSourceProvider));
 });
 
+final mpMovementMonthProvider = StateProvider<DateTime>(
+  (ref) => currentMonthStart(),
+);
+
 final mpMovementsProvider =
     StateNotifierProvider<
       MpMovementNotifier,
       AsyncValue<List<MpMovementEntity>>
     >((ref) {
       ref.watch(authProvider.select((s) => s.user?.idAuth));
-      return MpMovementNotifier(ref.read(mpMovementRepositoryProvider));
+      final month = ref.watch(mpMovementMonthProvider);
+      return MpMovementNotifier(ref.read(mpMovementRepositoryProvider), month);
     });
 
 class MpMovementNotifier
     extends StateNotifier<AsyncValue<List<MpMovementEntity>>> {
   final MpMovementRepository repository;
 
-  MpMovementNotifier(this.repository) : super(const AsyncValue.loading()) {
+  final DateTime month;
+
+  MpMovementNotifier(this.repository, this.month)
+    : super(const AsyncValue.loading()) {
     fetchMovements();
   }
 
   Future<void> fetchMovements() async {
     try {
       state = const AsyncValue.loading();
-      final movements = await repository.getMovements();
+      final movements = await repository.getMovements(month);
       state = AsyncValue.data(movements);
     } catch (e, stack) {
       state = AsyncValue.error(e, stack);

@@ -7,6 +7,7 @@ import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/features/expenses/domain/entities/expense_entity.dart';
 import 'package:gestion_integral_jyc/features/expenses/presentation/utils/expense_action_handler.dart';
+import 'package:gestion_integral_jyc/features/expenses/presentation/widgets/history/expense_status_badge.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/widgets/info_budget.dart';
 import 'package:go_router/go_router.dart';
 
@@ -60,7 +61,11 @@ class ExpenseCard extends ConsumerWidget {
           ],
         ),
 
-        const SizedBox(height: 12),
+        const SizedBox(height: 8),
+
+        ExpenseStatusBadge(status: expense.paymentStatus),
+
+        const SizedBox(height: 4),
         Divider(color: AppColors.outline),
         const SizedBox(height: 8),
 

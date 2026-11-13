@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gestion_integral_jyc/core/presentation/extensions/date_formatting.dart';
 import 'package:gestion_integral_jyc/core/presentation/extensions/screen_size.dart';
+import 'package:gestion_integral_jyc/core/presentation/widgets/month_selector.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/screen_header.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/summary_card.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
@@ -22,12 +24,25 @@ class ReportsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final reportState = ref.watch(reportMetricsProvider);
+    final selectedMonth = ref.watch(reportMonthProvider);
+
+    void selectMonth(DateTime month) {
+      ref.read(reportMonthProvider.notifier).state = month.monthStart;
+    }
+
+    Future<void> pickMonth() async {
+      final picked = await showMonthPickerDialog(
+        context,
+        selected: selectedMonth,
+      );
+      if (picked != null) selectMonth(picked);
+    }
 
     void exportReport() {
       reportState.whenData((dashboard) async {
         await Printing.layoutPdf(
           onLayout: (PdfPageFormat format) async =>
-              ReportPdfGenerator.generate(dashboard),
+              ReportPdfGenerator.generate(dashboard, date: selectedMonth),
         );
       });
     }
@@ -58,11 +73,17 @@ class ReportsScreen extends ConsumerWidget {
               onPressed: exportReport,
 
               hasSecondaryButton: true,
-              secondaryButtonLabel: "Este Mes",
+              secondaryButtonLabel: monthButtonLabel(selectedMonth),
               secondaryButtonIcon: Icons.calendar_month_outlined,
+              onPressedSecundary: pickMonth,
 
               hasButtons: true,
             ),
+
+            if (context.isMobileLayout) ...[
+              const SizedBox(height: 16),
+              MonthSelector(selected: selectedMonth, onChanged: selectMonth),
+            ],
 
             const SizedBox(height: 32),
 

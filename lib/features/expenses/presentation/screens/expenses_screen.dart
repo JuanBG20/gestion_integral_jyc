@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gestion_integral_jyc/core/enums/expense_payment_status.dart';
 import 'package:gestion_integral_jyc/core/presentation/extensions/screen_size.dart';
 import 'package:gestion_integral_jyc/core/presentation/providers/auth_provider.dart';
+import 'package:gestion_integral_jyc/core/presentation/widgets/month_selector.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/screen_header.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/summary_card.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
@@ -18,6 +19,7 @@ class ExpensesScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isAdmin = ref.watch(isAdminProvider);
     final expensesState = ref.watch(expenseProvider);
+    final selectedMonth = ref.watch(expenseMonthProvider);
     final templatesState = ref.watch(expenseTemplateProvider);
 
     double totalSpent = 0;
@@ -85,15 +87,24 @@ class ExpensesScreen extends ConsumerWidget {
                             buttonLabel: "Nuevo Gasto",
                             onPressed: () =>
                                 _newItemNavigation(tabContext, ref),
+                            hasSecondaryButton: true,
+                            secondaryButtonLabel: monthButtonLabel(
+                              selectedMonth,
+                            ),
+                            secondaryButtonIcon: Icons.calendar_month_outlined,
+                            onPressedSecundary: () =>
+                                _pickMonth(context, ref, selectedMonth),
                             hasButtons: true,
                           ),
 
-                          const SizedBox(height: 24),
+                          if (context.isMobileLayout) ...[
+                            const SizedBox(height: 16),
+                            MonthSelector(
+                              selected: selectedMonth,
+                              onChanged: (month) => _selectMonth(ref, month),
+                            ),
+                          ],
 
-                          /* SaleFilters(
-                      selectedState: selectedState,
-                      selectedMethod: selectedMethod,
-                                        ), */
                           const SizedBox(height: 32),
 
                           LayoutBuilder(
@@ -111,7 +122,7 @@ class ExpensesScreen extends ConsumerWidget {
                                     width: cardWidth,
                                     title: 'TOTAL GASTADO',
                                     value: '\$${totalSpent.toStringAsFixed(0)}',
-                                    subtitle: 'Historial de gastos abonados',
+                                    subtitle: 'Gastos abonados del mes',
                                     icon: Icons.receipt_long_outlined,
                                     iconColor: AppColors.primary,
                                     onTap: () => context.go('/sales'),
@@ -191,6 +202,19 @@ class ExpensesScreen extends ConsumerWidget {
         },
       ),
     );
+  }
+
+  void _selectMonth(WidgetRef ref, DateTime month) {
+    ref.read(expenseMonthProvider.notifier).state = month;
+  }
+
+  Future<void> _pickMonth(
+    BuildContext context,
+    WidgetRef ref,
+    DateTime selected,
+  ) async {
+    final picked = await showMonthPickerDialog(context, selected: selected);
+    if (picked != null) _selectMonth(ref, picked);
   }
 
   void _newItemNavigation(BuildContext tabContext, WidgetRef ref) {

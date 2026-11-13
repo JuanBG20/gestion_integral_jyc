@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gestion_integral_jyc/core/presentation/extensions/date_formatting.dart';
 import 'package:gestion_integral_jyc/core/presentation/extensions/screen_size.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/app_mobile_list.dart';
+import 'package:gestion_integral_jyc/core/presentation/widgets/month_selector.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/screen_header.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_entity.dart';
@@ -21,6 +23,19 @@ class AllSalesScreenWrapper extends ConsumerWidget {
 
     final selectedState = ref.watch(saleStateFilterProvider);
     final selectedMethod = ref.watch(salePaymentMethodFilterProvider);
+    final selectedMonth = ref.watch(saleMonthFilterProvider);
+
+    void selectMonth(DateTime month) {
+      ref.read(saleMonthFilterProvider.notifier).state = month;
+    }
+
+    Future<void> pickMonth() async {
+      final picked = await showMonthPickerDialog(
+        context,
+        selected: selectedMonth,
+      );
+      if (picked != null) selectMonth(picked);
+    }
 
     return Scaffold(
       backgroundColor: AppColors.surface,
@@ -45,8 +60,17 @@ class AllSalesScreenWrapper extends ConsumerWidget {
                   "Registra ventas, controla las transacciones y emite facturas.",
               buttonLabel: "Nueva Venta",
               onPressed: () => context.push('/sales/new'),
+              hasSecondaryButton: true,
+              secondaryButtonLabel: monthButtonLabel(selectedMonth),
+              secondaryButtonIcon: Icons.calendar_month_outlined,
+              onPressedSecundary: pickMonth,
               hasButtons: true,
             ),
+
+            if (context.isMobileLayout) ...[
+              const SizedBox(height: 16),
+              MonthSelector(selected: selectedMonth, onChanged: selectMonth),
+            ],
 
             const SizedBox(height: 24),
 
@@ -60,8 +84,10 @@ class AllSalesScreenWrapper extends ConsumerWidget {
             salesState.when(
               data: (sales) {
                 if (sales.isEmpty) {
-                  return const Center(
-                    child: Text("No hay ventas registradas."),
+                  return Center(
+                    child: Text(
+                      "No hay ventas registradas en ${selectedMonth.monthYearLabel}.",
+                    ),
                   );
                 }
 

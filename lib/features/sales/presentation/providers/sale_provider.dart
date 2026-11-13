@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:gestion_integral_jyc/core/domain/services/analytics_service.dart';
 import 'package:gestion_integral_jyc/core/enums/payment_method.dart';
+import 'package:gestion_integral_jyc/core/presentation/extensions/date_formatting.dart';
 import 'package:gestion_integral_jyc/core/presentation/providers/analytics_provider.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/providers/product_provider.dart';
 import 'package:gestion_integral_jyc/features/inventory/presentation/providers/raw_material_provider.dart';
@@ -11,6 +12,7 @@ import 'package:gestion_integral_jyc/features/sales/data/repositories/sale_repos
 import 'package:gestion_integral_jyc/features/sales/domain/entities/discount_entity.dart';
 import 'package:gestion_integral_jyc/features/sales/domain/entities/sale_entity.dart';
 import 'package:gestion_integral_jyc/features/sales/domain/repositories/sale_repository.dart';
+import 'package:gestion_integral_jyc/features/sales/presentation/providers/sale_filter_providers.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 final saleDataSourceProvider = Provider<SaleRemoteDataSource>((ref) {
@@ -30,19 +32,36 @@ final saleRepositoryProvider = Provider<SaleRepository>((ref) {
 
 final saleProvider =
     StateNotifierProvider<SaleNotifier, AsyncValue<List<SaleEntity>>>((ref) {
+      final month = ref.watch(saleMonthFilterProvider);
       return SaleNotifier(
+        month: month,
         repository: ref.read(saleRepositoryProvider),
         ref: ref,
         analytics: ref.read(analyticsProvider),
       );
     });
 
+final currentMonthSalesFetchProvider = FutureProvider<List<SaleEntity>>((ref) {
+  return ref.read(saleRepositoryProvider).getSales(currentMonthStart());
+});
+
+final currentMonthSalesProvider = Provider<AsyncValue<List<SaleEntity>>>((ref) {
+  final selected = ref.watch(saleMonthFilterProvider);
+  if (selected.isSameMonth(DateTime.now())) {
+    return ref.watch(saleProvider);
+  }
+  return ref.watch(currentMonthSalesFetchProvider);
+});
+
 class SaleNotifier extends StateNotifier<AsyncValue<List<SaleEntity>>> {
   final SaleRepository repository;
   final AnalyticsService analytics;
   final Ref ref;
 
+  final DateTime month;
+
   SaleNotifier({
+    required this.month,
     required this.repository,
     required this.analytics,
     required this.ref,
@@ -53,8 +72,12 @@ class SaleNotifier extends StateNotifier<AsyncValue<List<SaleEntity>>> {
   Future<void> fetchSales() async {
     try {
       state = const AsyncValue.loading();
-      final sales = await repository.getSales();
+      final sales = await repository.getSales(month);
       state = AsyncValue.data(sales);
+
+      if (!month.isSameMonth(DateTime.now())) {
+        ref.invalidate(currentMonthSalesFetchProvider);
+      }
     } catch (e, stack) {
       state = AsyncValue.error(e, stack);
     }

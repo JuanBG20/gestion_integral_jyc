@@ -6,14 +6,17 @@ class MpMovementRemoteDataSource {
 
   MpMovementRemoteDataSource(this.supabaseClient);
 
-  // Ultimos 25 movimientos
-  Future<List<MpMovementModel>> getMovements() async {
+  Future<List<MpMovementModel>> getMovements({
+    required DateTime from,
+    required DateTime to,
+  }) async {
     try {
       final response = await supabaseClient
           .from('movimiento_mp')
           .select('*, mp_venta(venta)')
-          .order('fecha', ascending: false)
-          .limit(25);
+          .gte('fecha', from.toUtc().toIso8601String())
+          .lt('fecha', to.toUtc().toIso8601String())
+          .order('fecha', ascending: false);
 
       return (response as List<dynamic>)
           .map((json) => MpMovementModel.fromJson(json as Map<String, dynamic>))

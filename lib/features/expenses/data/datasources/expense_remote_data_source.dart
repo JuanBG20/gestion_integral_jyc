@@ -49,7 +49,7 @@ class ExpenseRemoteDataSource {
       query = query.gte('fecha_emision', startDate.toUtc().toIso8601String());
     }
     if (endDate != null) {
-      query = query.lte('fecha_emision', endDate.toUtc().toIso8601String());
+      query = query.lt('fecha_emision', endDate.toUtc().toIso8601String());
     }
     if (status != null) {
       query = query.eq('estado_pago', status.dbValue);

@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:gestion_integral_jyc/core/domain/services/analytics_service.dart';
 import 'package:gestion_integral_jyc/core/enums/expense_payment_status.dart';
+import 'package:gestion_integral_jyc/core/presentation/extensions/date_formatting.dart';
 import 'package:gestion_integral_jyc/core/presentation/providers/analytics_provider.dart';
 import 'package:gestion_integral_jyc/features/expenses/data/datasources/expense_remote_data_source.dart';
 import 'package:gestion_integral_jyc/features/expenses/data/repositories/expense_category_repository_impl.dart';
@@ -149,11 +150,17 @@ class ExpenseTemplateNotifier
 
 // --- PROVIDER DE GASTOS ---
 
+final expenseMonthProvider = StateProvider<DateTime>(
+  (ref) => currentMonthStart(),
+);
+
 final expenseProvider =
     StateNotifierProvider<ExpenseNotifier, AsyncValue<List<ExpenseEntity>>>((
       ref,
     ) {
+      final month = ref.watch(expenseMonthProvider);
       return ExpenseNotifier(
+        month: month,
         repository: ref.read(expenseRepositoryProvider),
         analytics: ref.read(analyticsProvider),
         ref: ref,
@@ -165,7 +172,10 @@ class ExpenseNotifier extends StateNotifier<AsyncValue<List<ExpenseEntity>>> {
   final AnalyticsService analytics;
   final Ref ref;
 
+  final DateTime month;
+
   ExpenseNotifier({
+    required this.month,
     required this.repository,
     required this.analytics,
     required this.ref,
@@ -181,8 +191,8 @@ class ExpenseNotifier extends StateNotifier<AsyncValue<List<ExpenseEntity>>> {
     try {
       state = const AsyncValue.loading();
       final expenses = await repository.getExpenses(
-        startDate: startDate,
-        endDate: endDate,
+        startDate: startDate ?? month.monthStart,
+        endDate: endDate ?? month.nextMonthStart,
         status: status,
       );
       state = AsyncValue.data(expenses);

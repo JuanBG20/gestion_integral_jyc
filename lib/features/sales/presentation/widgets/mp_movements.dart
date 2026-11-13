@@ -5,6 +5,7 @@ import 'package:gestion_integral_jyc/core/enums/payment_method.dart';
 import 'package:gestion_integral_jyc/core/presentation/extensions/date_formatting.dart';
 import 'package:gestion_integral_jyc/core/presentation/providers/auth_provider.dart';
 import 'package:gestion_integral_jyc/core/presentation/widgets/app_action_menu.dart';
+import 'package:gestion_integral_jyc/core/presentation/widgets/month_selector.dart';
 import 'package:gestion_integral_jyc/core/theme/app_colors.dart';
 import 'package:gestion_integral_jyc/core/theme/theme_extensions.dart';
 import 'package:gestion_integral_jyc/features/clients/presentation/providers/client_provider.dart';
@@ -26,6 +27,8 @@ class MpMovements extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isPremium = ref.watch(subscriptionProvider).asData?.value ?? false;
     final accountState = ref.watch(mpAccountProvider);
+    final showMonthSelector =
+        isPremium && (accountState.asData?.value.isConnected ?? false);
 
     return Container(
       padding: const EdgeInsets.all(24),
@@ -37,7 +40,7 @@ class MpMovements extends ConsumerWidget {
 
       child: Column(
         children: [
-          _buildHeader(context, ref),
+          _buildHeader(context, ref, showMonthSelector: showMonthSelector),
 
           const SizedBox(height: 16),
 
@@ -75,7 +78,11 @@ class MpMovements extends ConsumerWidget {
     );
   }
 
-  Widget _buildHeader(BuildContext context, WidgetRef ref) {
+  Widget _buildHeader(
+    BuildContext context,
+    WidgetRef ref, {
+    required bool showMonthSelector,
+  }) {
     return Row(
       children: [
         Icon(Icons.sync, color: AppColors.primary),
@@ -86,8 +93,19 @@ class MpMovements extends ConsumerWidget {
           child: Text(
             "Movimientos Mercado Pago",
             style: context.textTheme.titleMedium,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
         ),
+
+        if (showMonthSelector) ...[
+          const SizedBox(width: 8),
+          MonthSelector(
+            selected: ref.watch(mpMovementMonthProvider),
+            onChanged: (month) =>
+                ref.read(mpMovementMonthProvider.notifier).state = month,
+          ),
+        ],
 
         /* Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -147,19 +165,15 @@ class MpMovements extends ConsumerWidget {
     if (movements.isEmpty) {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 24),
-        child: Center(child: Text("No hay movimientos recientes.")),
+        child: Center(child: Text("No hay movimientos en este mes.")),
       );
     }
 
-    return ListView.separated(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
+    return _IncrementalList(
+      key: ValueKey(ref.watch(mpMovementMonthProvider)),
       itemCount: movements.length,
-      separatorBuilder: (context, index) => const SizedBox(height: 12),
-      itemBuilder: (context, index) {
-        final movement = movements[index];
-        return _buildMovementItem(context, ref, movement);
-      },
+      itemBuilder: (context, index) =>
+          _buildMovementItem(context, ref, movements[index]),
     );
   }
 
@@ -323,5 +337,53 @@ class MpMovements extends ConsumerWidget {
           );
         }
     }
+  }
+}
+
+class _IncrementalList extends StatefulWidget {
+  final int itemCount;
+  final IndexedWidgetBuilder itemBuilder;
+
+  const _IncrementalList({
+    super.key,
+    required this.itemCount,
+    required this.itemBuilder,
+  });
+
+  static const initialCount = 5;
+  static const step = 10;
+
+  @override
+  State<_IncrementalList> createState() => _IncrementalListState();
+}
+
+class _IncrementalListState extends State<_IncrementalList> {
+  int _visible = _IncrementalList.initialCount;
+
+  @override
+  Widget build(BuildContext context) {
+    final shown = widget.itemCount < _visible ? widget.itemCount : _visible;
+    final remaining = widget.itemCount - shown;
+
+    return Column(
+      children: [
+        ListView.separated(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: shown,
+          separatorBuilder: (context, index) => const SizedBox(height: 12),
+          itemBuilder: widget.itemBuilder,
+        ),
+
+        if (remaining > 0) ...[
+          const SizedBox(height: 12),
+          TextButton.icon(
+            onPressed: () => setState(() => _visible += _IncrementalList.step),
+            icon: const Icon(Icons.expand_more),
+            label: Text("Mostrar más ($remaining restantes)"),
+          ),
+        ],
+      ],
+    );
   }
 }
